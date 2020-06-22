@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".ComingSoonActivity">
+
+    <com.airbnb.lottie.LottieAnimationView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:lottie_loop="true"
+        android:layout_margin="32dp"
+        app:lottie_rawRes="@raw/money"
+        app:lottie_autoPlay="true"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <ImageView
+            android:id="@+id/imageView8"
+            android:layout_width="wrap_content"
+            android:layout_height="100dp"
+            android:layout_weight="1"
+            android:scaleType="centerCrop"
+            android:padding="24dp"
+            app:srcCompat="@drawable/dd_full" />
+
+        <TextView
+            android:id="@+id/textView14"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Launching on '01 July 2020'"
+            android:textColor="@color/colorTextTitle"
+            android:gravity="center"
+            android:textSize="20sp"
+            android:fontFamily="@font/montserrat_bold"/>
+
+    </LinearLayout>
+
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:layout_gravity="bottom"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tvCount"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/montserrat_bold"
+            android:textColor="@color/colorTextTitle"
+            android:textSize="40dp"
+            android:gravity="center"
+            android:text="loading..."/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/montserrat"
+            android:gravity="center"
+            android:textColor="@color/colorTextTitle"
+            android:text="peoples have joined the 'boycott china' movement"/>
+
+        <TextView
+            android:id="@+id/tvJoin"
+            android:layout_width="match_parent"
+            android:layout_height="45dp"
+            android:background="@drawable/bg_button_gradient"
+            android:fontFamily="@font/montserrat_bold"
+            android:text="Join me in"
+            android:textColor="@color/colorAccentV1"
+            android:textSize="18dp"
+            android:gravity="center"
+            android:visibility="visible"
+            android:layout_marginTop="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"/>
+
+        <TextView
+            android:id="@+id/tvLogout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/montserrat_bold"
+            android:gravity="center"
+            android:layout_marginTop="16dp"
+            android:visibility="visible"
+            android:textColor="@color/colorTextTitle"
+            android:text="Logout"/>
+
+
+    </LinearLayout>
+
+</FrameLayout>

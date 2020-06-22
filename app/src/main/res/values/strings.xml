@@ -1,0 +1,21 @@
+<resources>
+    <string name="app_name">DingDong</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="home">Home</string>
+    <string name="discover">Discover</string>
+    <string name="notification">Notification</string>
+    <string name="profile">Profile</string>
+    <string name="create_video">Create Video</string>
+    <string name="following">Following</string>
+    <string name="follow">Follow</string>
+    <string name="followers">Followers</string>
+    <string name="settings">Settings</string>
+    <string name="passbook">Passbook</string>
+    <string name="add_bio">Add bio</string>
+    <string name="edit_profile">Edit Profile</string>
+    <string name="logout">Logout</string>
+    <string name="subscription">Subscription</string>
+    <string name="banks">Banks</string>
+</resources>

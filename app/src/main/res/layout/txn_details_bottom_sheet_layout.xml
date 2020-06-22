@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/colorPrimaryDarkV3"
+    android:id="@+id/lvTxnDetails"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp">
+
+        <TextView
+            android:id="@+id/textView10"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/colorTextTitle"
+            android:fontFamily="@font/montserrat_bold"
+            android:textSize="18sp"
+            android:layout_weight="1"
+            android:text="Transaction Details"/>
+
+        <ImageView
+            android:id="@+id/ivShare"
+            android:layout_width="50dp"
+            android:layout_height="match_parent"
+            android:padding="5dp"
+            app:srcCompat="@drawable/ic_dd_share_white"/>
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/tvRemark"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/montserrat"
+                android:layout_weight="1"
+                android:textSize="16sp"
+                android:layout_gravity="start"
+                android:textColor="@color/colorTextTitle" />
+
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:src="@drawable/coin" />
+
+            <TextView
+                android:id="@+id/tvAmount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:textSize="16sp"
+                android:fontFamily="@font/montserrat_bold"
+                android:textColor="@color/colorTextTitle" />
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tvTimeDate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/montserrat"
+            android:textSize="12sp"
+            android:textColor="@color/colorPrimaryDarkV2"/>
+
+        <LinearLayout
+            android:layout_marginTop="16dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Transaction ID:"
+                android:layout_weight="1"
+                android:fontFamily="@font/montserrat"
+                android:textColor="@color/colorAccentV1"/>
+
+            <TextView
+                android:id="@+id/tvId"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/montserrat"
+                android:textColor="@color/colorAccentV1"/>
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Status:"
+                android:layout_weight="1"
+                android:fontFamily="@font/montserrat"
+                android:textColor="@color/colorAccentV1"/>
+
+            <ImageView
+                android:id="@+id/ivStatus"
+                android:layout_width="15dp"
+                android:layout_height="15dp"
+                android:layout_marginEnd="4dp"
+                android:padding="2dp" />
+
+            <TextView
+                android:id="@+id/tvStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/montserrat"
+                android:textColor="@color/colorAccentV1"/>
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_marginTop="24dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Paid Using"
+                android:textSize="10sp"
+                android:fontFamily="@font/montserrat"
+                android:textColor="@color/colorAccentV1"
+                android:gravity="center"/>
+
+            <ImageView
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:src="@drawable/dingdong_placeholder"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+
+</LinearLayout>

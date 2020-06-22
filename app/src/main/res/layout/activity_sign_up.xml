@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:focusableInTouchMode="true"
+    tools:context=".auth.SignUpActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/ivGoBack"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_gravity="center_vertical|start"
+                android:layout_marginStart="16dp"
+                app:srcCompat="@drawable/ic_dd_back_white" />
+
+        </FrameLayout>
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:indeterminateTint="@color/colorAccentV1"
+            android:visibility="invisible"
+            android:indeterminate="true"/>
+
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/tvSignUpTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/montserrat_bold"
+        android:text="Create account"
+        android:layout_marginTop="8dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:textSize="25sp"
+        android:textColor="@color/colorAccentV1" />
+
+    <EditText
+        android:id="@+id/etName"
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:background="@drawable/bg_edittext"
+        android:fontFamily="@font/montserrat_bold"
+        android:hint="Full Name"
+        android:textSize="16sp"
+        android:autofillHints="password"
+        android:inputType="textPersonName|none"
+        android:gravity="center_vertical"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"/>
+
+    <EditText
+        android:id="@+id/etEmail"
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:background="@drawable/bg_edittext"
+        android:fontFamily="@font/montserrat_bold"
+        android:hint="Email"
+        android:textSize="16sp"
+        android:autofillHints="password"
+        android:inputType="textEmailAddress|none"
+        android:gravity="center_vertical"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"/>
+
+    <EditText
+        android:id="@+id/etPassword"
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:background="@drawable/bg_edittext"
+        android:fontFamily="@font/montserrat_bold"
+        android:hint="Password"
+        android:textSize="16sp"
+        android:autofillHints="password"
+        android:inputType="textPassword|none"
+        android:gravity="center_vertical"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"/>
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/colorAccentV1"
+        android:layout_margin="16dp"
+        android:fontFamily="@font/montserrat"
+        android:gravity="center"
+        android:text="By signing up you agree to our Terms of Use and Privacy Policy" />
+
+    <TextView
+        android:id="@+id/tvSignUp"
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:background="@drawable/bg_button_gradient"
+        android:fontFamily="@font/montserrat_bold"
+        android:text="Sign up"
+        android:textColor="@color/colorAccentV1"
+        android:textSize="18sp"
+        android:gravity="center"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/lhLogin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="24dp"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/colorPrimaryDarkV2"
+            android:fontFamily="@font/montserrat"
+            android:layout_marginEnd="8dp"
+            android:text="Already have account?" />
+
+        <TextView
+            android:id="@+id/textView3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/colorTextTitle"
+            android:fontFamily="@font/montserrat"
+            android:text="Log in" />
+    </LinearLayout>
+
+</LinearLayout>

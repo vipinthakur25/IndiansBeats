@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@color/colorPrimary"
+    android:gravity="center">
+
+    <ImageView
+        android:id="@+id/ivClose"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:srcCompat="@drawable/ic_dd_close_white"
+        android:layout_gravity="end"
+        android:layout_margin="8dp"/>
+
+    <ImageView
+        android:id="@+id/ivLightBox"
+        android:layout_width="250dp"
+        android:layout_height="300dp"
+        app:srcCompat="@drawable/dingdong_placeholder" />
+</FrameLayout>

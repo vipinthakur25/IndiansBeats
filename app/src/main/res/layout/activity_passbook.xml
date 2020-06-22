@@ -1,0 +1,366 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:focusableInTouchMode="true"
+    tools:context=".modules.passbook.PassbookActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/ivGoBack"
+                android:layout_width="50dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="center_vertical|start"
+                android:padding="14dp"
+                app:srcCompat="@drawable/ic_dd_back_white" />
+
+            <TextView
+                android:id="@+id/tvName"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:fontFamily="@font/montserrat_bold"
+                android:gravity="center"
+                android:text="@string/passbook"
+                android:textColor="@color/colorTextTitle"
+                android:textSize="16sp" />
+
+        </FrameLayout>
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:indeterminate="true"/>
+
+    </LinearLayout>
+
+    <ru.noties.scrollable.ScrollableLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:scrollable_autoMaxScroll="true"
+        app:scrollable_defaultCloseUp="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/bg_gradient_no_corner"
+            android:padding="16dp"
+            android:gravity="center">
+
+            <LinearLayout
+                android:id="@+id/lhCoins"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:id="@+id/imageView7"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_weight="1"
+                    android:layout_gravity="center"
+                    app:srcCompat="@drawable/coin" />
+
+                <TextView
+                    android:id="@+id/tvTotalCoins"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_weight="1"
+                    android:fontFamily="@font/montserrat_bold"
+                    android:textColor="@color/colorTextTitle"
+                    android:textSize="40sp" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/textView8"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:fontFamily="@font/montserrat"
+                android:textColor="@color/colorTextTitle"
+                android:text="Total Coins" />
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:padding="8dp">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:layout_width="25dp"
+                            android:layout_height="25dp"
+                            android:layout_weight="1"
+                            android:layout_gravity="center"
+                            app:srcCompat="@drawable/coin" />
+
+                        <TextView
+                            android:id="@+id/tvReservedCoins"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:textSize="18sp"
+                            android:layout_marginStart="8dp"
+                            android:fontFamily="@font/montserrat_bold"
+                            android:textColor="@color/colorTextTitle" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/montserrat"
+                        android:gravity="center"
+                        android:text="Reserved Coins"
+                        android:textColor="@color/colorAccentV1" />
+                </LinearLayout>
+
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="30dp"
+                    android:layout_gravity="center_vertical"
+                    android:background="@color/colorAccentV1" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:padding="8dp">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:layout_width="25dp"
+                            android:layout_height="25dp"
+                            android:layout_weight="1"
+                            android:layout_gravity="center"
+                            app:srcCompat="@drawable/coin" />
+
+                        <TextView
+                            android:id="@+id/tvUnReservedCoins"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:textSize="18sp"
+                            android:layout_marginStart="8dp"
+                            android:fontFamily="@font/montserrat_bold"
+                            android:textColor="@color/colorTextTitle" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/montserrat"
+                        android:gravity="center"
+                        android:text="Unreserved Coins"
+                        android:textColor="@color/colorAccentV1" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:id="@+id/lvFollowing"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:padding="8dp">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:layout_width="25dp"
+                            android:layout_height="25dp"
+                            android:layout_weight="1"
+                            android:layout_gravity="center"
+                            app:srcCompat="@drawable/coin" />
+
+                        <TextView
+                            android:id="@+id/tvCashbackCoin"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:textSize="18sp"
+                            android:layout_marginStart="8dp"
+                            android:fontFamily="@font/montserrat_bold"
+                            android:textColor="@color/colorTextTitle" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/montserrat"
+                        android:gravity="center"
+                        android:text="Cashback Coins"
+                        android:textColor="@color/colorAccentV1" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="80dp"
+                android:layout_marginTop="16dp"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:id="@+id/lvBuyCoins"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        app:srcCompat="@drawable/coin" />
+
+                    <TextView
+                        android:id="@+id/textView9"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/montserrat"
+                        android:gravity="center"
+                        android:layout_marginTop="8dp"
+                        android:textColor="@color/colorTextTitle"
+                        android:text="Buy Coins" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        app:srcCompat="@drawable/ic_dd_circle_up_white" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/montserrat"
+                        android:gravity="center"
+                        android:layout_marginTop="8dp"
+                        android:textColor="@color/colorTextTitle"
+                        android:text="Payouts" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/lvBanks"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        app:srcCompat="@drawable/ic_dd_pie_white" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/montserrat"
+                        android:gravity="center"
+                        android:layout_marginTop="8dp"
+                        android:textColor="@color/colorTextTitle"
+                        android:text="Banks" />
+                </LinearLayout>
+
+
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+
+
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/passbookTab"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:tabIconTint="@color/colorAccentV1"
+            app:tabMode="scrollable"
+            app:tabIndicatorColor="@color/colorGradientStart"
+            app:tabTextAppearance="@style/DingDongTabLayout">
+
+            <com.google.android.material.tabs.TabItem
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Reserved Coins" />
+
+            <com.google.android.material.tabs.TabItem
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Unreserved Coins" />
+
+            <com.google.android.material.tabs.TabItem
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Cashback Coins" />
+
+        </com.google.android.material.tabs.TabLayout>
+
+        <androidx.viewpager.widget.ViewPager
+            android:id="@+id/passbookPager"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+
+    </ru.noties.scrollable.ScrollableLayout>
+
+
+
+
+</LinearLayout>

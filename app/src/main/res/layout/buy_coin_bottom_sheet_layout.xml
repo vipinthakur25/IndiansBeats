@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:focusableInTouchMode="true"
+    android:background="@color/colorPrimaryDarkV3"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:id="@+id/lvTxn"
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:padding="16dp"
+        android:orientation="vertical">
+
+        <ImageView
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            app:srcCompat="@drawable/ic_dd_check_mark_white"/>
+
+
+        <TextView
+            android:id="@+id/tvTxnStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Transaction Successful"
+            android:gravity="center"
+            android:textSize="16sp"
+            android:fontFamily="@font/montserrat_bold"
+            android:textColor="@color/colorTextTitle"/>
+
+        <TextView
+            android:id="@+id/tvTxnTime"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textSize="10sp"
+            android:fontFamily="@font/montserrat"
+            android:textColor="@color/colorTextTitle"/>
+
+
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:id="@+id/lvBuyCoin"
+        android:visibility="visible"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="24dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginStart="16dp"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:layout_marginEnd="16dp">
+
+            <ImageView
+                android:id="@+id/imageView9"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+
+                android:layout_marginEnd="8dp"
+                app:srcCompat="@drawable/coin" />
+
+            <TextView
+                android:id="@+id/tvLoginTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/montserrat_bold"
+                android:text="Buy Coins"
+                android:textSize="18sp"
+                android:textColor="@color/colorAccentV1" />
+
+        </LinearLayout>
+
+
+
+
+        <EditText
+            android:id="@+id/etCoins"
+            android:layout_width="match_parent"
+            android:layout_height="45dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:background="@drawable/bg_edittext"
+            android:fontFamily="@font/montserrat_bold"
+            android:gravity="center_vertical"
+            android:hint="Coins"
+            android:inputType="number|none"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:textSize="16dp" />
+
+        <TextView
+            android:id="@+id/tvBuyNow"
+            android:layout_width="match_parent"
+            android:layout_height="45dp"
+            android:background="@drawable/bg_button_gradient"
+            android:fontFamily="@font/montserrat_bold"
+            android:text="Buy Now"
+            android:textColor="@color/colorTextTitle"
+            android:textSize="18dp"
+            android:gravity="center"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"/>
+
+        <TextView
+            android:id="@+id/tvSubscription"
+            android:layout_width="match_parent"
+            android:layout_height="18dp"
+            android:gravity="center"
+            android:textColor="@color/colorGradientStart"
+            android:fontFamily="@font/montserrat"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="32dp"
+            android:text="Show subscription plans" />
+
+    </LinearLayout>
+
+
+
+</LinearLayout>

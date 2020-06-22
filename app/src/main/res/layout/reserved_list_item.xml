@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:backgroundTint="@color/colorPrimaryDarkV3"
+    android:id="@+id/cardTransaction"
+    app:cardCornerRadius="10dp">
+
+    <LinearLayout
+        android:id="@+id/lhSubs"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_marginTop="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:gravity="start|center"
+                android:layout_weight="1"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_gravity="center"
+                    app:srcCompat="@drawable/coin" />
+
+                <TextView
+                    android:id="@+id/tvAmount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="16sp"
+                    android:layout_marginStart="8dp"
+                    android:fontFamily="@font/montserrat_bold"
+                    android:textColor="@color/colorTextTitle"
+                    android:text="+83" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tvRemark"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:fontFamily="@font/montserrat"
+                android:gravity="center"
+                android:textSize="12sp"
+                android:text="Video Reward"
+                android:textColor="@color/colorAccentV1" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="16dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/tvTimeDate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/montserrat"
+                android:text="01:32 AM ~ 09 June 2020"
+                android:textSize="12sp"
+                android:textColor="@color/colorAccentV1" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="end"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:id="@+id/ivPending"
+                    android:layout_width="15dp"
+                    android:layout_height="15dp"
+                    android:layout_marginEnd="4dp"
+                    android:padding="2dp"
+                    app:srcCompat="@drawable/ic_dd_check_mark_white"
+                   android:background="@drawable/bg_red_circle"/>
+
+                <ImageView
+                    android:id="@+id/ivProcessing"
+                    android:layout_width="15dp"
+                    android:layout_height="15dp"
+                    android:layout_marginEnd="4dp"
+                    android:padding="2dp"
+                    android:background="@drawable/bg_yellow_circle"/>
+
+                <ImageView
+                    android:id="@+id/ivDone"
+                    android:layout_width="15dp"
+                    android:layout_height="15dp"
+                    android:padding="2dp"
+                    android:background="@drawable/bg_green_circle" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>

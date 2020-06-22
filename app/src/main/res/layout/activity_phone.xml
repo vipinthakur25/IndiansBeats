@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:focusableInTouchMode="true"
+    android:id="@+id/lvPhone"
+    tools:context=".auth.PhoneActivity">
+
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="invisible"
+        android:indeterminate="true" />
+
+    <TextView
+        android:id="@+id/tvLoginTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/montserrat_bold"
+        android:text="Log in"
+        android:layout_marginTop="24dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:textSize="25sp"
+        android:textColor="@color/colorAccentV1" />
+
+    <TextView
+        android:id="@+id/tvLoginDesc"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/montserrat"
+        android:text="Please enter you phone number to watch fresh video content"
+        android:layout_marginTop="8dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:textSize="16dp"
+        android:textColor="@color/colorAccentV1" />
+    
+    <EditText
+        android:id="@+id/etPhoneNumber"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:background="@drawable/bg_edittext"
+        android:fontFamily="@font/montserrat_bold"
+        android:hint="Phone Number"
+        android:maxLength="10"
+        android:autofillHints="password"
+        android:inputType="phone|none"
+        android:gravity="center_vertical"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"/>
+
+
+    <TextView
+        android:id="@+id/tvSendOtp"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:background="@drawable/bg_button_gradient"
+        android:fontFamily="@font/montserrat_bold"
+        android:text="Send me code"
+        android:textColor="@color/colorAccentV1"
+        android:textSize="18sp"
+        android:gravity="center"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"/>
+
+
+</LinearLayout>

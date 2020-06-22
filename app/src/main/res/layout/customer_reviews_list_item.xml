@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="250dp"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:id="@+id/lvRating"
+    android:padding="8dp">
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/ivPhoto"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginBottom="8dp"
+        android:src="@drawable/sid" />
+
+    <TextView
+        android:id="@+id/tvName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Customer Name"
+        android:gravity="center"
+        android:layout_marginBottom="16dp"
+        android:textColor="@color/colorTextTitle"
+        android:fontFamily="@font/montserrat_bold"/>
+
+    <RatingBar
+        android:id="@+id/barRating"
+        style="@style/Widget.AppCompat.RatingBar.Small"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:rating="4.5"
+        android:stepSize="0.5"
+        android:theme="@style/RatingBar" />
+
+    <TextView
+        android:id="@+id/tvReview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/montserrat"
+        android:gravity="center"
+        android:padding="8dp"
+        android:text="Wonderful application of entertainment and nice way to earn lots of money."
+        android:textColor="@color/colorTextTitle" />
+
+</LinearLayout>
