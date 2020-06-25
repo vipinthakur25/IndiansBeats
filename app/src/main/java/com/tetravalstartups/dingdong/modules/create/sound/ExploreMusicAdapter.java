@@ -1,8 +1,8 @@
 package com.tetravalstartups.dingdong.modules.create.sound;
 
 import android.content.Context;
-import android.media.AudioManager;
-import android.media.MediaPlayer;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,20 +11,22 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.tetravalstartups.dingdong.R;
+import com.tetravalstartups.dingdong.utils.MediaPlayerUtils;
 
+import java.io.IOException;
 import java.util.List;
 
-public class ExploreMusicAdapter extends RecyclerView.Adapter<ExploreMusicAdapter.ViewHolder> {
+public class ExploreMusicAdapter extends RecyclerView.Adapter<ExploreMusicAdapter.ViewHolder>{
 
     Context context;
     List<Music> musicList;
-    int state = 0;
-    MediaPlayer mediaPlayer;
-
+    SharedPreferences preferences;
+    int row_index = -1;
 
     public ExploreMusicAdapter(Context context, List<Music> musicList) {
         this.context = context;
@@ -34,9 +36,8 @@ public class ExploreMusicAdapter extends RecyclerView.Adapter<ExploreMusicAdapte
     @NonNull
     @Override
     public ExploreMusicAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.music_list_item, parent, false);
-        mediaPlayer = new MediaPlayer();
-        mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.sounds_list_item, parent, false);
+        preferences = context.getSharedPreferences("selected_sound", 0);
         return new ViewHolder(view);
     }
 
@@ -47,35 +48,75 @@ public class ExploreMusicAdapter extends RecyclerView.Adapter<ExploreMusicAdapte
         holder.tvArtist.setText(music.getArtist());
         holder.tvDuration.setText(music.getDuration());
 
-        Glide.with(context).load(music.getBanner()).placeholder(R.drawable.dingdong_placeholder).into(holder.ivMusicBanner);
-
-        if (music.isFavorite()){
-            holder.ivFav.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_dd_liked_video_active));
+        if (music.getBanner().isEmpty()) {
+            holder.ivMusicBanner.setImageDrawable(context.getResources()
+                    .getDrawable(R.drawable.dd_logo_placeholder));
         } else {
-            holder.ivFav.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_dd_liked_video_inactive));
+            Glide.with(context).load(music.getBanner())
+                    .placeholder(R.drawable.dd_logo_placeholder)
+                    .into(holder.ivMusicBanner);
         }
 
-        if (music.getBanner().isEmpty()){
-            holder.ivMusicBanner.setImageDrawable(context.getResources().getDrawable(R.drawable.dingdong_placeholder));
-        }
-
-        if (music.getArtist().isEmpty()){
+        if (music.getArtist().isEmpty()) {
             holder.tvArtist.setText("Unknown");
         }
 
-        holder.ivPlayPause.setOnClickListener(new View.OnClickListener() {
+        holder.lhMusic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                row_index = position;
+                notifyDataSetChanged();
+
+                MediaPlayerUtils.getInstance();
+                if (MediaPlayerUtils.isPlaying()){
+                    holder.ivPlayPause.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_dd_music_play_white));
+                    MediaPlayerUtils.pauseMediaPlayer();
+                    MediaPlayerUtils.releaseMediaPlayer();
+                }
+
+                try {
+
+                    holder.ivPlayPause.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_dd_music_pause_white));
+
+                    MediaPlayerUtils.startAndPlayMediaPlayer(music.getMedia(), new MediaPlayerUtils.Listener() {
+                        @Override
+                        public void onAudioComplete() {
+                            holder.ivPlayPause.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_dd_music_play_white));
+                        }
+
+                        @Override
+                        public void onAudioUpdate(int currentPosition) {
+                        }
+                    });
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
 
             }
         });
 
-        holder.ivAdd.setOnClickListener(new View.OnClickListener() {
+        holder.lhUseSound.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                Editor editor = preferences.edit();
+                editor.putString("sound_url", music.getMedia());
+                editor.putString("sound_name", music.getName());
+                editor.apply();
+                ((SoundActivity)context).finish();
             }
         });
+
+
+        if(row_index==position){
+            holder.ivPlayPause.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_dd_music_pause_white));
+            holder.lhUseSound.setVisibility(View.VISIBLE);
+        }
+        else
+        {
+            holder.ivPlayPause.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_dd_music_play_white));
+            holder.lhUseSound.setVisibility(View.GONE);
+        }
 
     }
 
@@ -86,10 +127,11 @@ public class ExploreMusicAdapter extends RecyclerView.Adapter<ExploreMusicAdapte
 
     public class ViewHolder extends RecyclerView.ViewHolder {
 
-        LinearLayout lhMusic;
+        LinearLayout lhMusic, lhUseSound;
         ImageView ivPlayPause, ivMusicBanner;
         TextView tvName, tvArtist, tvDuration;
-        ImageView ivFav, ivAdd;
+        ImageView ivFav;
+        CardView cardSound;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -101,7 +143,8 @@ public class ExploreMusicAdapter extends RecyclerView.Adapter<ExploreMusicAdapte
             tvArtist = itemView.findViewById(R.id.tvArtist);
             tvDuration = itemView.findViewById(R.id.tvDuration);
             ivFav = itemView.findViewById(R.id.ivFav);
-            ivAdd = itemView.findViewById(R.id.ivAdd);
+            cardSound = itemView.findViewById(R.id.cardSound);
+            lhUseSound = itemView.findViewById(R.id.lhUseSound);
 
         }
     }

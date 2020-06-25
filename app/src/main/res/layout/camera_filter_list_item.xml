@@ -8,12 +8,12 @@
     android:orientation="vertical">
 
 
-    <ImageView
+    <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/ivFilterEffect"
         android:layout_width="match_parent"
         android:layout_height="70dp"
         android:scaleType="centerCrop"
-        app:srcCompat="@drawable/emma" />
+        android:src="@drawable/emma" />
 
     <TextView
         android:id="@+id/tvFilterName"
@@ -22,7 +22,6 @@
         android:layout_gravity="center"
         android:fontFamily="@font/montserrat"
         android:textColor="@color/colorTextTitle"
-        android:background="@drawable/bg_button_gradient"
         android:layout_marginTop="4dp"
         android:gravity="center"
         android:text="DOC" />

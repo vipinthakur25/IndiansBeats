@@ -9,26 +9,24 @@ public class Music implements Parcelable {
     private String cat_id;
     private String cat_name;
     private String media;
-    private String banner;
     private String name;
     private String artist;
     private String duration;
-    private boolean favorite;
-    private int status;
+    private String banner;
+    private String status;
 
     public Music() {
     }
 
-    public Music(String id, String cat_id, String cat_name, String media, String banner, String name, String artist, String duration, boolean favorite, int status) {
+    public Music(String id, String cat_id, String cat_name, String media, String name, String artist, String duration, String banner, String status) {
         this.id = id;
         this.cat_id = cat_id;
         this.cat_name = cat_name;
         this.media = media;
-        this.banner = banner;
         this.name = name;
         this.artist = artist;
         this.duration = duration;
-        this.favorite = favorite;
+        this.banner = banner;
         this.status = status;
     }
 
@@ -37,12 +35,11 @@ public class Music implements Parcelable {
         cat_id = in.readString();
         cat_name = in.readString();
         media = in.readString();
-        banner = in.readString();
         name = in.readString();
         artist = in.readString();
         duration = in.readString();
-        favorite = in.readByte() != 0;
-        status = in.readInt();
+        banner = in.readString();
+        status = in.readString();
     }
 
     public static final Creator<Music> CREATOR = new Creator<Music>() {
@@ -89,14 +86,6 @@ public class Music implements Parcelable {
         this.media = media;
     }
 
-    public String getBanner() {
-        return banner;
-    }
-
-    public void setBanner(String banner) {
-        this.banner = banner;
-    }
-
     public String getName() {
         return name;
     }
@@ -121,19 +110,19 @@ public class Music implements Parcelable {
         this.duration = duration;
     }
 
-    public boolean isFavorite() {
-        return favorite;
+    public String getBanner() {
+        return banner;
     }
 
-    public void setFavorite(boolean favorite) {
-        this.favorite = favorite;
+    public void setBanner(String banner) {
+        this.banner = banner;
     }
 
-    public int getStatus() {
+    public String getStatus() {
         return status;
     }
 
-    public void setStatus(int status) {
+    public void setStatus(String status) {
         this.status = status;
     }
 
@@ -148,11 +137,10 @@ public class Music implements Parcelable {
         dest.writeString(cat_id);
         dest.writeString(cat_name);
         dest.writeString(media);
-        dest.writeString(banner);
         dest.writeString(name);
         dest.writeString(artist);
         dest.writeString(duration);
-        dest.writeByte((byte) (favorite ? 1 : 0));
-        dest.writeInt(status);
+        dest.writeString(banner);
+        dest.writeString(status);
     }
 }

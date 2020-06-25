@@ -7,12 +7,15 @@ import androidx.fragment.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.cloudinary.android.MediaManager;
 import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
 import com.google.firebase.auth.FirebaseAuth;
@@ -47,14 +50,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private TextView tvNotification;
     private TextView tvProfile;
 
-
-//    final Fragment homeFragment = new HomeFragment();
-//    final Fragment searchFragment = new SearchFragment();
-//    final Fragment notificationFragment = new NotificationFragment();
-//    final Fragment profileFragment = new ProfileFragment();
-//    final FragmentManager fm = getSupportFragmentManager();
-//    Fragment active = homeFragment;
-
     private FirebaseFirestore db;
     private FirebaseAuth auth;
 
@@ -63,6 +58,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_main);
         initView();
     }
@@ -91,10 +89,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         lvNotification.setOnClickListener(this);
         lvProfile.setOnClickListener(this);
 
-//        fm.beginTransaction().add(R.id.frameContent, profileFragment, "4").hide(profileFragment).commit();
-//        fm.beginTransaction().add(R.id.frameContent, notificationFragment, "3").hide(notificationFragment).commit();
-//        fm.beginTransaction().add(R.id.frameContent, searchFragment, "2").hide(searchFragment).commit();
-//        fm.beginTransaction().add(R.id.frameContent, homeFragment, "1").commit();
+        MediaManager.init(this);
 
         Glide.with(this).load(R.drawable.dd_create_video).into(ivCreate);
 
@@ -109,11 +104,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             String id = auth.getCurrentUser().getUid();
             getProfileData(id);
         }
-
-//        YoYo.with(Techniques.Bounce)
-//                .duration(2000)
-//                .repeat(YoYo.INFINITE)
-//                .playOn(ivCreate);
 
     }
 
@@ -172,9 +162,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         tvNotification.setTextColor(getResources().getColor(R.color.colorTextTitle));
         tvProfile.setTextColor(getResources().getColor(R.color.colorTextTitle));
 
-//        fm.beginTransaction().hide(active).show(homeFragment).commit();
-//        active = homeFragment;
-
     }
 
     private void switchSearch(){
@@ -187,9 +174,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         tvHome.setTextColor(getResources().getColor(R.color.colorTextTitle));
         tvNotification.setTextColor(getResources().getColor(R.color.colorTextTitle));
         tvProfile.setTextColor(getResources().getColor(R.color.colorTextTitle));
-
-//        fm.beginTransaction().hide(active).show(searchFragment).commit();
-//        active = searchFragment;
 
     }
 
@@ -224,9 +208,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             String id = auth.getCurrentUser().getUid();
             getProfileData(id);
         }
-
-//        fm.beginTransaction().hide(active).show(profileFragment).commit();
-//        active = profileFragment;
 
     }
 

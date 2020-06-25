@@ -13,6 +13,7 @@ import android.widget.Toast;
 
 import com.tetravalstartups.dingdong.R;
 import com.tetravalstartups.dingdong.utils.EqualSpacingItemDecoration;
+import com.tetravalstartups.dingdong.utils.MediaPlayerUtils;
 
 import java.util.List;
 
@@ -61,5 +62,15 @@ public class ExploreMusicFragment extends Fragment implements ExploreMusicPresen
     @Override
     public void musicFetchError(String error) {
         Toast.makeText(getContext(), ""+error, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        MediaPlayerUtils.getInstance();
+        if (MediaPlayerUtils.isPlaying()){
+            MediaPlayerUtils.pauseMediaPlayer();
+            MediaPlayerUtils.releaseMediaPlayer();
+        }
     }
 }

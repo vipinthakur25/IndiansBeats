@@ -1,4 +1,4 @@
-package com.tetravalstartups.dingdong.modules.create.sound;
+package com.tetravalstartups.dingdong.modules.home.video;
 
 import android.content.Context;
 
@@ -13,51 +13,43 @@ import com.google.firebase.firestore.QuerySnapshot;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ExploreMusicPresenter {
-    Context context;
-    IExploreMusic iExploreMusic;
+public class VideoPresenter {
 
+    private Context context;
+    private IVideo iVideo;
     private FirebaseFirestore db;
 
-    public ExploreMusicPresenter(Context context, IExploreMusic iExploreMusic) {
+    public VideoPresenter(Context context, IVideo iVideo) {
         this.context = context;
-        this.iExploreMusic = iExploreMusic;
+        this.iVideo = iVideo;
     }
 
-    public interface IExploreMusic {
+    public interface IVideo {
+        void fetchVideosSuccess(List<Video> videoList);
 
-        void musicFetchSuccess(List<Music> musicList);
-
-        void musicFetchError(String error);
-
+        void fetchVideosError(String error);
     }
 
-    public void fetchExploreMusic(){
+    public void fetchVideos(){
         db = FirebaseFirestore.getInstance();
-        List<Music> musicList = new ArrayList<>();
+        List<Video> videoList = new ArrayList<>();
 
-        db.collection("sounds")
+        db.collection("videos")
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(@Nullable QuerySnapshot documentSnapshots, @Nullable FirebaseFirestoreException e) {
                         if (documentSnapshots.getDocuments().isEmpty()){
-                            iExploreMusic.musicFetchError("No Sounds");
-
+                            iVideo.fetchVideosError("No Videos");
                         } else {
-                            musicList.clear();
                             for (DocumentSnapshot snapshot : documentSnapshots.getDocuments()){
-                                Music music = snapshot.toObject(Music.class);
-                                musicList.add(music);
+                                Video video = snapshot.toObject(Video.class);
+                                videoList.add(video);
                             }
 
-                            iExploreMusic.musicFetchSuccess(musicList);
-
+                            iVideo.fetchVideosSuccess(videoList);
                         }
                     }
                 });
-
     }
-
-
 
 }

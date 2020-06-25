@@ -63,5 +63,20 @@
         </LinearLayout>
     </LinearLayout>
 
+    <TextView
+        android:id="@+id/tvUpload"
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:background="@drawable/bg_button_gradient"
+        android:fontFamily="@font/montserrat_bold"
+        android:text="Upload Video"
+        android:layout_gravity="bottom"
+        android:textColor="@color/colorAccentV1"
+        android:textSize="18sp"
+        android:gravity="center"
+        android:layout_marginBottom="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"/>
+
 
 </FrameLayout>

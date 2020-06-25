@@ -4,6 +4,7 @@
     <color name="colorPrimaryDark">#11111C</color>
     <color name="colorPrimaryDarkV2">#808188</color>
     <color name="colorPrimaryDarkV3">#3F4042</color>
+    <color name="colorPrimaryDarkV4">#B1BACF</color>
     <color name="colorAccent">#11111C</color>
     <color name="colorAccentV1">#F7F7F8</color>
     <color name="colorTextTitle">#FFFFFF</color>
@@ -16,6 +17,9 @@
 
     <color name="colorSingleGrad">#8B27B0</color>
 
+    <color name="colorBrandYellow">#FFDD37</color>
+    <color name="colorBrandPink">#E05FB5</color>
+
     <color name="colorDisable">#AEA7A7</color>
     <color name="colorDisableText">#615A5A</color>
     <color name="colorGold">#FFD700</color>
@@ -24,5 +28,7 @@
     <color name="colorYellow">#F89B14</color>
     <color name="colorGreen">#5F9A1C</color>
     <color name="colorSuccessGreen">#68BE61</color>
+
+    <color name="colorBlack">#000000</color>
 
 </resources>

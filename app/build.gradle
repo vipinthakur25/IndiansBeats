@@ -77,6 +77,10 @@ dependencies {
     api 'com.otaliastudios:cameraview:2.6.2'
     // file loader
     implementation 'com.github.kk121:File-Loader:1.2'
+    // transloadit
+    implementation 'com.transloadit.android.sdk:transloadit-android:0.0.2'
+    // cloudinary
+    implementation group: 'com.cloudinary', name: 'cloudinary-android', version: '1.28.2'
 
 }
 repositories {

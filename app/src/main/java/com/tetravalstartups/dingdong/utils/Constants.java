@@ -41,5 +41,11 @@ public class Constants {
     public static final int BANK_UNVERIFIED = -1;
     public static final int BANK_VERIFIED = 1;
 
+    //initial video
+    public static final int INITIAL_VIDEO_LIKES = 0;
+    public static final int INITIAL_VIDEO_SHARES = 0;
+    public static final int INITIAL_VIDEO_COMMENTS = 0;
+    public static final int INITIAL_VIDEO_STATUS = 0;
+
 
 }

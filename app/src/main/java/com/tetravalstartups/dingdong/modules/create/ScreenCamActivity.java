@@ -1,9 +1,12 @@
 package com.tetravalstartups.dingdong.modules.create;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.os.Environment;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -30,6 +33,7 @@ import com.otaliastudios.cameraview.filter.Filters;
 import com.otaliastudios.cameraview.gesture.Gesture;
 import com.otaliastudios.cameraview.gesture.GestureAction;
 import com.tetravalstartups.dingdong.R;
+import com.tetravalstartups.dingdong.modules.create.filters.CameraFilterBottomSheet;
 import com.tetravalstartups.dingdong.modules.create.sound.SoundActivity;
 import com.tetravalstartups.dingdong.utils.Constants;
 
@@ -37,16 +41,26 @@ import java.io.File;
 import java.io.IOException;
 
 
-public class ScreenCamActivity extends AppCompatActivity implements View.OnClickListener  {
+public class ScreenCamActivity extends AppCompatActivity implements View.OnClickListener, CameraFilterBottomSheet.FilterSelectedListener {
 
     private CameraView camera;
     private LinearLayout lvFlip;
     private LinearLayout lvFilters;
     private ImageView ivRecord;
     private TextView tvAddSound;
+    private MediaPlayer mp;
+    private SharedPreferences preferences;
 
     private int mCurrentFilter = 0;
     private final Filters[] mAllFilters = Filters.values();
+
+    private Editor editor;
+
+    private CameraFilterBottomSheet cameraFilterBottomSheet;
+
+    private String sound_url;
+
+
 
     public enum RECORDING_STATUS {
         RECORDING,
@@ -62,30 +76,37 @@ public class ScreenCamActivity extends AppCompatActivity implements View.OnClick
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_screen_cam);
+        preferences = getSharedPreferences("selected_sound", 0);
+        editor = preferences.edit();
+        editor.clear();
+        editor.apply();
         initView();
     }
 
+    @Override
+    public void onClicked(int id) {
+        changeCurrentFilter(id);
+    }
+
     private void initView() {
-        // camera init
         camera = findViewById(R.id.cameraView);
         initCameraView();
 
-        // flip camera
         lvFlip = findViewById(R.id.lvFlip);
         lvFlip.setOnClickListener(this);
 
-        // filter camera
         lvFilters = findViewById(R.id.lvFilters);
         lvFilters.setOnClickListener(this);
 
-        // record video
         ivRecord = findViewById(R.id.ivRecord);
         ivRecord.setOnClickListener(this);
 
-        // add sound
         tvAddSound = findViewById(R.id.tvAddSound);
         tvAddSound.setOnClickListener(this);
 
+        tvAddSound.setText(preferences.getString("sound_name", "Add Sound"));
+
+        cameraFilterBottomSheet = new CameraFilterBottomSheet();
     }
 
     private void initCameraView(){
@@ -95,7 +116,7 @@ public class ScreenCamActivity extends AppCompatActivity implements View.OnClick
         camera.setAudio(Audio.STEREO);
         camera.mapGesture(Gesture.PINCH, GestureAction.ZOOM);
         camera.mapGesture(Gesture.TAP, GestureAction.AUTO_FOCUS);
-        camera.setFilter(Filters.NONE.newInstance());
+        mp = new MediaPlayer();
         camera.addCameraListener(new CameraListener() {
             @Override
             public void onVideoTaken(@NonNull VideoResult result) {
@@ -128,40 +149,44 @@ public class ScreenCamActivity extends AppCompatActivity implements View.OnClick
         if (v == ivRecord){
             if (status == RECORDING_STATUS.STOPPED){
                 ivRecord.setImageDrawable(getResources().getDrawable(R.drawable.ic_dd_video_record_red));
-                FileLoader.with(this)
-                        .load(Constants.SOUND_0,false)
-                        .fromDirectory("test4", FileLoader.DIR_EXTERNAL_PUBLIC)
-                        .asFile(new FileRequestListener<File>() {
-                            @Override
-                            public void onLoad(FileLoadRequest request, FileResponse<File> response) {
-                                File loadedFile = response.getBody();
-                                MediaPlayer mp = new MediaPlayer();
-                                try {
-                                    mp.setDataSource(loadedFile.getPath());
-                                    mp.prepare();
-                                    mp.start();
-                                    captureVideoSnapshot(mp.getDuration());
-                                } catch (IOException e) {
-                                    e.printStackTrace();
+                if (sound_url != null){
+                    FileLoader.with(this)
+                            .load(sound_url,false)
+                            .fromDirectory("dingdong/songs", FileLoader.DIR_EXTERNAL_PUBLIC)
+                            .asFile(new FileRequestListener<File>() {
+                                @Override
+                                public void onLoad(FileLoadRequest request, FileResponse<File> response) {
+                                    File loadedFile = response.getBody();
+                                    try {
+                                        mp.setDataSource(loadedFile.getPath());
+                                        mp.prepare();
+                                        mp.start();
+                                        captureVideoSnapshot(mp.getDuration());
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                    }
+                                    //captureVideoSnapshot();
                                 }
-                                //captureVideoSnapshot();
-                            }
 
-                            @Override
-                            public void onError(FileLoadRequest request, Throwable t) {
-                            }
-                        });
+                                @Override
+                                public void onError(FileLoadRequest request, Throwable t) {
+                                }
+                            });
+                }
+
                 status = RECORDING_STATUS.RECORDING;
             } else
                 if (status == RECORDING_STATUS.RECORDING){
                     ivRecord.setImageDrawable(getResources().getDrawable(R.drawable.ic_dd_video_record_white));
                     camera.stopVideo();
                     status = RECORDING_STATUS.STOPPED;
+                    mp.stop();
+                    mp.release();
                 }
         }
 
         if (v == lvFilters){
-            changeCurrentFilter();
+            cameraFilterBottomSheet.show(getSupportFragmentManager(), "change_filters");
         }
 
         if (v == tvAddSound){
@@ -176,11 +201,23 @@ public class ScreenCamActivity extends AppCompatActivity implements View.OnClick
             message("Already taking video.", false);
             return;
         }
+
         if (camera.getPreview() != Preview.GL_SURFACE) {
             message("Video snapshots are only allowed with the GL_SURFACE preview.", true);
             return;
         }
-        camera.takeVideoSnapshot(new File(getFilesDir(), "video.mp4"), duration);
+
+        File folder = new File(Environment.getExternalStorageDirectory() +
+                File.separator + "dingdong");
+        boolean success = true;
+        if (!folder.exists()) {
+            success = folder.mkdirs();
+        }
+        if (success) {
+            camera.takeVideoSnapshot(new File(Environment.getExternalStorageDirectory(), "dingdong/video.mp4"), duration);
+        } else {
+            // Do something else on failure
+        }
     }
 
     private void message(@NonNull String content, boolean important) {
@@ -191,17 +228,13 @@ public class ScreenCamActivity extends AppCompatActivity implements View.OnClick
         }
     }
 
-    private void changeCurrentFilter() {
+    private void changeCurrentFilter(int id) {
         if (camera.getPreview() != Preview.GL_SURFACE) {
             message("Filters are supported only when preview is Preview.GL_SURFACE.", true);
             return;
         }
-        if (mCurrentFilter < mAllFilters.length - 1) {
-            mCurrentFilter++;
-        } else {
-            mCurrentFilter = 0;
-        }
-        Filters filter = mAllFilters[mCurrentFilter];
+
+        Filters filter = mAllFilters[id];
         message(filter.toString(), false);
         camera.setFilter(filter.newInstance());
     }
@@ -232,4 +265,14 @@ public class ScreenCamActivity extends AppCompatActivity implements View.OnClick
         }
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        preferences = getSharedPreferences("selected_sound", 0);
+        tvAddSound.setText(preferences.getString("sound_name", "Add Sound"));
+        if (!preferences.getString("sound_name", "Add Sound").equals("Add Sound")){
+            tvAddSound.setSelected(true);
+        }
+        sound_url = preferences.getString("sound_url", null);
+    }
 }

@@ -40,6 +40,11 @@
             </intent-filter>
         </activity>
         <activity android:name=".MainActivity" />
+
+        <meta-data
+            android:name="CLOUDINARY_URL"
+            android:value="cloudinary://797981641311225:ILAhO04JbFeOrF9ZQp3pDtFUowY@sevenbillion" />
+
     </application>
 
 </manifest>
