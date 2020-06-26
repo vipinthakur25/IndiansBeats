@@ -12,20 +12,32 @@ import android.view.animation.AnimationUtils;
 import android.view.animation.LinearInterpolator;
 import android.view.animation.RotateAnimation;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.VideoView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.airbnb.lottie.LottieAnimationView;
+import com.bumptech.glide.Glide;
 import com.cloudinary.Transformation;
 import com.cloudinary.android.MediaManager;
 import com.cloudinary.transformation.Layer;
 import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.like.LikeButton;
+import com.like.OnLikeListener;
 import com.tetravalstartups.dingdong.MainActivity;
 import com.tetravalstartups.dingdong.R;
+import com.tetravalstartups.dingdong.auth.Master;
 
+import java.util.HashMap;
 import java.util.List;
 
 public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.VideoViewHolder> {
@@ -33,6 +45,8 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.VideoViewHol
     Context context;
     List<Video> videoList;
     int row_index = -1;
+    Master master;
+    FirebaseFirestore db;
 
     public VideoAdapter(Context context, List<Video> videoList) {
         this.context = context;
@@ -43,6 +57,8 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.VideoViewHol
     @Override
     public VideoAdapter.VideoViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.auto_video_list_item_layout, parent, false);
+        master = new Master(context);
+        db = FirebaseFirestore.getInstance();
         return new VideoViewHolder(view);
     }
 
@@ -73,7 +89,19 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.VideoViewHol
         String url = MediaManager.get().url().transformation(new
                 Transformation().quality(30)).resourceType("video").generate("user_uploaded_videos/"+video.getId()+".mp4");
 
+        holder.likeVideo.setOnLikeListener(new OnLikeListener() {
+            @Override
+            public void liked(LikeButton likeButton) {
+                doLikeVideo(video);
+            }
 
+            @Override
+            public void unLiked(LikeButton likeButton) {
+                doUnLikeVideo();
+            }
+        });
+
+        Glide.with(context).load(video.getUser_photo()).into(holder.ivPhoto);
 
         holder.videoView.setVideoURI(Uri.parse(url));
         holder.videoView.requestFocus();
@@ -85,6 +113,42 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.VideoViewHol
         });
     }
 
+    private void doLikeVideo(Video video) {
+
+        db.collection("users")
+                .document(master.getId())
+                .collection("liked_videos")
+                .document(video.getId())
+                .set(video);
+
+        db.collection("videos")
+                .document(video.getId())
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if (task.isSuccessful()){
+                            String like_count =  task.getResult().getString("likes_count");
+                            int likes = Integer.parseInt(like_count);
+                            int update_like = likes+1;
+
+                            HashMap hashMap = new HashMap();
+                            hashMap.put("likes_count", update_like);
+
+                            db.collection("videos")
+                                    .document(video.getId())
+                                    .update(hashMap);
+                        }
+                    }
+                });
+
+
+
+    }
+
+    private void doUnLikeVideo() {
+    }
+
     @Override
     public int getItemCount() {
         return videoList.size();
@@ -94,7 +158,10 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.VideoViewHol
 
         TextView tvLikes, tvComments, tvShares, tvUserName, tvFollowers, tvSoundName;
         VideoView videoView;
-        ImageView ivSoundCD;
+        ImageView ivSoundCD, ivPhoto, ivHeadphone;
+        LinearLayout lvLike;
+        LottieAnimationView aniLike;
+        LikeButton likeVideo;
 
         public VideoViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -107,6 +174,8 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.VideoViewHol
             videoView = itemView.findViewById(R.id.videoView);
             ivSoundCD = itemView.findViewById(R.id.ivSoundCD);
             tvSoundName = itemView.findViewById(R.id.tvSoundName);
+            ivPhoto = itemView.findViewById(R.id.ivPhoto);
+            likeVideo = itemView.findViewById(R.id.likeVideo);
             tvSoundName.setSelected(true);
 
         }

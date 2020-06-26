@@ -4,25 +4,26 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 public class Video implements Parcelable {
+
     private String id;
     private String video_desc;
     private boolean sound_contain;
     private String sound_id;
     private String sound_title;
     private String sound_url;
-    private int likes_count;
-    private int share_count;
-    private int comment_count;
+    private String likes_count;
+    private String share_count;
+    private String comment_count;
     private String user_id;
     private String user_handle;
     private String user_photo;
     private String video_thumbnail;
-    private int video_status;
+    private String video_status;
 
     public Video() {
     }
 
-    public Video(String id, String video_desc, boolean sound_contain, String sound_id, String sound_title, String sound_url, int likes_count, int share_count, int comment_count, String user_id, String user_handle, String user_photo, String video_thumbnail, int video_status) {
+    public Video(String id, String video_desc, boolean sound_contain, String sound_id, String sound_title, String sound_url, String likes_count, String share_count, String comment_count, String user_id, String user_handle, String user_photo, String video_thumbnail, String video_status) {
         this.id = id;
         this.video_desc = video_desc;
         this.sound_contain = sound_contain;
@@ -46,14 +47,14 @@ public class Video implements Parcelable {
         sound_id = in.readString();
         sound_title = in.readString();
         sound_url = in.readString();
-        likes_count = in.readInt();
-        share_count = in.readInt();
-        comment_count = in.readInt();
+        likes_count = in.readString();
+        share_count = in.readString();
+        comment_count = in.readString();
         user_id = in.readString();
         user_handle = in.readString();
         user_photo = in.readString();
         video_thumbnail = in.readString();
-        video_status = in.readInt();
+        video_status = in.readString();
     }
 
     public static final Creator<Video> CREATOR = new Creator<Video>() {
@@ -116,27 +117,27 @@ public class Video implements Parcelable {
         this.sound_url = sound_url;
     }
 
-    public int getLikes_count() {
+    public String getLikes_count() {
         return likes_count;
     }
 
-    public void setLikes_count(int likes_count) {
+    public void setLikes_count(String likes_count) {
         this.likes_count = likes_count;
     }
 
-    public int getShare_count() {
+    public String getShare_count() {
         return share_count;
     }
 
-    public void setShare_count(int share_count) {
+    public void setShare_count(String share_count) {
         this.share_count = share_count;
     }
 
-    public int getComment_count() {
+    public String getComment_count() {
         return comment_count;
     }
 
-    public void setComment_count(int comment_count) {
+    public void setComment_count(String comment_count) {
         this.comment_count = comment_count;
     }
 
@@ -172,11 +173,11 @@ public class Video implements Parcelable {
         this.video_thumbnail = video_thumbnail;
     }
 
-    public int getVideo_status() {
+    public String getVideo_status() {
         return video_status;
     }
 
-    public void setVideo_status(int video_status) {
+    public void setVideo_status(String video_status) {
         this.video_status = video_status;
     }
 
@@ -193,13 +194,13 @@ public class Video implements Parcelable {
         dest.writeString(sound_id);
         dest.writeString(sound_title);
         dest.writeString(sound_url);
-        dest.writeInt(likes_count);
-        dest.writeInt(share_count);
-        dest.writeInt(comment_count);
+        dest.writeString(likes_count);
+        dest.writeString(share_count);
+        dest.writeString(comment_count);
         dest.writeString(user_id);
         dest.writeString(user_handle);
         dest.writeString(user_photo);
         dest.writeString(video_thumbnail);
-        dest.writeInt(video_status);
+        dest.writeString(video_status);
     }
 }

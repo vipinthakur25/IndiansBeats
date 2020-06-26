@@ -51,7 +51,7 @@ public class HomeFragment extends Fragment implements VideoPresenter.IVideo {
         }
 
         videoPresenter = new VideoPresenter(getContext(), HomeFragment.this);
-        videoPresenter.fetchVideos();
+        //videoPresenter.fetchVideos();
     }
 
     @Override

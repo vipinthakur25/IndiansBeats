@@ -1,10 +1,12 @@
 package com.tetravalstartups.dingdong.modules.create;
 
+import android.Manifest;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.view.View;
@@ -22,6 +24,8 @@ import com.krishna.fileloader.FileLoader;
 import com.krishna.fileloader.listener.FileRequestListener;
 import com.krishna.fileloader.pojo.FileResponse;
 import com.krishna.fileloader.request.FileLoadRequest;
+import com.nabinbhandari.android.permissions.PermissionHandler;
+import com.nabinbhandari.android.permissions.Permissions;
 import com.otaliastudios.cameraview.CameraListener;
 import com.otaliastudios.cameraview.CameraView;
 import com.otaliastudios.cameraview.VideoResult;
@@ -35,7 +39,6 @@ import com.otaliastudios.cameraview.gesture.GestureAction;
 import com.tetravalstartups.dingdong.R;
 import com.tetravalstartups.dingdong.modules.create.filters.CameraFilterBottomSheet;
 import com.tetravalstartups.dingdong.modules.create.sound.SoundActivity;
-import com.tetravalstartups.dingdong.utils.Constants;
 
 import java.io.File;
 import java.io.IOException;
@@ -48,7 +51,10 @@ public class ScreenCamActivity extends AppCompatActivity implements View.OnClick
     private LinearLayout lvFilters;
     private ImageView ivRecord;
     private TextView tvAddSound;
+    private LinearLayout lvEffects;
     private MediaPlayer mp;
+    private Uri passImageUri;
+    ImageView imageView;
     private SharedPreferences preferences;
 
     private int mCurrentFilter = 0;
@@ -76,6 +82,15 @@ public class ScreenCamActivity extends AppCompatActivity implements View.OnClick
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_screen_cam);
+
+        String[] permissions = {Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE};
+        Permissions.check(this/*context*/, permissions, null/*rationale*/, null/*options*/, new PermissionHandler() {
+            @Override
+            public void onGranted() {
+
+            }
+        });
+
         preferences = getSharedPreferences("selected_sound", 0);
         editor = preferences.edit();
         editor.clear();
@@ -103,6 +118,9 @@ public class ScreenCamActivity extends AppCompatActivity implements View.OnClick
 
         tvAddSound = findViewById(R.id.tvAddSound);
         tvAddSound.setOnClickListener(this);
+
+        lvEffects = findViewById(R.id.lvEffects);
+        lvEffects.setOnClickListener(this);
 
         tvAddSound.setText(preferences.getString("sound_name", "Add Sound"));
 
@@ -165,7 +183,7 @@ public class ScreenCamActivity extends AppCompatActivity implements View.OnClick
                                     } catch (IOException e) {
                                         e.printStackTrace();
                                     }
-                                    //captureVideoSnapshot();
+                                    captureVideoSnapshot(mp.getDuration());
                                 }
 
                                 @Override
@@ -193,7 +211,47 @@ public class ScreenCamActivity extends AppCompatActivity implements View.OnClick
             startActivity(new Intent(ScreenCamActivity.this, SoundActivity.class));
         }
 
+        if (v == lvEffects){
+//            showTextOnImage();
+        }
+
     }
+
+//    private void showTextOnImage() {
+//        Intent intent = new Intent(ScreenCamActivity.this, TextOnImage.class);
+//        Bundle bundle = new Bundle();
+//        bundle.putString(TextOnImage.IMAGE_IN_URI, passImageUri.toString()); //image uri
+//        bundle.putString(TextOnImage.TEXT_COLOR,"#27ceb8");                 //initial color of the text
+//        bundle.putFloat(TextOnImage.TEXT_FONT_SIZE,20.0f);                  //initial text size
+//        bundle.putString(TextOnImage.TEXT_TO_WRITE,text);                   //text to be add in the image
+//        intent.putExtras(bundle);
+//        startActivityForResult(intent, TextOnImage.TEXT_ON_IMAGE_REQUEST_CODE); //start activity for the result
+//    }
+
+//    @Override
+//    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+//        if(requestCode == TextOnImage.TEXT_ON_IMAGE_REQUEST_CODE)
+//        {
+//            if(resultCode == TextOnImage.TEXT_ON_IMAGE_RESULT_OK_CODE)
+//            {
+//                Uri resultImageUri = Uri.parse(data.getStringExtra(TextOnImage.IMAGE_OUT_URI));
+//
+//                try {
+//                    Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), resultImageUri);
+//                    imageView.setImageBitmap(bitmap);
+//
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+//
+//            }else if(resultCode == TextOnImage.TEXT_ON_IMAGE_RESULT_FAILED_CODE)
+//            {
+//                String errorInfo = data.getStringExtra(TextOnImage.IMAGE_OUT_ERROR);
+//                Log.d("MainActivity", "onActivityResult: "+errorInfo);
+//            }
+//        }
+//
+//    }
 
 
     private void captureVideoSnapshot(int duration) {

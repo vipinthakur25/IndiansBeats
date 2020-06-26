@@ -13,43 +13,131 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="56dp"
+        android:layout_marginBottom="64dp"
         android:layout_gravity="bottom"
         android:orientation="vertical">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
 
-        </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp"
-            android:paddingTop="8dp"
-            android:paddingBottom="8dp"
-            android:orientation="vertical">
+            android:orientation="horizontal"
+            android:padding="16dp"
+            android:gravity="bottom">
 
-            <TextView
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="sahilsingh.dsc"
-                android:layout_marginEnd="24dp"
-                android:fontFamily="@font/montserrat_bold"
-                android:textColor="@color/colorTextTitle"
-                android:textSize="16sp"/>
+                android:layout_weight="1"
+                android:layout_marginEnd="8dp"
+                android:orientation="vertical">
 
-            <TextView
-                android:layout_width="match_parent"
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/montserrat_bold"
+                    android:text="sahilsingh.dsc"
+                    android:textColor="@color/colorTextTitle"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/montserrat"
+                    android:text="#EduDong Primary education is very important for everyone #dingdong #trending"
+                    android:textColor="@color/colorTextTitle"
+                    android:textSize="14sp" />
+
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="#EduDong Primary education is very important for everyone #dingdong #trending"
-                android:fontFamily="@font/montserrat"
-                android:textColor="@color/colorTextTitle"
-                android:layout_marginEnd="24dp"
-                android:textSize="14sp"/>
+                android:gravity="center"
+                android:layout_gravity="end"
+                android:orientation="vertical">
+
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/ivPhoto"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_marginBottom="16dp"
+                    android:background="@drawable/bg_white_ring"
+                    android:padding="2dp"/>
+
+                <LinearLayout
+                    android:id="@+id/lvLike"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:layout_marginBottom="16dp"
+                    android:orientation="vertical">
+
+                    <com.like.LikeButton
+                        android:id="@+id/likeVideo"
+                        app:icon_type="heart"
+                        app:icon_size="35dp"
+                        android:layout_width="55dp"
+                        app:unlike_drawable="@drawable/dd_home_like"
+                        app:like_drawable="@drawable/dd_home_liked"
+                        android:layout_height="40dp"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="14.2K"
+                        android:layout_marginTop="4dp"
+                        android:textColor="@color/colorTextTitle"
+                        android:fontFamily="@font/montserrat"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:layout_marginBottom="16dp"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:src="@drawable/dd_home_comment"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="27"
+                        android:layout_marginTop="4dp"
+                        android:textColor="@color/colorTextTitle"
+                        android:fontFamily="@font/montserrat"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:src="@drawable/dd_home_share"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="574"
+                        android:layout_marginTop="4dp"
+                        android:textColor="@color/colorTextTitle"
+                        android:fontFamily="@font/montserrat"/>
+
+                </LinearLayout>
+
+            </LinearLayout>
 
         </LinearLayout>
 
@@ -59,8 +147,8 @@
             android:gravity="center|end"
             android:paddingStart="16dp"
             android:paddingEnd="16dp"
-            android:paddingTop="8dp"
-            android:paddingBottom="8dp"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp"
             android:orientation="horizontal">
             
             <ImageView
@@ -90,11 +178,12 @@
                 android:layout_weight="1"/>
 
 
-            <ImageView
-                android:id="@+id/ivSoundCD"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:src="@drawable/dd_sound_cd"/>
+
+                <ImageView
+                    android:id="@+id/ivSoundCD"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:src="@drawable/dd_sound_cd"/>
 
         </LinearLayout>
 

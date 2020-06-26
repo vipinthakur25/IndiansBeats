@@ -52,7 +52,6 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/bg_gradient_no_corner"
                 android:orientation="vertical">
 
                 <LinearLayout
@@ -67,7 +66,9 @@
                         android:layout_height="100dp"
                         android:layout_marginTop="16dp"
                         app:civ_border_width="2dp"
-                        app:civ_border_color="@color/colorAccentV1"/>
+                        android:background="@drawable/bg_white_ring"
+                        android:padding="2dp"
+                        android:src="@drawable/emma" />
 
                     <TextView
                         android:id="@+id/tvHandle"
@@ -90,6 +91,7 @@
                         android:layout_marginEnd="16dp"
                         android:fontFamily="@font/montserrat"
                         android:gravity="center"
+                        android:text="Emma Margaret Marie Tachard-Mackey is a French and British actress."
                         android:textColor="@color/colorAccentV1" />
 
                     <LinearLayout
@@ -122,7 +124,8 @@
                                 android:fontFamily="@font/montserrat"
                                 android:gravity="center"
                                 android:text="Likes"
-                                android:textColor="@color/colorAccentV1" />
+                                android:textSize="12sp"
+                                android:textColor="@color/colorPrimaryDarkV2" />
                         </LinearLayout>
 
                         <View
@@ -155,7 +158,8 @@
                                 android:fontFamily="@font/montserrat"
                                 android:gravity="center"
                                 android:text="Followers"
-                                android:textColor="@color/colorAccentV1" />
+                                android:textSize="12sp"
+                                android:textColor="@color/colorPrimaryDarkV2" />
                         </LinearLayout>
 
                         <View
@@ -188,7 +192,8 @@
                                 android:fontFamily="@font/montserrat"
                                 android:gravity="center"
                                 android:text="Following"
-                                android:textColor="@color/colorAccentV1" />
+                                android:textSize="12sp"
+                                android:textColor="@color/colorPrimaryDarkV2" />
                         </LinearLayout>
                     </LinearLayout>
 

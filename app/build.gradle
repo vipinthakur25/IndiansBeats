@@ -81,6 +81,12 @@ dependencies {
     implementation 'com.transloadit.android.sdk:transloadit-android:0.0.2'
     // cloudinary
     implementation group: 'com.cloudinary', name: 'cloudinary-android', version: '1.28.2'
+    // like button
+    implementation 'com.github.jd-alexander:LikeButton:0.2.3'
+    // auto permission
+    implementation 'com.nabinbhandari.android:permissions:3.8'
+
+    implementation 'com.github.sarthakdoshi04:text-on-image:0.1.0'
 
 }
 repositories {

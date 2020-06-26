@@ -9,8 +9,12 @@
     <color name="colorAccentV1">#F7F7F8</color>
     <color name="colorTextTitle">#FFFFFF</color>
 
-    <color name="colorGradientStart">#51A9DA</color>
-    <color name="colorGradientEnd">#9C27B0</color>
+<!--    <color name="colorGradientStart">#51A9DA</color>-->
+<!--    <color name="colorGradientEnd">#9C27B0</color>-->
+
+    <color name="colorGradientStart">#FFDD37</color>
+    <color name="colorGradientCenter">#7C2AE8</color>
+    <color name="colorGradientEnd">#E05FB5</color>
 
 <!--    <color name="colorGradientStart">#F9A92F</color>-->
 <!--    <color name="colorGradientEnd">#F03766</color>-->

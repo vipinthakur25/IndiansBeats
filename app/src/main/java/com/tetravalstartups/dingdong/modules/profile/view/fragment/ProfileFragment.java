@@ -90,16 +90,16 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     private void setupProfile() {
         tvName.setText(master.getName());
         tvHandle.setText(master.getHandle());
-        if (master.getBio() != null) {
-            tvBio.setText(master.getBio());
-        } else {
-            tvBio.setText(R.string.add_bio);
-        }
+//        if (master.getBio() != null) {
+//            tvBio.setText(master.getBio());
+//        } else {
+//            tvBio.setText(R.string.add_bio);
+//        }
 
-        Glide.with(getContext())
-                .load(master.getPhoto())
-                .placeholder(R.drawable.dingdong_placeholder)
-                .into(ivPhoto);
+//        Glide.with(getContext())
+//                .load(master.getPhoto())
+//                .placeholder(R.drawable.dingdong_placeholder)
+//                .into(ivPhoto);
 
         ivPhoto.setOnClickListener(new View.OnClickListener() {
             @Override

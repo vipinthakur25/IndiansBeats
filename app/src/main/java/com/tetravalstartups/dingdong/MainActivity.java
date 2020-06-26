@@ -157,7 +157,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         ivNotification.setImageDrawable(getResources().getDrawable(R.drawable.ic_dd_notification_inactive));
         ivProfile.setImageDrawable(getResources().getDrawable(R.drawable.ic_dd_profile_inactive));
 
-        tvHome.setTextColor(getResources().getColor(R.color.colorGradientStart));
+        tvHome.setTextColor(getResources().getColor(R.color.colorBrandYellow));
         tvDiscover.setTextColor(getResources().getColor(R.color.colorTextTitle));
         tvNotification.setTextColor(getResources().getColor(R.color.colorTextTitle));
         tvProfile.setTextColor(getResources().getColor(R.color.colorTextTitle));
@@ -170,7 +170,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         ivNotification.setImageDrawable(getResources().getDrawable(R.drawable.ic_dd_notification_inactive));
         ivProfile.setImageDrawable(getResources().getDrawable(R.drawable.ic_dd_profile_inactive));
 
-        tvDiscover.setTextColor(getResources().getColor(R.color.colorGradientStart));
+        tvDiscover.setTextColor(getResources().getColor(R.color.colorBrandYellow));
         tvHome.setTextColor(getResources().getColor(R.color.colorTextTitle));
         tvNotification.setTextColor(getResources().getColor(R.color.colorTextTitle));
         tvProfile.setTextColor(getResources().getColor(R.color.colorTextTitle));
@@ -183,7 +183,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         ivHome.setImageDrawable(getResources().getDrawable(R.drawable.ic_dd_home_inactive));
         ivProfile.setImageDrawable(getResources().getDrawable(R.drawable.ic_dd_profile_inactive));
 
-        tvNotification.setTextColor(getResources().getColor(R.color.colorGradientStart));
+        tvNotification.setTextColor(getResources().getColor(R.color.colorBrandYellow));
         tvDiscover.setTextColor(getResources().getColor(R.color.colorTextTitle));
         tvHome.setTextColor(getResources().getColor(R.color.colorTextTitle));
         tvProfile.setTextColor(getResources().getColor(R.color.colorTextTitle));
@@ -199,7 +199,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         ivNotification.setImageDrawable(getResources().getDrawable(R.drawable.ic_dd_notification_inactive));
         ivHome.setImageDrawable(getResources().getDrawable(R.drawable.ic_dd_home_inactive));
 
-        tvProfile.setTextColor(getResources().getColor(R.color.colorGradientStart));
+        tvProfile.setTextColor(getResources().getColor(R.color.colorBrandYellow));
         tvDiscover.setTextColor(getResources().getColor(R.color.colorTextTitle));
         tvNotification.setTextColor(getResources().getColor(R.color.colorTextTitle));
         tvHome.setTextColor(getResources().getColor(R.color.colorTextTitle));
