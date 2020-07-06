@@ -1,81 +1,92 @@
 package com.tetravalstartups.dingdong.modules.create;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-
-import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
-import android.media.AudioManager;
+import android.content.SharedPreferences.Editor;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.MediaController;
-import android.widget.SeekBar;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
 
-import com.cloudinary.android.MediaManager;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.krishna.fileloader.FileLoader;
-import com.krishna.fileloader.listener.FileRequestListener;
-import com.krishna.fileloader.pojo.FileResponse;
-import com.krishna.fileloader.request.FileLoadRequest;
 import com.otaliastudios.cameraview.VideoResult;
+import com.otaliastudios.transcoder.Transcoder;
+import com.otaliastudios.transcoder.TranscoderListener;
+import com.otaliastudios.transcoder.TranscoderOptions;
+import com.otaliastudios.transcoder.engine.TrackType;
+import com.otaliastudios.transcoder.sink.DataSink;
+import com.otaliastudios.transcoder.sink.DefaultDataSink;
+import com.otaliastudios.transcoder.source.DataSource;
+import com.otaliastudios.transcoder.source.UriDataSource;
 import com.tetravalstartups.dingdong.R;
 import com.tetravalstartups.dingdong.auth.Master;
-import com.tetravalstartups.dingdong.modules.home.video.Video;
-import com.tetravalstartups.dingdong.utils.Constants;
-import com.tetravalstartups.dingdong.utils.MyAssemblyProgressListener;
-import com.transloadit.android.sdk.AndroidAsyncAssembly;
-import com.transloadit.android.sdk.AndroidTransloadit;
+import com.tetravalstartups.dingdong.utils.DDLoading;
+import com.tetravalstartups.dingdong.utils.DDProgress;
 import com.transloadit.sdk.async.AssemblyProgressListener;
-import com.transloadit.sdk.exceptions.LocalOperationException;
-import com.transloadit.sdk.exceptions.RequestException;
 import com.transloadit.sdk.response.AssemblyResponse;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.DecimalFormat;
+import java.util.concurrent.Future;
 
-public class VideoPreviewActivity extends AppCompatActivity implements View.OnClickListener, AssemblyProgressListener  {
+public class VideoPreviewActivity extends AppCompatActivity implements View.OnClickListener, AssemblyProgressListener, TranscoderListener {
 
     private VideoView videoView;
     private static VideoResult videoResult;
     MediaPlayer soundPlayer;
-    SeekBar seekBarSound;
-    SeekBar seekBarRecording;
-    AudioManager audioManager;
     FirebaseAuth firebaseAuth;
     private SharedPreferences preferences;
-
-    private String sound_url;
-
+    private String sound_path;
     private TextView tvUpload;
-
     private Master master;
+
+    private VideoType videoType;
+
+    private DDLoading ddLoading;
+
+    private RecordingSpeed recordingSpeed = RecordingSpeed.ONE;
+
+    private float speed_value;
+
+    private Future<Void> mTranscodeFuture;
 
     public static void setVideoResult(@Nullable VideoResult result) {
         videoResult = result;
     }
 
+    File mTranscodeOutputFile;
+
+    private DDProgress ddProgress;
+
+    private TextView tvNext;
+    VideoResult result = videoResult;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_video_preview);
         initView();
 
     }
 
     private void initView() {
-        final VideoResult result = videoResult;
         if (result == null) {
             finish();
             return;
@@ -83,174 +94,160 @@ public class VideoPreviewActivity extends AppCompatActivity implements View.OnCl
 
         preferences = getSharedPreferences("selected_sound", 0);
 
-        seekBarSound = findViewById(R.id.seekBarSound);
-        seekBarRecording = findViewById(R.id.seekBarRecording);
-
-        audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-        assert audioManager != null;
-        seekBarSound.setMax(audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC));
-        seekBarSound.setProgress(audioManager.getStreamVolume(AudioManager.STREAM_MUSIC));
-        seekBarRecording.setMax(audioManager.getStreamMaxVolume(AudioManager.STREAM_SYSTEM));
-        seekBarRecording.setProgress(0);
-
         firebaseAuth = FirebaseAuth.getInstance();
 
         master = new Master(VideoPreviewActivity.this);
 
         videoView = findViewById(R.id.videoView);
-        tvUpload = findViewById(R.id.tvUpload);
 
         videoView.setOnClickListener(this);
-        tvUpload.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                FirebaseFirestore db = FirebaseFirestore.getInstance();
-                DocumentReference documentReference = db.collection("videos").document();
-                String public_id = documentReference.getId();
 
-                Video video = new Video();
-                video.setId(public_id);
-                video.setVideo_desc("");
-                video.setSound_contain(false);
-                video.setSound_id("");
-                video.setSound_title("");
-                video.setSound_url("");
-                video.setLikes_count(Constants.INITIAL_VIDEO_LIKES);
-                video.setShare_count(Constants.INITIAL_VIDEO_SHARES);
-                video.setComment_count(Constants.INITIAL_VIDEO_COMMENTS);
-                video.setUser_id(firebaseAuth.getUid());
-                video.setUser_handle(master.getHandle());
-                video.setUser_photo(master.getPhoto());
-                video.setVideo_thumbnail("");
-                video.setVideo_status(Constants.INITIAL_VIDEO_STATUS);
+        soundPlayer = new MediaPlayer();
 
-                String requestId = MediaManager.get().upload(Uri.fromFile(result.getFile()))
-                        .option("resource_type", "video")
-                        .option("folder", "user_uploaded_videos")
-                        .option("public_id", public_id)
-                        .option("overwrite", true)
-                        .dispatch();
+        ddLoading = DDLoading.getInstance();
 
-                db.collection("videos").document(public_id)
-                        .set(video)
-                        .addOnCompleteListener(new OnCompleteListener<Void>() {
-                            @Override
-                            public void onComplete(@NonNull Task<Void> task) {
-                                if (task.isSuccessful()){
-                                    Toast.makeText(VideoPreviewActivity.this, "video upload successful...", Toast.LENGTH_SHORT).show();
-                                }
-                            }
-                        });
+        ddProgress = DDProgress.getInstance();
 
-                Log.e("requestId", requestId);
-            }
-        });
+        tvNext = findViewById(R.id.tvNext);
+        tvNext.setOnClickListener(this);
+
+//        tvUpload.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
 
 
-        initVideo(result);
+//        initVideo(result);
+
+        try {
+            //ddLoading.showProgress(VideoPreviewActivity.this, "Processing Video...", false);
+            initVideoPlayer();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
-    private void initVideo(VideoResult result) {
-        soundPlayer = new MediaPlayer();
-        MediaController controller = new MediaController(this);
-        controller.setAnchorView(videoView);
-        controller.setMediaPlayer(videoView);
-        videoView.setMediaController(controller);
-        videoView.setVideoURI(Uri.fromFile(result.getFile()));
-        videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-            @Override
-            public void onPrepared(MediaPlayer mp) {
-                ViewGroup.LayoutParams lp = videoView.getLayoutParams();
-                float videoWidth = mp.getVideoWidth();
-                float videoHeight = mp.getVideoHeight();
-                float viewWidth = videoView.getWidth();
-                lp.height = (int) (viewWidth * (videoHeight / videoWidth));
-                videoView.setLayoutParams(lp);
-                FileLoader.with(VideoPreviewActivity.this)
-                        .load(sound_url,false)
-                        .fromDirectory("dingdong/songs", FileLoader.DIR_EXTERNAL_PUBLIC)
-                        .asFile(new FileRequestListener<File>() {
-                            @Override
-                            public void onLoad(FileLoadRequest request, FileResponse<File> response) {
-                                File loadedFile = response.getBody();
+    private void initVideoPlayer() throws IOException {
+        //ddProgress.showProgress(VideoPreviewActivity.this, "", false);
+        DataSink sink;
+        File f = new File(Environment.getExternalStorageDirectory() + "/xyz/");
 
-                                try {
-                                    soundPlayer.setDataSource(loadedFile.getPath());
-                                    soundPlayer.prepare();
-                                    soundPlayer.start();
-                                    playVideo();
+            f.mkdirs();
+            mTranscodeOutputFile = File.createTempFile("transcode_test", ".mp4", f);
+            sink = new DefaultDataSink(mTranscodeOutputFile.getAbsolutePath());
+
+        TranscoderOptions.Builder builder = Transcoder.into(sink);
+       // Uri uri =  Uri.parse(sound_path);
+        if (sound_path != null){
+           // DataSource source = new UriDataSource(this, uri);
+            builder.addDataSource(TrackType.AUDIO, sound_path);
+            builder.addDataSource(TrackType.VIDEO, result.getFile().getPath());
+
+            mTranscodeFuture = builder.setListener(this).transcode();
+
+            SharedPreferences preferences = getSharedPreferences("trans_path", 0);
+            Editor editor = preferences.edit();
+            editor.putString("video_path", mTranscodeOutputFile.getPath());
+            editor.apply();
 
 
 
-                                    mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                                        @Override
-                                        public void onCompletion(MediaPlayer mp) {
-                                            soundPlayer.stop();
-                                            soundPlayer.release();
-                                        }
-                                    });
-
-                                    seekBarSound.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-                                        @Override
-                                        public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                                            soundPlayer.setVolume((float) progress, (float) progress);
-                                        }
-
-                                        @Override
-                                        public void onStartTrackingTouch(SeekBar seekBar) {
-
-                                        }
-
-                                        @Override
-                                        public void onStopTrackingTouch(SeekBar seekBar) {
-
-                                        }
-                                    });
-
-                                    seekBarRecording.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-                                        @Override
-                                        public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                                            mp.setVolume((float) progress, (float) progress);
-                                        }
-
-                                        @Override
-                                        public void onStartTrackingTouch(SeekBar seekBar) {
-
-                                        }
-
-                                        @Override
-                                        public void onStopTrackingTouch(SeekBar seekBar) {
-
-                                        }
-                                    });
+        }
 
 
+//        Transcoder.into(sink)
+//                .addDataSource(TrackType.VIDEO, result.getFile().getPath())
+//                .addDataSource(TrackType.AUDIO, new UriDataSource(VideoPreviewActivity.this, uri))
+//                .setListener(new TranscoderListener() {
+//                    public void onTranscodeProgress(double progress) {
+//
+//                    }
+//                    public void onTranscodeCompleted(int successCode) {
+//                        ddLoading.hideProgress();
+//                        if (successCode == Transcoder.SUCCESS_TRANSCODED){
+//                            playTranscodeResult(mTranscodeOutputFile);
+//                        }
+//                    }
+//                    public void onTranscodeCanceled() {
+//                        ddLoading.hideProgress();
+//                    }
+//
+//                    public void onTranscodeFailed(@NonNull Throwable exception) {
+//                        ddLoading.hideProgress();
+//                    }
+//                }).transcode();
 
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                }
-                                //captureVideoSnapshot();
-                            }
+       // playTranscodeResult(result.getFile());
 
-                            @Override
-                            public void onError(FileLoadRequest request, Throwable t) {
-                            }
-                        });
-                playVideo();
+    }
+
+    private void playTranscodeResult(File mTranscodeOutputFile){
+
+        videoView.setVideoURI(Uri.parse(mTranscodeOutputFile.getAbsolutePath()));
+        videoView.setOnPreparedListener(mp -> {
+            ViewGroup.LayoutParams lp = videoView.getLayoutParams();
+            float videoWidth = mp.getVideoWidth();
+            float videoHeight = mp.getVideoHeight();
+            float viewWidth = videoView.getWidth();
+            lp.height = (int) (viewWidth * (videoHeight / videoWidth));
+            videoView.setLayoutParams(lp);
+
+//            if (sound_path == null){
+//                playVideoWithoutSound();
+//
+//            } else {
+//                playVideoWithSound();
+//            }
+
+            playVideoWithoutSound();
+
+            if (result.isSnapshot()) {
+                Log.e("VideoPreview", "The video full size is " + videoWidth + "x" + videoHeight);
             }
         });
+
+    }
+
+//    private void playVideoWithSound() {
+//        try {
+//            soundPlayer.setDataSource(sound_path);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//        try {
+//            soundPlayer.prepare();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//        if (!videoView.isPlaying()) {
+//            soundPlayer.start();
+//            videoView.start();
+//            videoView.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+//                @Override
+//                public void onCompletion(MediaPlayer mp) {
+//                    soundPlayer.start();
+//                    mp.start();
+//                }
+//            });
+//        }
+//    }
+
+    private void playVideoWithoutSound() {
+        if (!videoView.isPlaying()) {
+            videoView.start();
+            videoView.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                @Override
+                public void onCompletion(MediaPlayer mp) {
+                    mp.start();
+                }
+            });
+        }
     }
 
     @Override
     public void onClick(View v) {
-        if (v == videoView){
-            playVideo();
-        }
-    }
-
-    void playVideo() {
-        if (!videoView.isPlaying()) {
-            videoView.start();
+        if (v == tvNext){
+            //Intent intent = new Intent();
+            startActivity(new Intent(VideoPreviewActivity.this, PostActivity.class));
         }
     }
 
@@ -266,7 +263,7 @@ public class VideoPreviewActivity extends AppCompatActivity implements View.OnCl
     public void onBackPressed() {
         super.onBackPressed();
         soundPlayer.stop();
-        soundPlayer.release();
+        soundPlayer.reset();
     }
 
     @Override
@@ -298,7 +295,36 @@ public class VideoPreviewActivity extends AppCompatActivity implements View.OnCl
     protected void onResume() {
         super.onResume();
         preferences = getSharedPreferences("selected_sound", 0);
-        sound_url = preferences.getString("sound_url", null);
+        sound_path = preferences.getString("sound_path", null);
+        try {
+            initVideoPlayer();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
+    @Override
+    public void onTranscodeProgress(double progress) {
+        double percent = (progress / 1) * 100;
+        Log.e("trans_percent", percent+"");
+        //ddProgress.updateProgress("Processing Video", (int) percent);
+    }
+
+    @Override
+    public void onTranscodeCompleted(int successCode) {
+        Toast.makeText(this, "Task Done", Toast.LENGTH_SHORT).show();
+        if (successCode == Transcoder.SUCCESS_TRANSCODED){
+            playTranscodeResult(mTranscodeOutputFile);
+        }
+    }
+
+    @Override
+    public void onTranscodeCanceled() {
+
+    }
+
+    @Override
+    public void onTranscodeFailed(@NonNull Throwable exception) {
+
+    }
 }

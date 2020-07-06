@@ -18,4 +18,5 @@
     <string name="logout">Logout</string>
     <string name="subscription">Subscription</string>
     <string name="banks">Banks</string>
+    <string name="folder_creation_problem">folder not created</string>
 </resources>

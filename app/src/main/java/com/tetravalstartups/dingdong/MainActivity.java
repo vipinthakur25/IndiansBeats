@@ -12,12 +12,8 @@ import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.cloudinary.android.MediaManager;
-import com.daimajia.androidanimations.library.Techniques;
-import com.daimajia.androidanimations.library.YoYo;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
@@ -30,7 +26,7 @@ import com.tetravalstartups.dingdong.modules.create.ScreenCamActivity;
 import com.tetravalstartups.dingdong.modules.home.HomeFragment;
 import com.tetravalstartups.dingdong.modules.notification.NotificationFragment;
 import com.tetravalstartups.dingdong.modules.profile.view.fragment.ProfileFragment;
-import com.tetravalstartups.dingdong.modules.search.SearchFragment;
+import com.tetravalstartups.dingdong.modules.discover.DiscoverFragment;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -89,7 +85,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         lvNotification.setOnClickListener(this);
         lvProfile.setOnClickListener(this);
 
-        MediaManager.init(this);
 
         Glide.with(this).load(R.drawable.dd_create_video).into(ivCreate);
 
@@ -115,12 +110,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             switchHome();
         }
         if (v == lvDiscover){
-            fragment = new SearchFragment();
+            fragment = new DiscoverFragment();
             loadFragment(fragment);
             switchSearch();
         }
         if (v == ivCreate){
             startActivity(new Intent(MainActivity.this, ScreenCamActivity.class));
+            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
         }
         if (v == lvNotification){
             fragment = new NotificationFragment();
@@ -135,6 +131,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 loadFragment(fragment);
             } else {
                 startActivity(new Intent(MainActivity.this, LoginActivity.class));
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
             }
         }
     }

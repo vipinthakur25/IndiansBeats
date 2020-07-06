@@ -7,13 +7,13 @@
     android:orientation="vertical"
     tools:context=".modules.create.ScreenCamActivity">
 
-
     <com.otaliastudios.cameraview.CameraView
         android:id="@+id/cameraView"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
     </com.otaliastudios.cameraview.CameraView>
+
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -27,16 +27,13 @@
             style="?android:attr/progressBarStyleHorizontal"
             android:layout_width="match_parent"
             android:layout_height="5dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginBottom="8dp"
-            android:background="@color/colorPrimaryDarkV2"
-            android:progress="0"
-            android:progressTint="@color/colorGradientStart" />
+            android:max="300"
+            android:layout_marginBottom="16dp"
+            android:progressDrawable="@drawable/gradient_progress"
+            android:progress="0"/>
 
         <TextView
-            android:id="@+id/tvVideoProgressTime"
+            android:id="@+id/tvVideoTimer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
@@ -44,155 +41,226 @@
             android:text="00:00"
             android:textColor="@color/colorTextTitle" />
 
+        <LinearLayout
+            android:id="@+id/lhSound"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:orientation="horizontal"
+            android:gravity="center">
+
+            <ImageView
+                android:id="@+id/ivSoundSelected"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@drawable/dd_sound"/>
+
+            <TextView
+                android:id="@+id/tvAddSound"
+                android:layout_width="80dp"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/montserrat"
+                android:text="Add Sound"
+                android:layout_marginStart="8dp"
+                android:gravity="center"
+                android:focusable="true"
+                android:ellipsize="marquee"
+                android:marqueeRepeatLimit="marquee_forever"
+                android:textSize="14sp"
+                android:textColor="@color/colorTextTitle"
+                android:singleLine="true" />
+
+
+            <ImageView
+                android:id="@+id/ivRemoveSound"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:padding="4dp"
+                android:visibility="gone"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="16dp"
+                app:srcCompat="@drawable/ic_dd_cancel_white"/>
+
+        </LinearLayout>
+
     </LinearLayout>
 
-    <LinearLayout
+    <FrameLayout
+        android:id="@+id/frameSidePanel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="end"
-        android:layout_marginTop="80dp"
-        android:layout_marginEnd="16dp"
-        android:gravity="center"
-        android:orientation="vertical">
+        android:layout_marginEnd="8dp"
+        android:layout_marginTop="110dp">
 
         <LinearLayout
-            android:id="@+id/lvFlip"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="16dp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:alpha="0.1"
+            android:orientation="vertical"
+            android:background="@drawable/bg_tint_color_primary_side_panel"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="end"
             android:gravity="center"
+            android:layout_margin="4dp"
             android:orientation="vertical">
 
-            <ImageView
-                android:layout_width="25dp"
-                android:layout_height="25dp"
-                android:src="@drawable/dd_record_flip" />
-
-            <TextView
+            <LinearLayout
+                android:id="@+id/lvFlip"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/montserrat"
-                android:text="Flip"
-                android:textColor="@color/colorTextTitle"
-                android:textSize="10sp" />
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="16dp"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:id="@+id/ivFlip"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:src="@drawable/dd_record_flip" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/montserrat"
+                    android:text="Flip"
+                    android:textColor="@color/colorTextTitle"
+                    android:textSize="10sp" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/lvSpeed"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:gravity="center"
+                android:visibility="visible"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:id="@+id/ivSpeed"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:src="@drawable/dd_record_speed_off" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/montserrat"
+                    android:text="Speed"
+                    android:textColor="@color/colorTextTitle"
+                    android:textSize="10sp" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/lvBeauty"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:gravity="center"
+                android:visibility="visible"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:src="@drawable/dd_record_beauty" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/montserrat"
+                    android:text="Beauty"
+                    android:textColor="@color/colorTextTitle"
+                    android:textSize="10sp" />
+
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:id="@+id/lvFilters"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:src="@drawable/dd_record_filters" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/montserrat"
+                    android:text="Filters"
+                    android:textColor="@color/colorTextTitle"
+                    android:textSize="10sp" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/lvTimer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:id="@+id/ivTimer"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:src="@drawable/dd_record_timer" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/montserrat"
+                    android:text="Timer"
+                    android:textColor="@color/colorTextTitle"
+                    android:textSize="10sp" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/lvFlash"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:gravity="center"
+                android:visibility="gone"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:id="@+id/ivFlash"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:src="@drawable/dd_record_flash_off" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/montserrat"
+                    android:text="Flash"
+                    android:textColor="@color/colorTextTitle"
+                    android:textSize="10sp" />
+
+            </LinearLayout>
+
 
         </LinearLayout>
 
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:gravity="center"
-            android:orientation="vertical">
 
-            <ImageView
-                android:layout_width="25dp"
-                android:layout_height="25dp"
-                android:src="@drawable/dd_record_speed_off" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/montserrat"
-                android:text="Speed"
-                android:textColor="@color/colorTextTitle"
-                android:textSize="10sp" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:gravity="center"
-            android:orientation="vertical">
-
-            <ImageView
-                android:layout_width="25dp"
-                android:layout_height="25dp"
-                android:src="@drawable/dd_record_beauty" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/montserrat"
-                android:text="Beauty"
-                android:textColor="@color/colorTextTitle"
-                android:textSize="10sp" />
-
-        </LinearLayout>
+    </FrameLayout>
 
 
-        <LinearLayout
-            android:id="@+id/lvFilters"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:gravity="center"
-            android:orientation="vertical">
-
-            <ImageView
-                android:layout_width="25dp"
-                android:layout_height="25dp"
-                android:src="@drawable/dd_record_filters" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/montserrat"
-                android:text="Filters"
-                android:textColor="@color/colorTextTitle"
-                android:textSize="10sp" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:gravity="center"
-            android:orientation="vertical">
-
-            <ImageView
-                android:layout_width="25dp"
-                android:layout_height="25dp"
-                android:src="@drawable/dd_record_timer" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/montserrat"
-                android:text="Timer"
-                android:textColor="@color/colorTextTitle"
-                android:textSize="10sp" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:gravity="center"
-            android:orientation="vertical">
-
-            <ImageView
-                android:layout_width="25dp"
-                android:layout_height="25dp"
-                android:src="@drawable/dd_record_flash_off" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/montserrat"
-                android:text="Flash"
-                android:textColor="@color/colorTextTitle"
-                android:textSize="10sp" />
-
-        </LinearLayout>
-
-
-    </LinearLayout>
 
     <FrameLayout
         android:layout_width="match_parent"
@@ -202,44 +270,122 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@drawable/bg_nav_end_gradient"
             android:alpha="0.8"/>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:layout_marginBottom="16dp"
+            android:padding="16dp"
             android:orientation="vertical">
 
-            <LinearLayout
-                android:layout_width="wrap_content"
+            <FrameLayout
+                android:id="@+id/frameSpeed"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center"
                 android:layout_marginTop="16dp"
-                android:layout_marginBottom="24dp">
+                android:visibility="gone"
+                android:layout_marginBottom="24dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp">
 
-                <ImageView
-                    android:layout_width="25dp"
-                    android:layout_height="25dp"
-                    android:src="@drawable/dd_sound"/>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:alpha="0.4"
+                    android:background="@drawable/bg_tint_color_primary_side_panel"/>
 
-                <TextView
-                    android:id="@+id/tvAddSound"
-                    android:layout_width="100dp"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="@font/montserrat"
-                    android:text="Add Sound"
-                    android:gravity="center"
-                    android:focusable="true"
-                    android:ellipsize="marquee"
-                    android:marqueeRepeatLimit="marquee_forever"
-                    android:textSize="14sp"
-                    android:textColor="@color/colorTextTitle"
-                    android:singleLine="true" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_margin="8dp"
+                    android:orientation="horizontal">
 
-            </LinearLayout>
+                    <TextView
+                        android:id="@+id/tvSpeed05x"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:text="0.5x"
+                        android:gravity="center"
+                        android:layout_weight="1"
+                        android:fontFamily="@font/montserrat"
+                        android:textColor="@color/colorDisable"/>
+
+
+                    <TextView
+                        android:id="@+id/tvSpeed1x"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:text="1x"
+                        android:gravity="center"
+                        android:layout_weight="1"
+                        android:fontFamily="@font/montserrat"
+                        android:background="@color/text_shadow_white"
+                        android:textColor="@color/colorPrimary"/>
+
+
+                    <TextView
+                        android:id="@+id/tvSpeed2x"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:text="2x"
+                        android:gravity="center"
+                        android:layout_weight="1"
+                        android:fontFamily="@font/montserrat"
+                        android:textColor="@color/colorDisable"/>
+
+
+                </LinearLayout>
+
+            </FrameLayout>
+
+            <FrameLayout
+                android:id="@+id/frameTimer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:visibility="gone"
+                android:layout_marginBottom="24dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:alpha="0.4"
+                    android:background="@drawable/bg_tint_color_primary_side_panel"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_margin="8dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/tvTimer3"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:text="3s"
+                        android:background="@color/text_shadow_white"
+                        android:gravity="center"
+                        android:layout_weight="1"
+                        android:fontFamily="@font/montserrat"
+                        android:textColor="@color/colorPrimary"/>
+
+
+                    <TextView
+                        android:id="@+id/tvTimer10"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:text="10s"
+                        android:gravity="center"
+                        android:layout_weight="1"
+                        android:fontFamily="@font/montserrat"
+                        android:textColor="@color/colorDisable"/>
+
+                </LinearLayout>
+
+            </FrameLayout>
 
 
 
@@ -247,27 +393,57 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:layout_marginBottom="8dp"
                 android:orientation="horizontal">
 
                 <LinearLayout
-                    android:id="@+id/lvEffects"
+                    android:id="@+id/lhControl"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:visibility="gone"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/tvDiscard"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Discard"
+                        android:layout_marginEnd="16dp"
+                        android:fontFamily="@font/montserrat_bold"
+                        android:textColor="@color/colorTextTitle"/>
+
+                    <TextView
+                        android:id="@+id/tvNext"
+                        android:layout_width="match_parent"
+                        android:layout_height="45dp"
+                        android:background="@drawable/bg_button_gradient"
+                        android:fontFamily="@font/montserrat_bold"
+                        android:text="Next"
+                        android:textColor="@color/colorAccentV1"
+                        android:textSize="18sp"
+                        android:gravity="center"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/lvStickers"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:gravity="center"
+                    android:visibility="visible"
                     android:orientation="vertical">
 
                     <ImageView
-                        android:layout_width="25dp"
-                        android:layout_height="25dp"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
                         android:src="@drawable/dd_record_stickers" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/montserrat"
-                        android:text="Effects"
+                        android:text="Stickers"
                         android:textColor="@color/colorTextTitle"
                         android:textSize="10sp" />
 
@@ -275,21 +451,23 @@
 
                 <ImageView
                     android:id="@+id/ivRecord"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:visibility="visible"
                     app:srcCompat="@drawable/ic_dd_video_record_white" />
 
-
                 <LinearLayout
+                    android:id="@+id/lvGallery"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:gravity="center"
+                    android:visibility="visible"
                     android:orientation="vertical">
 
                     <ImageView
-                        android:layout_width="25dp"
-                        android:layout_height="25dp"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
                         android:src="@drawable/dd_record_gallery" />
 
                     <TextView
@@ -309,6 +487,31 @@
     </FrameLayout>
 
 
+    <LinearLayout
+        android:visibility="gone"
+        android:id="@+id/lvFilterSheet"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:background="@color/colorPrimaryDarkV3"
+        android:orientation="vertical">
 
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/colorTextTitle"
+            android:fontFamily="@font/montserrat_bold"
+            android:gravity="center"
+            android:textSize="16sp"
+            android:layout_margin="8dp"
+            android:text="Select Filter"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerFilters"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"/>
+
+    </LinearLayout>
 
 </FrameLayout>

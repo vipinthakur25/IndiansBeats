@@ -4,35 +4,71 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_INTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FLASHLIGHT" />
 
     <application
-        android:allowBackup="true"
+        android:name=".App"
         android:hardwareAccelerated="true"
         android:icon="@mipmap/ic_launcher_foreground"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_foreground"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ComingSoonActivity"></activity>
-        <activity android:name=".modules.create.sound.SoundActivity" />
-        <activity android:name=".modules.create.VideoPreviewActivity" />
-        <activity android:name=".modules.create.ScreenCamActivity" />
-        <activity android:name=".modules.passbook.BanksActivity" />
-        <activity android:name=".modules.passbook.PassbookActivity" />
-        <activity android:name=".modules.subscription.SubscriptionActivity" />
-        <activity android:name=".modules.profile.view.activity.EditProfileActivity" />
-        <activity android:name=".modules.profile.view.activity.SettingsActivity" />
-        <activity android:name=".auth.SignUpActivity" />
-        <activity android:name=".auth.LoginActivity" />
-        <activity android:name=".modules.profile.view.activity.FollowersActivity" />
-        <activity android:name=".auth.CodeActivity" />
-        <activity android:name=".auth.PhoneActivity" />
-        <activity android:name=".SplashActivity">
+        <activity android:name=".modules.create.PreviewActivity"></activity>
+        <activity
+            android:name=".modules.create.PostActivity"
+            android:screenOrientation="nosensor" />
+        <activity
+            android:name=".ComingSoonActivity"
+            android:screenOrientation="nosensor" />
+        <activity
+            android:name=".modules.create.sound.SoundActivity"
+            android:screenOrientation="nosensor" />
+        <activity
+            android:name=".modules.create.VideoPreviewActivity"
+            android:screenOrientation="nosensor" />
+        <activity
+            android:name=".modules.create.ScreenCamActivity"
+            android:screenOrientation="nosensor" />
+        <activity
+            android:name=".modules.passbook.BanksActivity"
+            android:screenOrientation="nosensor" />
+        <activity
+            android:name=".modules.passbook.PassbookActivity"
+            android:screenOrientation="nosensor" />
+        <activity
+            android:name=".modules.subscription.SubscriptionActivity"
+            android:screenOrientation="nosensor" />
+        <activity
+            android:name=".modules.profile.view.activity.EditProfileActivity"
+            android:screenOrientation="nosensor" />
+        <activity
+            android:name=".modules.profile.view.activity.SettingsActivity"
+            android:screenOrientation="nosensor" />
+        <activity
+            android:name=".auth.SignUpActivity"
+            android:screenOrientation="nosensor" />
+        <activity
+            android:name=".auth.LoginActivity"
+            android:screenOrientation="nosensor" />
+        <activity
+            android:name=".modules.profile.view.activity.FollowersActivity"
+            android:screenOrientation="nosensor" />
+        <activity
+            android:name=".auth.CodeActivity"
+            android:screenOrientation="nosensor" />
+        <activity
+            android:name=".auth.PhoneActivity"
+            android:screenOrientation="nosensor" />
+        <activity
+            android:name=".SplashActivity"
+            android:screenOrientation="nosensor">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -41,13 +77,9 @@
         </activity>
         <activity android:name=".MainActivity" />
 
-        <activity android:name="com.sarthakdoshi.textonimage.TextOnImage"
-            android:theme="@style/Base.Theme.AppCompat"/>
-
         <meta-data
             android:name="CLOUDINARY_URL"
             android:value="cloudinary://797981641311225:ILAhO04JbFeOrF9ZQp3pDtFUowY@sevenbillion" />
-
     </application>
 
 </manifest>

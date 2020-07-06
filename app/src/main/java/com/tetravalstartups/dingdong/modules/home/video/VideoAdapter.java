@@ -86,20 +86,19 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.VideoViewHol
 //        holder.tvShares.setText(video.getShare_count()+"");
 //        holder.tvUserName.setText(video.getUser_handle());
 
-        String url = MediaManager.get().url().transformation(new
-                Transformation().quality(30)).resourceType("video").generate("user_uploaded_videos/"+video.getId()+".mp4");
+        String url = MediaManager.get().url().transformation(new Transformation().gravity("north_west").quality(40).overlay(new Layer().publicId("dd_final_wm")).width(200).x(20).y(20).crop("scale")).resourceType("video").generate("user_uploaded_videos/"+video.getId()+".mp4");
 
-        holder.likeVideo.setOnLikeListener(new OnLikeListener() {
-            @Override
-            public void liked(LikeButton likeButton) {
-                doLikeVideo(video);
-            }
-
-            @Override
-            public void unLiked(LikeButton likeButton) {
-                doUnLikeVideo();
-            }
-        });
+//        holder.likeVideo.setOnLikeListener(new OnLikeListener() {
+//            @Override
+//            public void liked(LikeButton likeButton) {
+//                doLikeVideo(video);
+//            }
+//
+//            @Override
+//            public void unLiked(LikeButton likeButton) {
+//                doUnLikeVideo();
+//            }
+//        });
 
         Glide.with(context).load(video.getUser_photo()).into(holder.ivPhoto);
 
@@ -109,42 +108,48 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.VideoViewHol
             @Override
             public void onPrepared(MediaPlayer mp) {
                 holder.videoView.start();
+                mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                    @Override
+                    public void onCompletion(MediaPlayer mp) {
+                        mp.start();
+                    }
+                });
             }
         });
     }
 
-    private void doLikeVideo(Video video) {
-
-        db.collection("users")
-                .document(master.getId())
-                .collection("liked_videos")
-                .document(video.getId())
-                .set(video);
-
-        db.collection("videos")
-                .document(video.getId())
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                        if (task.isSuccessful()){
-                            String like_count =  task.getResult().getString("likes_count");
-                            int likes = Integer.parseInt(like_count);
-                            int update_like = likes+1;
-
-                            HashMap hashMap = new HashMap();
-                            hashMap.put("likes_count", update_like);
-
-                            db.collection("videos")
-                                    .document(video.getId())
-                                    .update(hashMap);
-                        }
-                    }
-                });
-
-
-
-    }
+//    private void doLikeVideo(Video video) {
+//
+//        db.collection("users")
+//                .document(master.getId())
+//                .collection("liked_videos")
+//                .document(video.getId())
+//                .set(video);
+//
+//        db.collection("videos")
+//                .document(video.getId())
+//                .get()
+//                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+//                    @Override
+//                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+//                        if (task.isSuccessful()){
+//                            String like_count =  task.getResult().getString("likes_count");
+//                            int likes = Integer.parseInt(like_count);
+//                            int update_like = likes+1;
+//
+//                            HashMap hashMap = new HashMap();
+//                            hashMap.put("likes_count", update_like);
+//
+//                            db.collection("videos")
+//                                    .document(video.getId())
+//                                    .update(hashMap);
+//                        }
+//                    }
+//                });
+//
+//
+//
+//    }
 
     private void doUnLikeVideo() {
     }

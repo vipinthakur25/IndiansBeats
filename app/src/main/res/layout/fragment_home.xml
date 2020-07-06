@@ -15,6 +15,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
+        android:layout_marginTop="24dp"
         android:orientation="horizontal"
         android:padding="16dp">
 
@@ -23,7 +24,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_weight="1"
-            android:gravity="center_vertical"
+            android:gravity="center"
             android:orientation="horizontal">
 
             <TextView
@@ -53,36 +54,36 @@
 
         </LinearLayout>
 
-        <LinearLayout
-            android:id="@+id/lhCoins"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end"
-            android:background="@drawable/bg_button_disabled"
-            android:gravity="center"
-            android:paddingStart="8dp"
-            android:paddingTop="4dp"
-            android:paddingEnd="8dp"
-            android:paddingBottom="4dp">
+<!--        <LinearLayout-->
+<!--            android:id="@+id/lhCoins"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_gravity="end"-->
+<!--            android:background="@drawable/bg_button_disabled"-->
+<!--            android:gravity="center"-->
+<!--            android:paddingStart="8dp"-->
+<!--            android:paddingTop="4dp"-->
+<!--            android:paddingEnd="8dp"-->
+<!--            android:paddingBottom="4dp">-->
 
 
-            <ImageView
-                android:id="@+id/imageView7"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_weight="1"
-                app:srcCompat="@drawable/coin" />
+<!--            <ImageView-->
+<!--                android:id="@+id/imageView7"-->
+<!--                android:layout_width="20dp"-->
+<!--                android:layout_height="20dp"-->
+<!--                android:layout_weight="1"-->
+<!--                app:srcCompat="@drawable/coin" />-->
 
-            <TextView
-                android:id="@+id/textView5"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_weight="1"
-                android:fontFamily="@font/montserrat_bold"
-                android:text="9,999"
-                android:textColor="@color/colorDisableText" />
-        </LinearLayout>
+<!--            <TextView-->
+<!--                android:id="@+id/textView5"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginStart="8dp"-->
+<!--                android:layout_weight="1"-->
+<!--                android:fontFamily="@font/montserrat_bold"-->
+<!--                android:text="9,999"-->
+<!--                android:textColor="@color/colorDisableText" />-->
+<!--        </LinearLayout>-->
 
     </LinearLayout>
 

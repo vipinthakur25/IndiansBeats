@@ -15,68 +15,31 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:gravity="center">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="16dp"
-            android:orientation="vertical">
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textColor="@color/colorTextTitle"
-                android:fontFamily="@font/montserrat"
-                android:text="Sound Volume"/>
-
-            <SeekBar
-                android:id="@+id/seekBarSound"
-                android:layout_marginTop="8dp"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-
-        </LinearLayout>
-
-
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="16dp"
-            android:orientation="vertical">
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textColor="@color/colorTextTitle"
-                android:fontFamily="@font/montserrat"
-                android:text="Recording Volume"/>
-
-            <SeekBar
-                android:id="@+id/seekBarRecording"
-                android:layout_marginTop="8dp"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-
-        </LinearLayout>
-    </LinearLayout>
-
-    <TextView
-        android:id="@+id/tvUpload"
-        android:layout_width="match_parent"
-        android:layout_height="45dp"
-        android:background="@drawable/bg_button_gradient"
-        android:fontFamily="@font/montserrat_bold"
-        android:text="Upload Video"
-        android:layout_gravity="bottom"
-        android:textColor="@color/colorAccentV1"
-        android:textSize="18sp"
+        android:padding="16dp"
         android:gravity="center"
-        android:layout_marginBottom="16dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"/>
+        android:layout_gravity="bottom"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Discard"
+            android:layout_marginEnd="16dp"
+            android:fontFamily="@font/montserrat_bold"
+            android:textColor="@color/colorTextTitle"/>
+
+        <TextView
+            android:id="@+id/tvNext"
+            android:layout_width="match_parent"
+            android:layout_height="45dp"
+            android:background="@drawable/bg_button_gradient"
+            android:fontFamily="@font/montserrat_bold"
+            android:text="Next"
+            android:textColor="@color/colorAccentV1"
+            android:textSize="18sp"
+            android:gravity="center"/>
+
+    </LinearLayout>
 
 
 </FrameLayout>

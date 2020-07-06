@@ -19,12 +19,10 @@ public class CameraFilterAdapter extends RecyclerView.Adapter<CameraFilterAdapte
 
     Context context;
     List<CameraFilter> cameraFilterList;
-    ICameraFilterAdapterListener iCameraFilterAdapterListener;
 
-    public CameraFilterAdapter(Context context, List<CameraFilter> cameraFilterList, ICameraFilterAdapterListener iCameraFilterAdapterListener) {
+    public CameraFilterAdapter(Context context, List<CameraFilter> cameraFilterList) {
         this.context = context;
         this.cameraFilterList = cameraFilterList;
-        this.iCameraFilterAdapterListener = iCameraFilterAdapterListener;
     }
 
     @NonNull
@@ -43,7 +41,7 @@ public class CameraFilterAdapter extends RecyclerView.Adapter<CameraFilterAdapte
         holder.lvCameraFilters.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                iCameraFilterAdapterListener.onClick(cameraFilter.getId());
+
             }
         });
     }

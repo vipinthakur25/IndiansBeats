@@ -6,24 +6,29 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Vibrator;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
-import com.krishna.fileloader.FileLoader;
-import com.krishna.fileloader.listener.FileRequestListener;
-import com.krishna.fileloader.pojo.FileResponse;
-import com.krishna.fileloader.request.FileLoadRequest;
+import com.daimajia.androidanimations.library.Techniques;
+import com.daimajia.androidanimations.library.YoYo;
 import com.nabinbhandari.android.permissions.PermissionHandler;
 import com.nabinbhandari.android.permissions.Permissions;
 import com.otaliastudios.cameraview.CameraListener;
@@ -31,49 +36,87 @@ import com.otaliastudios.cameraview.CameraView;
 import com.otaliastudios.cameraview.VideoResult;
 import com.otaliastudios.cameraview.controls.Audio;
 import com.otaliastudios.cameraview.controls.Facing;
+import com.otaliastudios.cameraview.controls.Flash;
 import com.otaliastudios.cameraview.controls.Mode;
 import com.otaliastudios.cameraview.controls.Preview;
 import com.otaliastudios.cameraview.filter.Filters;
 import com.otaliastudios.cameraview.gesture.Gesture;
 import com.otaliastudios.cameraview.gesture.GestureAction;
 import com.tetravalstartups.dingdong.R;
+import com.tetravalstartups.dingdong.modules.create.filters.CameraFilter;
+import com.tetravalstartups.dingdong.modules.create.filters.CameraFilterAdapter;
 import com.tetravalstartups.dingdong.modules.create.filters.CameraFilterBottomSheet;
 import com.tetravalstartups.dingdong.modules.create.sound.SoundActivity;
+import com.tetravalstartups.dingdong.modules.home.video.Video;
+import com.tetravalstartups.dingdong.utils.DDAlert;
+import com.tetravalstartups.dingdong.utils.EqualSpacingItemDecoration;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 
 
-public class ScreenCamActivity extends AppCompatActivity implements View.OnClickListener, CameraFilterBottomSheet.FilterSelectedListener {
+public class ScreenCamActivity extends AppCompatActivity implements View.OnClickListener {
 
+    private final Filters[] mAllFilters = Filters.values();
+    FlashState flashState;
+    MediaPlayer soundPlayer;
+    RECORDING_STATUS recordingStatus = RECORDING_STATUS.STOPPED;
+    VideoType videoType = VideoType.WITHOUT_SOUND;
+    FilterStatus filterStatus = FilterStatus.HIDE;
     private CameraView camera;
     private LinearLayout lvFlip;
     private LinearLayout lvFilters;
     private ImageView ivRecord;
     private TextView tvAddSound;
-    private LinearLayout lvEffects;
+    private LinearLayout lvGallery;
+    private LinearLayout lvFlash;
+    private FrameLayout frameSidePanel;
+    private LinearLayout lhSound;
     private MediaPlayer mp;
-    private Uri passImageUri;
-    ImageView imageView;
     private SharedPreferences preferences;
-
+    private ImageView ivFlip;
+    private ImageView ivSoundSelected;
+    private ImageView ivRemoveSound;
+    private ImageView ivFlash;
+    private Vibrator vibRecorder;
     private int mCurrentFilter = 0;
-    private final Filters[] mAllFilters = Filters.values();
-
     private Editor editor;
-
     private CameraFilterBottomSheet cameraFilterBottomSheet;
-
-    private String sound_url;
-
-
-
-    public enum RECORDING_STATUS {
-        RECORDING,
-        STOPPED
-    }
-
-    RECORDING_STATUS status = RECORDING_STATUS.STOPPED;
+    private String sound_path;
+    private TextView tvVideoTimer;
+    private int seconds = 0;
+    private boolean running;
+    private boolean wasRunning;
+    private int total_time = 5 * 60;
+    private ProgressBar progressVideo;
+    private AlphaAnimation alphaAnimation;
+    private LinearLayout lvSpeed;
+    private LinearLayout lvBeauty;
+    private LinearLayout lvStickers;
+    private LinearLayout lvTimer;
+    private TextView tvSpeed05x;
+    private TextView tvSpeed1x;
+    private TextView tvSpeed2x;
+    private ImageView ivSpeed;
+    private ImageView ivTimer;
+    private FrameLayout frameSpeed;
+    private FrameLayout frameTimer;
+    private TextView tvTimer3;
+    private TextView tvTimer10;
+    private LinearLayout lhControl;
+    private ImageView ivSendResult;
+    private ImageView ivDeleteResult;
+    private RecyclerView recyclerFilters;
+    private List<CameraFilter> cameraFilterList;
+    private CameraFilterAdapter cameraFilterAdapter;
+    private LinearLayout lvFilterSheet;
+    private TextView tvDiscard;
+    private TextView tvNext;
+    private DDAlert ddAlert;
+    private VideoResult videoResult;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,7 +126,10 @@ public class ScreenCamActivity extends AppCompatActivity implements View.OnClick
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_screen_cam);
 
-        String[] permissions = {Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE};
+        String[] permissions = {Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                Manifest.permission.READ_EXTERNAL_STORAGE,
+                Manifest.permission.CAMERA,
+                Manifest.permission.RECORD_AUDIO};
         Permissions.check(this/*context*/, permissions, null/*rationale*/, null/*options*/, new PermissionHandler() {
             @Override
             public void onGranted() {
@@ -92,25 +138,79 @@ public class ScreenCamActivity extends AppCompatActivity implements View.OnClick
         });
 
         preferences = getSharedPreferences("selected_sound", 0);
+
         editor = preferences.edit();
         editor.clear();
         editor.apply();
         initView();
     }
 
-    @Override
-    public void onClicked(int id) {
-        changeCurrentFilter(id);
-    }
-
     private void initView() {
         camera = findViewById(R.id.cameraView);
         initCameraView();
+        soundPlayer = new MediaPlayer();
 
         lvFlip = findViewById(R.id.lvFlip);
+        ivFlip = findViewById(R.id.ivFlip);
         lvFlip.setOnClickListener(this);
 
+        vibRecorder = (Vibrator) this.getSystemService(VIBRATOR_SERVICE);
+
         lvFilters = findViewById(R.id.lvFilters);
+        lvSpeed = findViewById(R.id.lvSpeed);
+        lvBeauty = findViewById(R.id.lvBeauty);
+        lvStickers = findViewById(R.id.lvStickers);
+        lvGallery = findViewById(R.id.lvGallery);
+        lvTimer = findViewById(R.id.lvTimer);
+
+        tvDiscard = findViewById(R.id.tvDiscard);
+        tvNext = findViewById(R.id.tvNext);
+
+        tvDiscard.setOnClickListener(this);
+        tvNext.setOnClickListener(this);
+
+        tvSpeed05x = findViewById(R.id.tvSpeed05x);
+        tvSpeed1x = findViewById(R.id.tvSpeed1x);
+        tvSpeed2x = findViewById(R.id.tvSpeed2x);
+
+        tvSpeed05x.setOnClickListener(this);
+        tvSpeed1x.setOnClickListener(this);
+        tvSpeed2x.setOnClickListener(this);
+
+        ivSpeed = findViewById(R.id.ivSpeed);
+        ivTimer = findViewById(R.id.ivTimer);
+        frameSpeed = findViewById(R.id.frameSpeed);
+        frameTimer = findViewById(R.id.frameTimer);
+
+        tvTimer3 = findViewById(R.id.tvTimer3);
+        tvTimer10 = findViewById(R.id.tvTimer10);
+
+        tvTimer3.setOnClickListener(this);
+        tvTimer10.setOnClickListener(this);
+
+        lvSpeed.setOnClickListener(this);
+        lvBeauty.setOnClickListener(this);
+        lvStickers.setOnClickListener(this);
+        lvGallery.setOnClickListener(this);
+        lvTimer.setOnClickListener(this);
+
+        ivSoundSelected = findViewById(R.id.ivSoundSelected);
+        ivRemoveSound = findViewById(R.id.ivRemoveSound);
+        lvFlash = findViewById(R.id.lvFlash);
+        ivFlash = findViewById(R.id.ivFlash);
+        frameSidePanel = findViewById(R.id.frameSidePanel);
+        lhSound = findViewById(R.id.lhSound);
+        tvVideoTimer = findViewById(R.id.tvVideoTimer);
+        progressVideo = findViewById(R.id.progressVideo);
+        progressVideo.setMax(300);
+
+        alphaAnimation = new AlphaAnimation(0.0f, 1.0f);
+        alphaAnimation.setDuration(1000);
+        alphaAnimation.setRepeatCount(300);
+        alphaAnimation.setRepeatMode(Animation.REVERSE);
+
+        lvFlash.setOnClickListener(this);
+        ivRemoveSound.setOnClickListener(this);
         lvFilters.setOnClickListener(this);
 
         ivRecord = findViewById(R.id.ivRecord);
@@ -119,142 +219,390 @@ public class ScreenCamActivity extends AppCompatActivity implements View.OnClick
         tvAddSound = findViewById(R.id.tvAddSound);
         tvAddSound.setOnClickListener(this);
 
-        lvEffects = findViewById(R.id.lvEffects);
-        lvEffects.setOnClickListener(this);
+        lhControl = findViewById(R.id.lhControl);
+        lvFilterSheet = findViewById(R.id.lvFilterSheet);
 
         tvAddSound.setText(preferences.getString("sound_name", "Add Sound"));
 
         cameraFilterBottomSheet = new CameraFilterBottomSheet();
+        setSpeed1x();
+        setTimer3();
+
+        recyclerFilters = findViewById(R.id.recyclerFilters);
+        setFilterData();
+
     }
 
-    private void initCameraView(){
+    private void initCameraView() {
         camera.setLifecycleOwner(this);
         camera.setFacing(Facing.FRONT);
         camera.setMode(Mode.VIDEO);
         camera.setAudio(Audio.STEREO);
+        camera.setFlash(Flash.OFF);
+        flashState = FlashState.FLASH_OFF;
         camera.mapGesture(Gesture.PINCH, GestureAction.ZOOM);
         camera.mapGesture(Gesture.TAP, GestureAction.AUTO_FOCUS);
+        camera.mapGesture(Gesture.SCROLL_VERTICAL, GestureAction.EXPOSURE_CORRECTION);
         mp = new MediaPlayer();
+
         camera.addCameraListener(new CameraListener() {
             @Override
             public void onVideoTaken(@NonNull VideoResult result) {
                 super.onVideoTaken(result);
-                VideoPreviewActivity.setVideoResult(result);
-                Intent intent = new Intent(ScreenCamActivity.this, VideoPreviewActivity.class);
-                startActivity(intent);
+                lvGallery.setVisibility(View.GONE);
+                lvStickers.setVisibility(View.GONE);
+                ivRecord.setVisibility(View.GONE);
+                lhControl.setVisibility(View.VISIBLE);
+                videoResult = result;
             }
 
             @Override
             public void onVideoRecordingStart() {
                 super.onVideoRecordingStart();
-                message("Video recording started", false);
             }
 
             @Override
             public void onVideoRecordingEnd() {
                 super.onVideoRecordingEnd();
-                message("Video recording end", false);
+
+            }
+        });
+
+    }
+
+    private void setFilterData() {
+        cameraFilterList = new ArrayList<>();
+        recyclerFilters.setLayoutManager(new LinearLayoutManager(ScreenCamActivity.this,
+                LinearLayoutManager.HORIZONTAL,
+                false));
+        recyclerFilters.addItemDecoration(new EqualSpacingItemDecoration(16,
+                EqualSpacingItemDecoration.HORIZONTAL));
+
+        // add filter data
+        cameraFilterList.add(new CameraFilter(0, "None", R.drawable.emma));
+        cameraFilterList.add(new CameraFilter(1, "Auto Fix", R.drawable.emma));
+        cameraFilterList.add(new CameraFilter(2, "B&W", R.drawable.emma));
+        cameraFilterList.add(new CameraFilter(3, "Bright", R.drawable.emma));
+        cameraFilterList.add(new CameraFilter(4, "Contrast", R.drawable.emma));
+        cameraFilterList.add(new CameraFilter(5, "Cross", R.drawable.emma));
+        cameraFilterList.add(new CameraFilter(6, "Document", R.drawable.emma));
+        cameraFilterList.add(new CameraFilter(7, "Duotone", R.drawable.emma));
+        cameraFilterList.add(new CameraFilter(8, "Fill", R.drawable.emma));
+        cameraFilterList.add(new CameraFilter(9, "Gamma", R.drawable.emma));
+        cameraFilterList.add(new CameraFilter(10, "Grain", R.drawable.emma));
+        cameraFilterList.add(new CameraFilter(11, "Greyscale", R.drawable.emma));
+        cameraFilterList.add(new CameraFilter(12, "Hue", R.drawable.emma));
+        cameraFilterList.add(new CameraFilter(13, "Invert", R.drawable.emma));
+        cameraFilterList.add(new CameraFilter(14, "Lomoish", R.drawable.emma));
+        cameraFilterList.add(new CameraFilter(15, "Posterize", R.drawable.emma));
+        cameraFilterList.add(new CameraFilter(16, "Saturation", R.drawable.emma));
+        cameraFilterList.add(new CameraFilter(17, "Sepia", R.drawable.emma));
+        cameraFilterList.add(new CameraFilter(18, "Sharp", R.drawable.emma));
+        cameraFilterList.add(new CameraFilter(19, "Temp", R.drawable.emma));
+        cameraFilterList.add(new CameraFilter(20, "Vintage", R.drawable.emma));
+
+        cameraFilterAdapter =
+                new CameraFilterAdapter(ScreenCamActivity.this, cameraFilterList);
+
+        cameraFilterAdapter.notifyDataSetChanged();
+
+        recyclerFilters.setAdapter(cameraFilterAdapter);
+    }
+
+    private void runTimer() {
+        Handler handler = new Handler();
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                int minutes = (seconds % 3600) / 60;
+                int secs = seconds % 60;
+
+                String time =
+                        String.format(Locale.getDefault(),
+                                "%02d:%02d", minutes, secs);
+                tvVideoTimer.setText(time);
+
+                if (running) {
+                    seconds++;
+                }
+
+                progressVideo.setProgress(seconds);
+
+                handler.postDelayed(this, 1000);
+
             }
         });
     }
 
     @Override
     public void onClick(View v) {
-        if (v == lvFlip){
+        if (v == lvFlip) {
+            YoYo.with(Techniques.FlipInY)
+                    .duration(500)
+                    .repeat(0)
+                    .playOn(ivFlip);
             flipCamera();
         }
 
-        if (v == ivRecord){
-            if (status == RECORDING_STATUS.STOPPED){
-                ivRecord.setImageDrawable(getResources().getDrawable(R.drawable.ic_dd_video_record_red));
-                if (sound_url != null){
-                    FileLoader.with(this)
-                            .load(sound_url,false)
-                            .fromDirectory("dingdong/songs", FileLoader.DIR_EXTERNAL_PUBLIC)
-                            .asFile(new FileRequestListener<File>() {
-                                @Override
-                                public void onLoad(FileLoadRequest request, FileResponse<File> response) {
-                                    File loadedFile = response.getBody();
-                                    try {
-                                        mp.setDataSource(loadedFile.getPath());
-                                        mp.prepare();
-                                        mp.start();
-                                        captureVideoSnapshot(mp.getDuration());
-                                    } catch (IOException e) {
-                                        e.printStackTrace();
-                                    }
-                                    captureVideoSnapshot(mp.getDuration());
-                                }
-
-                                @Override
-                                public void onError(FileLoadRequest request, Throwable t) {
-                                }
-                            });
+        if (v == ivRecord) {
+            if (recordingStatus == RECORDING_STATUS.STOPPED) {
+                try {
+                    vibRecorder.vibrate(50);
+                    hideViews();
+                    running = true;
+                    runTimer();
+                    ivRecord.setImageDrawable(getResources().getDrawable(R.drawable.ic_dd_video_record_red));
+                    ivRecord.startAnimation(alphaAnimation);
+                    startVideoRecording();
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
+            } else {
+                vibRecorder.vibrate(50);
+                showViews();
+                running = false;
+                ivRecord.setImageDrawable(getResources().getDrawable(R.drawable.ic_dd_video_record_white));
+                ivRecord.clearAnimation();
+                stopVideoRecording();
+            }
 
-                status = RECORDING_STATUS.RECORDING;
-            } else
-                if (status == RECORDING_STATUS.RECORDING){
-                    ivRecord.setImageDrawable(getResources().getDrawable(R.drawable.ic_dd_video_record_white));
-                    camera.stopVideo();
-                    status = RECORDING_STATUS.STOPPED;
-                    mp.stop();
-                    mp.release();
-                }
         }
 
-        if (v == lvFilters){
-            cameraFilterBottomSheet.show(getSupportFragmentManager(), "change_filters");
+        if (v == lvFilters) {
+            if (filterStatus == FilterStatus.HIDE) {
+                lvFilterSheet.setVisibility(View.VISIBLE);
+                filterStatus = FilterStatus.SHOW;
+            } else {
+                lvFilterSheet.setVisibility(View.GONE);
+                filterStatus = FilterStatus.HIDE;
+            }
+
         }
 
-        if (v == tvAddSound){
+        if (v == tvAddSound) {
             startActivity(new Intent(ScreenCamActivity.this, SoundActivity.class));
         }
 
-        if (v == lvEffects){
-//            showTextOnImage();
+        if (v == ivRemoveSound) {
+            editor = preferences.edit();
+            editor.clear();
+            editor.apply();
+            onResume();
+        }
+
+        if (v == lvFlash) {
+            if (flashState == FlashState.FLASH_OFF) {
+                ivFlash.setImageDrawable(getResources().getDrawable(R.drawable.dd_record_flash_on));
+                camera.setFlash(Flash.TORCH);
+                flashState = FlashState.FLASH_ON;
+            } else {
+                ivFlash.setImageDrawable(getResources().getDrawable(R.drawable.dd_record_flash_off));
+                camera.setFlash(Flash.OFF);
+                flashState = FlashState.FLASH_OFF;
+            }
+
+        }
+
+        if (v == lvSpeed) {
+//
+//            if (speedStatus == SpeedStatus.OFF){
+//                frameTimer.setVisibility(View.GONE);
+//                frameSpeed.setVisibility(View.VISIBLE);
+//                speedStatus = SpeedStatus.ON;
+//            } else {
+//                frameSpeed.setVisibility(View.GONE);
+//                speedStatus = SpeedStatus.OFF;
+//            }
+
+            message("Coming Soon", false);
+
+        }
+
+        if (v == lvBeauty) {
+            message("Coming Soon", false);
+        }
+
+        if (v == lvStickers) {
+            message("Coming Soon", false);
+        }
+
+        if (v == lvGallery) {
+            message("Coming Soon", false);
+        }
+
+        if (v == lvTimer) {
+
+        }
+
+        if (v == tvSpeed05x) {
+            //setSpeed05x();
+        }
+
+        if (v == tvSpeed1x) {
+            //setSpeed1x();
+        }
+
+        if (v == tvSpeed2x) {
+            //setSpeed2x();
+        }
+
+        if (v == tvTimer3) {
+            setTimer3();
+        }
+
+        if (v == tvTimer10) {
+            setTimer10();
+        }
+
+        if (v == tvDiscard) {
+            discardAndResetCamera();
+        }
+
+        if (v == tvNext) {
+            goNextWithResult();
         }
 
     }
 
-//    private void showTextOnImage() {
-//        Intent intent = new Intent(ScreenCamActivity.this, TextOnImage.class);
-//        Bundle bundle = new Bundle();
-//        bundle.putString(TextOnImage.IMAGE_IN_URI, passImageUri.toString()); //image uri
-//        bundle.putString(TextOnImage.TEXT_COLOR,"#27ceb8");                 //initial color of the text
-//        bundle.putFloat(TextOnImage.TEXT_FONT_SIZE,20.0f);                  //initial text size
-//        bundle.putString(TextOnImage.TEXT_TO_WRITE,text);                   //text to be add in the image
-//        intent.putExtras(bundle);
-//        startActivityForResult(intent, TextOnImage.TEXT_ON_IMAGE_REQUEST_CODE); //start activity for the result
-//    }
+    private void goNextWithResult() {
+        VideoPreviewActivity.setVideoResult(videoResult);
+        Intent intent = new Intent(ScreenCamActivity.this, VideoPreviewActivity.class);
+        intent.putExtra("sound_path", sound_path);
+        intent.putExtra("filepath", Environment.getExternalStorageDirectory() + "dingdong/videos/video_trans.mp4");
+        startActivity(intent);
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+    }
 
-//    @Override
-//    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-//        if(requestCode == TextOnImage.TEXT_ON_IMAGE_REQUEST_CODE)
-//        {
-//            if(resultCode == TextOnImage.TEXT_ON_IMAGE_RESULT_OK_CODE)
-//            {
-//                Uri resultImageUri = Uri.parse(data.getStringExtra(TextOnImage.IMAGE_OUT_URI));
-//
-//                try {
-//                    Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), resultImageUri);
-//                    imageView.setImageBitmap(bitmap);
-//
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
-//
-//            }else if(resultCode == TextOnImage.TEXT_ON_IMAGE_RESULT_FAILED_CODE)
-//            {
-//                String errorInfo = data.getStringExtra(TextOnImage.IMAGE_OUT_ERROR);
-//                Log.d("MainActivity", "onActivityResult: "+errorInfo);
-//            }
-//        }
-//
-//    }
+    private void discardAndResetCamera() {
+        startActivity(new Intent(ScreenCamActivity.this, ScreenCamActivity.class));
+        finish();
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+//        lhControl.setVisibility(View.GONE);
+//        lvStickers.setVisibility(View.VISIBLE);
+//        lvGallery.setVisibility(View.VISIBLE);
+//        ivRecord.setVisibility(View.VISIBLE);
+//        seconds = 0;
+//        running = false;
+    }
 
+    private void setTimer10() {
+        tvTimer10.setBackgroundColor(getResources().getColor(R.color.text_shadow_white));
+        tvTimer10.setTextColor(getResources().getColor(R.color.colorPrimary));
 
-    private void captureVideoSnapshot(int duration) {
+        ivTimer.setImageDrawable(getResources().getDrawable(R.drawable.dd_record_timer_10));
+
+        tvTimer3.setBackgroundColor(0);
+        tvTimer3.setTextColor(getResources().getColor(R.color.colorDisable));
+    }
+
+    private void setTimer3() {
+        tvTimer3.setBackgroundColor(getResources().getColor(R.color.text_shadow_white));
+        tvTimer3.setTextColor(getResources().getColor(R.color.colorPrimary));
+
+        ivTimer.setImageDrawable(getResources().getDrawable(R.drawable.dd_record_timer));
+
+        tvTimer10.setBackgroundColor(0);
+        tvTimer10.setTextColor(getResources().getColor(R.color.colorDisable));
+    }
+
+    private void setSpeed2x() {
+        tvSpeed2x.setBackgroundColor(getResources().getColor(R.color.text_shadow_white));
+        tvSpeed2x.setTextColor(getResources().getColor(R.color.colorPrimary));
+
+        ivSpeed.setImageDrawable(getResources().getDrawable(R.drawable.dd_record_speed_on));
+
+        tvSpeed1x.setBackgroundColor(0);
+        tvSpeed1x.setTextColor(getResources().getColor(R.color.colorDisable));
+        tvSpeed05x.setBackgroundColor(0);
+        tvSpeed05x.setTextColor(getResources().getColor(R.color.colorDisable));
+    }
+
+    private void setSpeed1x() {
+        tvSpeed1x.setBackgroundColor(getResources().getColor(R.color.text_shadow_white));
+        tvSpeed1x.setTextColor(getResources().getColor(R.color.colorPrimary));
+
+        ivSpeed.setImageDrawable(getResources().getDrawable(R.drawable.dd_record_speed_off));
+
+        tvSpeed2x.setBackgroundColor(0);
+        tvSpeed2x.setTextColor(getResources().getColor(R.color.colorDisable));
+        tvSpeed05x.setBackgroundColor(0);
+        tvSpeed05x.setTextColor(getResources().getColor(R.color.colorDisable));
+    }
+
+    private void setSpeed05x() {
+        tvSpeed05x.setBackgroundColor(getResources().getColor(R.color.text_shadow_white));
+        tvSpeed05x.setTextColor(getResources().getColor(R.color.colorPrimary));
+
+        ivSpeed.setImageDrawable(getResources().getDrawable(R.drawable.dd_record_speed_on));
+
+        tvSpeed2x.setBackgroundColor(0);
+        tvSpeed2x.setTextColor(getResources().getColor(R.color.colorDisable));
+        tvSpeed1x.setBackgroundColor(0);
+        tvSpeed1x.setTextColor(getResources().getColor(R.color.colorDisable));
+    }
+
+    private void showViews() {
+        frameSidePanel.animate()
+                .translationX(0)
+                .alpha(1.0f);
+
+        lvGallery.animate()
+                .translationY(0)
+                .alpha(1.0f);
+
+        lvStickers.animate()
+                .translationY(0)
+                .alpha(1.0f);
+
+        lhSound.setVisibility(View.VISIBLE);
+    }
+
+    private void hideViews() {
+        frameSidePanel.animate()
+                .translationX(50)
+                .alpha(0.0f);
+
+        lvGallery.animate()
+                .translationY(50)
+                .alpha(0.0f);
+
+        lvStickers.animate()
+                .translationY(50)
+                .alpha(0.0f);
+
+        lhSound.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+    }
+
+    private void checkForVideoType() {
+        if (sound_path.equals("NO_SOUND")) {
+            videoType = VideoType.WITHOUT_SOUND;
+        } else {
+            videoType = VideoType.WITH_SOUND;
+        }
+    }
+
+    private void startVideoRecording() throws IOException {
+        if (videoType == VideoType.WITHOUT_SOUND) {
+
+            if (recordingStatus == RECORDING_STATUS.STOPPED) {
+                recordVideoWithoutSound();
+            }
+
+        } else if (videoType == VideoType.WITH_SOUND) {
+            soundPlayer.setDataSource(sound_path);
+            soundPlayer.prepare();
+            recordVideoWithSound(soundPlayer.getDuration());
+        }
+    }
+
+    private void recordVideoWithoutSound() {
         if (camera.isTakingVideo()) {
             message("Already taking video.", false);
             return;
@@ -265,16 +613,85 @@ public class ScreenCamActivity extends AppCompatActivity implements View.OnClick
             return;
         }
 
-        File folder = new File(Environment.getExternalStorageDirectory() +
-                File.separator + "dingdong");
+        File folder = new File(
+                Environment.getExternalStorageDirectory()
+                        + File.separator + "dingdong/videos");
+
+        boolean success = true;
+
+        if (!folder.exists()) {
+            success = folder.mkdirs();
+        }
+        if (success) {
+            recordingStatus = RECORDING_STATUS.RECORDING;
+            camera.takeVideoSnapshot(new File(Environment.getExternalStorageDirectory(),
+                            "dingdong/videos/video.mp4"),
+                    Video.MAX_VIDEO_DURATION);
+        } else {
+            message(getResources().getString(R.string.folder_creation_problem), false);
+        }
+
+    }
+
+    private void recordVideoWithSound(int sound_duration) {
+        if (camera.isTakingVideo()) {
+            message("Already taking video.", false);
+            return;
+        }
+
+        if (camera.getPreview() != Preview.GL_SURFACE) {
+            message("Video snapshots are only allowed with the GL_SURFACE preview.", true);
+            return;
+        }
+
+        File folder = new File(
+                Environment.getExternalStorageDirectory()
+                        + File.separator + "dingdong/videos");
+
+        boolean success = true;
+
+        if (!folder.exists()) {
+            success = folder.mkdirs();
+        }
+        if (success) {
+            recordingStatus = RECORDING_STATUS.RECORDING;
+            soundPlayer.start();
+            camera.setAudio(Audio.OFF);
+            camera.takeVideoSnapshot(new File(Environment.getExternalStorageDirectory(),
+                            "dingdong/videos/video.mp4"),
+                    sound_duration);
+        } else {
+            message(getResources().getString(R.string.folder_creation_problem), false);
+        }
+    }
+
+    private void stopVideoRecording() {
+        camera.stopVideo();
+        soundPlayer.stop();
+        soundPlayer.reset();
+        recordingStatus = RECORDING_STATUS.STOPPED;
+    }
+
+    private void captureVideoSnapshot() {
+        if (camera.isTakingVideo()) {
+            message("Already taking video.", false);
+            return;
+        }
+
+        if (camera.getPreview() != Preview.GL_SURFACE) {
+            message("Video snapshots are only allowed with the GL_SURFACE preview.", true);
+            return;
+        }
+
+        File folder = new File(Environment.getExternalStorageDirectory() + File.separator + "dingdong/videos");
         boolean success = true;
         if (!folder.exists()) {
             success = folder.mkdirs();
         }
         if (success) {
-            camera.takeVideoSnapshot(new File(Environment.getExternalStorageDirectory(), "dingdong/video.mp4"), duration);
+            camera.takeVideoSnapshot(new File(Environment.getExternalStorageDirectory(), "dingdong/videos/video.mp4"), 44542);
         } else {
-            // Do something else on failure
+            message("Something went wrong...", false);
         }
     }
 
@@ -297,16 +714,15 @@ public class ScreenCamActivity extends AppCompatActivity implements View.OnClick
         camera.setFilter(filter.newInstance());
     }
 
-
     private void flipCamera() {
         if (camera.isTakingPicture() || camera.isTakingVideo()) return;
         switch (camera.toggleFacing()) {
             case BACK:
-                message("Switched to back camera!", false);
+                lvFlash.setVisibility(View.VISIBLE);
                 break;
 
             case FRONT:
-                message("Switched to front camera!", false);
+                lvFlash.setVisibility(View.GONE);
                 break;
         }
     }
@@ -328,9 +744,37 @@ public class ScreenCamActivity extends AppCompatActivity implements View.OnClick
         super.onResume();
         preferences = getSharedPreferences("selected_sound", 0);
         tvAddSound.setText(preferences.getString("sound_name", "Add Sound"));
-        if (!preferences.getString("sound_name", "Add Sound").equals("Add Sound")){
+
+        if (!preferences.getString("sound_name", "Add Sound").equals("Add Sound")) {
             tvAddSound.setSelected(true);
+            ivSoundSelected.setImageDrawable(getResources().getDrawable(R.drawable.dd_record_sound_selected));
+            ivRemoveSound.setVisibility(View.VISIBLE);
+        } else {
+            tvAddSound.setSelected(false);
+            ivSoundSelected.setImageDrawable(getResources().getDrawable(R.drawable.dd_sound));
+            ivRemoveSound.setVisibility(View.GONE);
         }
-        sound_url = preferences.getString("sound_url", null);
+        sound_path = preferences.getString("sound_path", "NO_SOUND");
+        checkForVideoType();
+    }
+
+    public enum SpeedStatus {
+        ON,
+        OFF
+    }
+
+    public enum TimerStatus {
+        ON,
+        OFF
+    }
+
+    public enum FilterStatus {
+        HIDE,
+        SHOW
+    }
+
+    public enum RECORDING_STATUS {
+        RECORDING,
+        STOPPED
     }
 }

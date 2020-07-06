@@ -10,13 +10,18 @@ import android.os.Handler;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.ImageView;
 import android.widget.VideoView;
 
+import com.bumptech.glide.Glide;
+import com.daimajia.androidanimations.library.Techniques;
+import com.daimajia.androidanimations.library.YoYo;
 import com.tetravalstartups.dingdong.utils.Constants;
 
 public class SplashActivity extends AppCompatActivity {
 
     private VideoView videoSplash;
+    private ImageView ivSplash;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,27 +36,37 @@ public class SplashActivity extends AppCompatActivity {
 
     private void initView() {
 
-        videoSplash = findViewById(R.id.videoSplash);
-        Uri video = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.dd_video);
-        videoSplash.setVideoURI(video);
+//        videoSplash = findViewById(R.id.videoSplash);
+        ivSplash = findViewById(R.id.ivSplash);
+        Glide.with(this).load(R.drawable.dd_gif_splash).into(ivSplash);
+        //Uri video = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.dd_video);
+        //videoSplash.setVideoURI(video);
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
 
-        videoSplash.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-            public void onCompletion(MediaPlayer mp) {
                 Intent splashIntent = new Intent(SplashActivity.this, MainActivity.class);
                 startActivity(splashIntent);
                 finish();
                 overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+
+//                YoYo.with(Techniques.Bounce)
+//                        .duration(800)
+//                .repeat(4)
+//                .playOn(videoSplash);
             }
-        });
+        }, 2000);
 
-        videoSplash.start();
-
-//        new Handler().postDelayed(new Runnable() {
-//            @Override
-//            public void run() {
-//
+//        videoSplash.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+//            public void onCompletion(MediaPlayer mp) {
+//                Intent splashIntent = new Intent(SplashActivity.this, MainActivity.class);
+//                startActivity(splashIntent);
+//                finish();
+//                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
 //            }
-//        }, Constants.SPLASH_DELAY);
+//        });
+//
+//        videoSplash.start();
     }
 
     @Override

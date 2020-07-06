@@ -2,9 +2,11 @@
 <resources>
     <color name="colorPrimary">#11111C</color>
     <color name="colorPrimaryDark">#11111C</color>
+    <color name="colorSurface">#11111C</color>
     <color name="colorPrimaryDarkV2">#808188</color>
     <color name="colorPrimaryDarkV3">#3F4042</color>
     <color name="colorPrimaryDarkV4">#B1BACF</color>
+    <color name="colorPrimaryDarkV5">#242439</color>
     <color name="colorAccent">#11111C</color>
     <color name="colorAccentV1">#F7F7F8</color>
     <color name="colorTextTitle">#FFFFFF</color>

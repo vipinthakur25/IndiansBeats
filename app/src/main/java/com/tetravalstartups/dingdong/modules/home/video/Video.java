@@ -3,7 +3,12 @@ package com.tetravalstartups.dingdong.modules.home.video;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-public class Video implements Parcelable {
+public class Video {
+
+    public static final int VIDEO_TYPE_WITHOUT_SOUND = 1;
+    public static final int VIDEO_TYPE_WITH_SOUND = 2;
+
+    public static final int MAX_VIDEO_DURATION = 60000 * 5;
 
     private String id;
     private String video_desc;
@@ -39,35 +44,6 @@ public class Video implements Parcelable {
         this.video_thumbnail = video_thumbnail;
         this.video_status = video_status;
     }
-
-    protected Video(Parcel in) {
-        id = in.readString();
-        video_desc = in.readString();
-        sound_contain = in.readByte() != 0;
-        sound_id = in.readString();
-        sound_title = in.readString();
-        sound_url = in.readString();
-        likes_count = in.readString();
-        share_count = in.readString();
-        comment_count = in.readString();
-        user_id = in.readString();
-        user_handle = in.readString();
-        user_photo = in.readString();
-        video_thumbnail = in.readString();
-        video_status = in.readString();
-    }
-
-    public static final Creator<Video> CREATOR = new Creator<Video>() {
-        @Override
-        public Video createFromParcel(Parcel in) {
-            return new Video(in);
-        }
-
-        @Override
-        public Video[] newArray(int size) {
-            return new Video[size];
-        }
-    };
 
     public String getId() {
         return id;
@@ -179,28 +155,5 @@ public class Video implements Parcelable {
 
     public void setVideo_status(String video_status) {
         this.video_status = video_status;
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(id);
-        dest.writeString(video_desc);
-        dest.writeByte((byte) (sound_contain ? 1 : 0));
-        dest.writeString(sound_id);
-        dest.writeString(sound_title);
-        dest.writeString(sound_url);
-        dest.writeString(likes_count);
-        dest.writeString(share_count);
-        dest.writeString(comment_count);
-        dest.writeString(user_id);
-        dest.writeString(user_handle);
-        dest.writeString(user_photo);
-        dest.writeString(video_thumbnail);
-        dest.writeString(video_status);
     }
 }

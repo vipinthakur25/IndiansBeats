@@ -34,6 +34,35 @@
           ]
         }
       }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:340005109453:android:1cb2458110fb2b24a3b384",
+        "android_client_info": {
+          "package_name": "com.tetravalstartups.videospeed"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "340005109453-n4rh2fht1orlohqinujkprg12uijdudu.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDOgh_cfFCxa7AiJ8RWWc7JfD8Q2IO2yiM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "340005109453-n4rh2fht1orlohqinujkprg12uijdudu.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
     }
   ],
   "configuration_version": "1"

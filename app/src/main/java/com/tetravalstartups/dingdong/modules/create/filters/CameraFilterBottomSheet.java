@@ -71,8 +71,7 @@ public class CameraFilterBottomSheet extends BottomSheetDialogFragment implement
         cameraFilterList.add(new CameraFilter(20, "Vintage", R.drawable.emma));
 
         cameraFilterAdapter =
-                new CameraFilterAdapter(getContext(), cameraFilterList,
-                CameraFilterBottomSheet.this);
+                new CameraFilterAdapter(getContext(), cameraFilterList);
 
         cameraFilterAdapter.notifyDataSetChanged();
 
