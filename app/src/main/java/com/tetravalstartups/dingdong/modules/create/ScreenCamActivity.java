@@ -100,6 +100,7 @@ public class ScreenCamActivity extends AppCompatActivity implements View.OnClick
     private TextView tvSpeed05x;
     private TextView tvSpeed1x;
     private TextView tvSpeed2x;
+    private TextView tvFilterName;
     private ImageView ivSpeed;
     private ImageView ivTimer;
     private FrameLayout frameSpeed;
@@ -162,6 +163,7 @@ public class ScreenCamActivity extends AppCompatActivity implements View.OnClick
         lvStickers = findViewById(R.id.lvStickers);
         lvGallery = findViewById(R.id.lvGallery);
         lvTimer = findViewById(R.id.lvTimer);
+        tvFilterName = findViewById(R.id.tvFilterName);
 
         tvDiscard = findViewById(R.id.tvDiscard);
         tvNext = findViewById(R.id.tvNext);
@@ -221,8 +223,6 @@ public class ScreenCamActivity extends AppCompatActivity implements View.OnClick
 
         lhControl = findViewById(R.id.lhControl);
         lvFilterSheet = findViewById(R.id.lvFilterSheet);
-
-        tvAddSound.setText(preferences.getString("sound_name", "Add Sound"));
 
         cameraFilterBottomSheet = new CameraFilterBottomSheet();
         setSpeed1x();
@@ -369,14 +369,7 @@ public class ScreenCamActivity extends AppCompatActivity implements View.OnClick
         }
 
         if (v == lvFilters) {
-            if (filterStatus == FilterStatus.HIDE) {
-                lvFilterSheet.setVisibility(View.VISIBLE);
-                filterStatus = FilterStatus.SHOW;
-            } else {
-                lvFilterSheet.setVisibility(View.GONE);
-                filterStatus = FilterStatus.HIDE;
-            }
-
+            flipFilters();
         }
 
         if (v == tvAddSound) {
@@ -387,6 +380,8 @@ public class ScreenCamActivity extends AppCompatActivity implements View.OnClick
             editor = preferences.edit();
             editor.clear();
             editor.apply();
+            Bundle bundle = getIntent().getExtras();
+            sound_path = "Add Sound";
             onResume();
         }
 
@@ -461,6 +456,31 @@ public class ScreenCamActivity extends AppCompatActivity implements View.OnClick
         if (v == tvNext) {
             goNextWithResult();
         }
+
+    }
+
+    private void flipFilters() {
+        if (camera.getPreview() != Preview.GL_SURFACE) {
+            return;
+        }
+        if (mCurrentFilter < mAllFilters.length - 1) {
+            mCurrentFilter++;
+        } else {
+            mCurrentFilter = 0;
+        }
+        Filters filter = mAllFilters[mCurrentFilter];
+    //    message(filter.toString(), false);
+
+        tvFilterName.setText(filter.toString());
+        tvFilterName.setVisibility(View.VISIBLE);
+        tvFilterName.setAlpha(1.0f);
+        tvFilterName.animate()
+                .alpha(0.0f).translationX(50);
+        //tvFilterName.setVisibility(View.INVISIBLE);
+
+
+        // Normal behavior:
+        camera.setFilter(filter.newInstance());
 
     }
 
@@ -583,18 +603,18 @@ public class ScreenCamActivity extends AppCompatActivity implements View.OnClick
     private void checkForVideoType() {
         if (sound_path.equals("NO_SOUND")) {
             videoType = VideoType.WITHOUT_SOUND;
+            Toast.makeText(this, "no sound", Toast.LENGTH_SHORT).show();
         } else {
             videoType = VideoType.WITH_SOUND;
+            Toast.makeText(this, "sound", Toast.LENGTH_SHORT).show();
         }
     }
 
     private void startVideoRecording() throws IOException {
         if (videoType == VideoType.WITHOUT_SOUND) {
-
             if (recordingStatus == RECORDING_STATUS.STOPPED) {
                 recordVideoWithoutSound();
             }
-
         } else if (videoType == VideoType.WITH_SOUND) {
             soundPlayer.setDataSource(sound_path);
             soundPlayer.prepare();
@@ -742,19 +762,35 @@ public class ScreenCamActivity extends AppCompatActivity implements View.OnClick
     @Override
     protected void onResume() {
         super.onResume();
-        preferences = getSharedPreferences("selected_sound", 0);
-        tvAddSound.setText(preferences.getString("sound_name", "Add Sound"));
+//        preferences = getSharedPreferences("selected_sound", 0);
+//        tvAddSound.setText(preferences.getString("sound_name", "Add Sound"));
+        Bundle bundle = getIntent().getExtras();
 
-        if (!preferences.getString("sound_name", "Add Sound").equals("Add Sound")) {
-            tvAddSound.setSelected(true);
-            ivSoundSelected.setImageDrawable(getResources().getDrawable(R.drawable.dd_record_sound_selected));
-            ivRemoveSound.setVisibility(View.VISIBLE);
-        } else {
+        if (bundle == null){
             tvAddSound.setSelected(false);
             ivSoundSelected.setImageDrawable(getResources().getDrawable(R.drawable.dd_sound));
             ivRemoveSound.setVisibility(View.GONE);
+            sound_path = "NO_SOUND";
+        } else {
+            tvAddSound.setSelected(true);
+            ivSoundSelected.setImageDrawable(getResources().getDrawable(R.drawable.dd_record_sound_selected));
+            tvAddSound.setText(bundle.getString("sound_title"));
+            sound_path = bundle.getString("sound_path");
+            ivRemoveSound.setVisibility(View.VISIBLE);
         }
-        sound_path = preferences.getString("sound_path", "NO_SOUND");
+//
+
+//
+//        if (!preferences.getString("sound_name", "Add Sound").equals("Add Sound")) {
+//            tvAddSound.setSelected(true);
+//            ivSoundSelected.setImageDrawable(getResources().getDrawable(R.drawable.dd_record_sound_selected));
+//            ivRemoveSound.setVisibility(View.VISIBLE);
+//            sound_path = preferences.getString("sound_path", "NO_SOUND");
+//        } else {
+//            tvAddSound.setSelected(false);
+//            ivSoundSelected.setImageDrawable(getResources().getDrawable(R.drawable.dd_sound));
+//            ivRemoveSound.setVisibility(View.GONE);
+//        }
         checkForVideoType();
     }
 

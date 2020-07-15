@@ -90,16 +90,14 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     private void setupProfile() {
         tvName.setText(master.getName());
         tvHandle.setText(master.getHandle());
-//        if (master.getBio() != null) {
-//            tvBio.setText(master.getBio());
-//        } else {
-//            tvBio.setText(R.string.add_bio);
-//        }
+        if (master.getBio() != null) {
+            tvBio.setText(master.getBio());
+        }
 
-//        Glide.with(getContext())
-//                .load(master.getPhoto())
-//                .placeholder(R.drawable.dingdong_placeholder)
-//                .into(ivPhoto);
+        Glide.with(getContext())
+                .load(master.getPhoto())
+                .placeholder(R.drawable.dd_logo_placeholder)
+                .into(ivPhoto);
 
         ivPhoto.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -134,6 +132,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         videoTab.setupWithViewPager(videoPager);
         Objects.requireNonNull(videoTab.getTabAt(0)).setIcon(R.drawable.ic_dd_created_video_inactive);
         Objects.requireNonNull(videoTab.getTabAt(1)).setIcon(R.drawable.ic_dd_liked_video_inactive);
+        Objects.requireNonNull(videoTab.getTabAt(2)).setIcon(R.drawable.ic_dd_private_draft_video);
     }
 
     @Override

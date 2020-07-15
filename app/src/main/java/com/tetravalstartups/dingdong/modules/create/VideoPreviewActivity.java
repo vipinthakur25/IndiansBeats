@@ -127,56 +127,30 @@ public class VideoPreviewActivity extends AppCompatActivity implements View.OnCl
     }
 
     private void initVideoPlayer() throws IOException {
-        //ddProgress.showProgress(VideoPreviewActivity.this, "", false);
         DataSink sink;
-        File f = new File(Environment.getExternalStorageDirectory() + "/xyz/");
+        File f = new File(Environment.getExternalStorageDirectory() + "/dingdong/transcode/");
 
             f.mkdirs();
-            mTranscodeOutputFile = File.createTempFile("transcode_test", ".mp4", f);
+            mTranscodeOutputFile = File.createTempFile("video", ".mp4", f);
             sink = new DefaultDataSink(mTranscodeOutputFile.getAbsolutePath());
 
         TranscoderOptions.Builder builder = Transcoder.into(sink);
-       // Uri uri =  Uri.parse(sound_path);
-        if (sound_path != null){
-           // DataSource source = new UriDataSource(this, uri);
-            builder.addDataSource(TrackType.AUDIO, sound_path);
+
+        if (!getIntent().getStringExtra("sound_path").equals("NO _SOUND")){
+            builder.addDataSource(TrackType.AUDIO, getIntent().getStringExtra("sound_path"));
             builder.addDataSource(TrackType.VIDEO, result.getFile().getPath());
-
             mTranscodeFuture = builder.setListener(this).transcode();
-
             SharedPreferences preferences = getSharedPreferences("trans_path", 0);
             Editor editor = preferences.edit();
             editor.putString("video_path", mTranscodeOutputFile.getPath());
             editor.apply();
-
-
-
+        } else {
+            playTranscodeResult(result.getFile());
+            SharedPreferences preferences = getSharedPreferences("trans_path", 0);
+            Editor editor = preferences.edit();
+            editor.putString("video_path", result.getFile().getPath());
+            editor.apply();
         }
-
-
-//        Transcoder.into(sink)
-//                .addDataSource(TrackType.VIDEO, result.getFile().getPath())
-//                .addDataSource(TrackType.AUDIO, new UriDataSource(VideoPreviewActivity.this, uri))
-//                .setListener(new TranscoderListener() {
-//                    public void onTranscodeProgress(double progress) {
-//
-//                    }
-//                    public void onTranscodeCompleted(int successCode) {
-//                        ddLoading.hideProgress();
-//                        if (successCode == Transcoder.SUCCESS_TRANSCODED){
-//                            playTranscodeResult(mTranscodeOutputFile);
-//                        }
-//                    }
-//                    public void onTranscodeCanceled() {
-//                        ddLoading.hideProgress();
-//                    }
-//
-//                    public void onTranscodeFailed(@NonNull Throwable exception) {
-//                        ddLoading.hideProgress();
-//                    }
-//                }).transcode();
-
-       // playTranscodeResult(result.getFile());
 
     }
 

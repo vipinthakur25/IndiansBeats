@@ -2,13 +2,15 @@ package com.tetravalstartups.dingdong.modules.home.video;
 
 import android.content.Context;
 
-import androidx.annotation.Nullable;
+import androidx.annotation.NonNull;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.tetravalstartups.dingdong.utils.Constants;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,47 +26,54 @@ public class VideoPresenter {
         this.iVideo = iVideo;
     }
 
+    public void fetchVideos() {
+        db = FirebaseFirestore.getInstance();
+        List<Video> videoList = new ArrayList<>();
+
+        Query query = db.collection("videos");
+        query.whereEqualTo("video_status", Constants.VIDEO_STATUS_PUBLIC)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()){
+                            if (task.getResult().getDocuments().isEmpty()){
+                                iVideo.fetchVideosError("No Videos");
+                            } else {
+
+                                videoList.clear();
+                                for (DocumentSnapshot snapshot : task.getResult()) {
+                                    Video video = new Video();
+                                    video.setId(snapshot.getString("id"));
+                                    video.setVideo_desc(snapshot.getString("video_desc"));
+                                    video.setSound_id(snapshot.getString("sound_id"));
+                                    video.setSound_title(snapshot.getString("sound_title"));
+                                    video.setLikes_count(snapshot.getString("likes_count"));
+                                    video.setShare_count(snapshot.getString("share_count"));
+                                    video.setComment_count(snapshot.getString("comment_count"));
+                                    video.setUser_id(snapshot.getString("user_id"));
+                                    video.setUser_handle(snapshot.getString("user_handle"));
+                                    video.setUser_photo(snapshot.getString("user_photo"));
+                                    video.setVideo_thumbnail(snapshot.getString("video_thumbnail"));
+                                    video.setVideo_status(snapshot.getString("video_status"));
+                                    videoList.add(video);
+                                }
+
+                                iVideo.fetchVideosSuccess(videoList);
+
+                            }
+                        }
+                    }
+                });
+    }
+
     public interface IVideo {
         void fetchVideosSuccess(List<Video> videoList);
 
         void fetchVideosError(String error);
     }
 
-    public void fetchVideos(){
-        db = FirebaseFirestore.getInstance();
-        List<Video> videoList = new ArrayList<>();
-
-        db.collection("videos")
-                .addSnapshotListener(new EventListener<QuerySnapshot>() {
-                    @Override
-                    public void onEvent(@Nullable QuerySnapshot documentSnapshots, @Nullable FirebaseFirestoreException e) {
-                        if (documentSnapshots.getDocuments().isEmpty()){
-                            iVideo.fetchVideosError("No Videos");
-                        } else {
-                            for (DocumentSnapshot snapshot : documentSnapshots.getDocuments()){
-//                                Video video = snapshot.toObject(Video.class);
-                                Video video = new Video();
-                                video.setId(snapshot.getString("id"));
-                                video.setVideo_desc(snapshot.getString("video_desc"));
-                                video.setSound_contain(snapshot.getBoolean("sound_contain"));
-                                video.setSound_id(snapshot.getString("sound_id"));
-                                video.setSound_title(snapshot.getString("sound_title"));
-                                video.setSound_url(snapshot.getString("sound_url"));
-                              //  video.setLikes_count(snapshot.getString("likes_count"));
-                                video.setShare_count(snapshot.getString("share_count"));
-                                video.setComment_count(snapshot.getString("comment_count"));
-                                video.setUser_id(snapshot.getString("user_id"));
-                                video.setUser_handle(snapshot.getString("user_handle"));
-                                video.setUser_photo(snapshot.getString("user_photo"));
-                                video.setVideo_thumbnail(snapshot.getString("video_thumbnail"));
-                                video.setVideo_status(snapshot.getString("video_status"));
-                                videoList.add(video);
-                            }
-
-                            iVideo.fetchVideosSuccess(videoList);
-                        }
-                    }
-                });
-    }
-
 }
+
+
+

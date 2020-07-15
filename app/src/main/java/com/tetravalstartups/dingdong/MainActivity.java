@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
@@ -27,8 +28,9 @@ import com.tetravalstartups.dingdong.modules.home.HomeFragment;
 import com.tetravalstartups.dingdong.modules.notification.NotificationFragment;
 import com.tetravalstartups.dingdong.modules.profile.view.fragment.ProfileFragment;
 import com.tetravalstartups.dingdong.modules.discover.DiscoverFragment;
+import com.tetravalstartups.dingdong.modules.record.RecordActivity;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends BaseActivity implements View.OnClickListener {
 
     private LinearLayout lvHome;
     private LinearLayout lvDiscover;
@@ -54,10 +56,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-                WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        setStatusBarTransparentFlag();
         setContentView(R.layout.activity_main);
+        this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         initView();
     }
 
@@ -84,7 +85,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         ivCreate.setOnClickListener(this);
         lvNotification.setOnClickListener(this);
         lvProfile.setOnClickListener(this);
-
 
         Glide.with(this).load(R.drawable.dd_create_video).into(ivCreate);
 
@@ -115,13 +115,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             switchSearch();
         }
         if (v == ivCreate){
-            startActivity(new Intent(MainActivity.this, ScreenCamActivity.class));
+            if (auth.getCurrentUser() != null){
+                startActivity(new Intent(MainActivity.this, RecordActivity.class));
+            } else {
+                startActivity(new Intent(MainActivity.this, LoginActivity.class));
+            }
             overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+
         }
         if (v == lvNotification){
-            fragment = new NotificationFragment();
-            loadFragment(fragment);
-            switchNotification();
+            if (auth.getCurrentUser() != null){
+                fragment = new NotificationFragment();
+                loadFragment(fragment);
+                switchNotification();
+            } else {
+                startActivity(new Intent(MainActivity.this, LoginActivity.class));
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+            }
         }
         if (v == lvProfile){
             fragment = new ProfileFragment();

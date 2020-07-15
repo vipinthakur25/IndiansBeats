@@ -7,6 +7,7 @@ import androidx.fragment.app.FragmentPagerAdapter;
 
 import com.tetravalstartups.dingdong.modules.profile.view.fragment.CreatedVideoFragment;
 import com.tetravalstartups.dingdong.modules.profile.view.fragment.LikedVideoFragment;
+import com.tetravalstartups.dingdong.modules.profile.view.fragment.PrivateDraftFragment;
 
 public class VideoTabPagerAdapter extends FragmentPagerAdapter {
 
@@ -22,6 +23,8 @@ public class VideoTabPagerAdapter extends FragmentPagerAdapter {
                 return new CreatedVideoFragment();
             case 1:
                 return new LikedVideoFragment();
+            case 2:
+                return new PrivateDraftFragment();
             default:
                 return null;
         }
@@ -29,7 +32,7 @@ public class VideoTabPagerAdapter extends FragmentPagerAdapter {
 
     @Override
     public int getCount() {
-        return 2;
+        return 3;
     }
 
 }

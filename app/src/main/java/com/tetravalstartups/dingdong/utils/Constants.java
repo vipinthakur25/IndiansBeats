@@ -27,7 +27,7 @@ public class Constants {
 
     public static final String DEFAULT_BIO = "Add bio";
 
-    public static final String DD_IV_PLACEHOLDER = "https://firebasestorage.googleapis.com/v0/b/dingdong-7billion.appspot.com/o/avatars%2Fdingdong_placeholder.png?alt=media&token=c512bc76-7a63-4ab4-8200-f1f2059bab2f";
+    public static final String DD_IV_PLACEHOLDER = "https://firebasestorage.googleapis.com/v0/b/dingdong-7billion.appspot.com/o/dd_logo_for_profile.png?alt=media&token=ebd963fe-4283-44b8-9b4a-41599506ee3c";
 
     public static final int TXN_DEBIT = -1;
     public static final int TXN_CREDIT = 1;
@@ -47,5 +47,9 @@ public class Constants {
     public static final String INITIAL_VIDEO_COMMENTS = "0";
     public static final String INITIAL_VIDEO_STATUS = "0";
 
+    // video status
+    public static final String VIDEO_STATUS_PUBLIC = "1";
+    public static final String VIDEO_STATUS_PRIVATE = "0";
+    public static final String VIDEO_STATUS_MODERATE = "-1";
 
 }

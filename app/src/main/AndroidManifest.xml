@@ -17,58 +17,72 @@
         android:hardwareAccelerated="true"
         android:icon="@mipmap/ic_launcher_foreground"
         android:label="@string/app_name"
+        android:requestLegacyExternalStorage="true"
         android:roundIcon="@mipmap/ic_launcher_foreground"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".modules.create.PreviewActivity"></activity>
+        <activity android:name=".BaseActivity"></activity>
+        <activity android:name=".modules.profile.view.activity.PlayVideoActivity" />
+        <activity
+            android:name=".modules.record.RecordActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".modules.create.DDCameraActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".modules.create.SoundDetailActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".modules.record.PreviewActivity"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".modules.create.PostActivity"
-            android:screenOrientation="nosensor" />
+            android:screenOrientation="portrait" />
         <activity
             android:name=".ComingSoonActivity"
-            android:screenOrientation="nosensor" />
+            android:screenOrientation="portrait" />
         <activity
             android:name=".modules.create.sound.SoundActivity"
-            android:screenOrientation="nosensor" />
+            android:screenOrientation="portrait" />
         <activity
             android:name=".modules.create.VideoPreviewActivity"
-            android:screenOrientation="nosensor" />
+            android:screenOrientation="portrait" />
         <activity
             android:name=".modules.create.ScreenCamActivity"
-            android:screenOrientation="nosensor" />
+            android:screenOrientation="portrait" />
         <activity
             android:name=".modules.passbook.BanksActivity"
-            android:screenOrientation="nosensor" />
+            android:screenOrientation="portrait" />
         <activity
             android:name=".modules.passbook.PassbookActivity"
-            android:screenOrientation="nosensor" />
+            android:screenOrientation="portrait" />
         <activity
             android:name=".modules.subscription.SubscriptionActivity"
-            android:screenOrientation="nosensor" />
+            android:screenOrientation="portrait" />
         <activity
             android:name=".modules.profile.view.activity.EditProfileActivity"
-            android:screenOrientation="nosensor" />
+            android:screenOrientation="portrait" />
         <activity
             android:name=".modules.profile.view.activity.SettingsActivity"
-            android:screenOrientation="nosensor" />
+            android:screenOrientation="portrait" />
         <activity
             android:name=".auth.SignUpActivity"
-            android:screenOrientation="nosensor" />
+            android:screenOrientation="portrait" />
         <activity
             android:name=".auth.LoginActivity"
-            android:screenOrientation="nosensor" />
+            android:screenOrientation="portrait" />
         <activity
             android:name=".modules.profile.view.activity.FollowersActivity"
-            android:screenOrientation="nosensor" />
+            android:screenOrientation="portrait" />
         <activity
             android:name=".auth.CodeActivity"
-            android:screenOrientation="nosensor" />
+            android:screenOrientation="portrait" />
         <activity
             android:name=".auth.PhoneActivity"
-            android:screenOrientation="nosensor" />
+            android:screenOrientation="portrait" />
         <activity
             android:name=".SplashActivity"
-            android:screenOrientation="nosensor">
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

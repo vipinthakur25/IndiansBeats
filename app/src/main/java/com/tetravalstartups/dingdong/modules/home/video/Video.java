@@ -3,19 +3,16 @@ package com.tetravalstartups.dingdong.modules.home.video;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.google.firebase.firestore.IgnoreExtraProperties;
+
+@IgnoreExtraProperties
 public class Video {
-
-    public static final int VIDEO_TYPE_WITHOUT_SOUND = 1;
-    public static final int VIDEO_TYPE_WITH_SOUND = 2;
-
-    public static final int MAX_VIDEO_DURATION = 60000 * 5;
+    public static final int MAX_VIDEO_DURATION = 60000;
 
     private String id;
     private String video_desc;
-    private boolean sound_contain;
     private String sound_id;
     private String sound_title;
-    private String sound_url;
     private String likes_count;
     private String share_count;
     private String comment_count;
@@ -28,13 +25,11 @@ public class Video {
     public Video() {
     }
 
-    public Video(String id, String video_desc, boolean sound_contain, String sound_id, String sound_title, String sound_url, String likes_count, String share_count, String comment_count, String user_id, String user_handle, String user_photo, String video_thumbnail, String video_status) {
+    public Video(String id, String video_desc, String sound_id, String sound_title, String likes_count, String share_count, String comment_count, String user_id, String user_handle, String user_photo, String video_thumbnail, String video_status) {
         this.id = id;
         this.video_desc = video_desc;
-        this.sound_contain = sound_contain;
         this.sound_id = sound_id;
         this.sound_title = sound_title;
-        this.sound_url = sound_url;
         this.likes_count = likes_count;
         this.share_count = share_count;
         this.comment_count = comment_count;
@@ -61,14 +56,6 @@ public class Video {
         this.video_desc = video_desc;
     }
 
-    public boolean isSound_contain() {
-        return sound_contain;
-    }
-
-    public void setSound_contain(boolean sound_contain) {
-        this.sound_contain = sound_contain;
-    }
-
     public String getSound_id() {
         return sound_id;
     }
@@ -83,14 +70,6 @@ public class Video {
 
     public void setSound_title(String sound_title) {
         this.sound_title = sound_title;
-    }
-
-    public String getSound_url() {
-        return sound_url;
-    }
-
-    public void setSound_url(String sound_url) {
-        this.sound_url = sound_url;
     }
 
     public String getLikes_count() {
