@@ -94,12 +94,15 @@
 
 
 
-        <ImageView
+        <com.like.LikeButton
             android:id="@+id/ivFav"
-            android:layout_width="wrap_content"
-            android:layout_height="22dp"
-            android:layout_gravity="center"
-            app:srcCompat="@drawable/ic_dd_liked_video_inactive"/>
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            app:icon_type="heart"
+            app:icon_size="20dp"
+            app:anim_scale_factor="0"
+            android:layout_marginTop="8dp"
+            android:layout_gravity="center"/>
 
 
 

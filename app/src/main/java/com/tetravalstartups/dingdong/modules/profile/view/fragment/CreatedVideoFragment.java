@@ -1,5 +1,6 @@
 package com.tetravalstartups.dingdong.modules.profile.view.fragment;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
@@ -10,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -27,16 +29,18 @@ import com.tetravalstartups.dingdong.utils.Constants;
 import com.tetravalstartups.dingdong.utils.EqualSpacingItemDecoration;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class CreatedVideoFragment extends Fragment {
 
     private View view;
-    private RecyclerView recyclerCreatedVideo;
+    private RecyclerView recyclerVideos;
     private List<InProfileCreatedVideo> inProfileCreatedVideoList;
     private InProfileCreatedVideoAdapter inProfileCreatedVideoAdapter;
     private FirebaseFirestore db;
     private Master master;
+    private TextView tvNoVideos;
 
     public CreatedVideoFragment() {
     }
@@ -50,37 +54,54 @@ public class CreatedVideoFragment extends Fragment {
     }
 
     private void initView() {
-        recyclerCreatedVideo = view.findViewById(R.id.recyclerCreatedVideo);
+        recyclerVideos = view.findViewById(R.id.recyclerVideos);
+        recyclerVideos.setHasFixedSize(true);
+        tvNoVideos = view.findViewById(R.id.tvNoVideos);
         db = FirebaseFirestore.getInstance();
         master = new Master(getContext());
-        fetchCreatedVideos();
+        SharedPreferences preferences = getActivity().getSharedPreferences("videoPref", 0);
+
+        if (preferences.getString("profile_type", "none").equals("public")) {
+            fetchCreatedVideos(preferences.getString("user_id", "none"));
+
+        } else if (preferences.getString("profile_type", "none").equals("private")) {
+            fetchCreatedVideos(master.getId());
+        }
+
+
     }
 
-    private void fetchCreatedVideos() {
+    private void fetchCreatedVideos(String id) {
         inProfileCreatedVideoList = new ArrayList<>();
-        recyclerCreatedVideo.setLayoutManager(new GridLayoutManager(getContext(), 3));
-        recyclerCreatedVideo.addItemDecoration(new EqualSpacingItemDecoration(4, EqualSpacingItemDecoration.GRID));
+        recyclerVideos.setLayoutManager(new GridLayoutManager(getContext(), 3));
+        recyclerVideos.addItemDecoration(new EqualSpacingItemDecoration(4, EqualSpacingItemDecoration.GRID));
         Query query = db.collection("videos");
-        query.whereEqualTo("user_id", master.getId())
+        query.whereEqualTo("user_id", id)
                 .whereEqualTo("video_status", Constants.VIDEO_STATUS_PUBLIC)
+                .orderBy("timestamp", Query.Direction.DESCENDING)
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
                         if (queryDocumentSnapshots.getDocuments().isEmpty()){
-                            Toast.makeText(getContext(), "No Videos", Toast.LENGTH_SHORT).show();
+                            tvNoVideos.setVisibility(View.VISIBLE);
+                            recyclerVideos.setVisibility(View.GONE);
                         } else {
+                            tvNoVideos.setVisibility(View.GONE);
+                            recyclerVideos.setVisibility(View.VISIBLE);
                             inProfileCreatedVideoList.clear();
                             for (DocumentSnapshot snapshot : queryDocumentSnapshots.getDocuments()){
                                 InProfileCreatedVideo inProfileCreatedVideo = new InProfileCreatedVideo();
                                 inProfileCreatedVideo.setId(snapshot.getString("id"));
-                                inProfileCreatedVideo.setViews("10K");
+                                inProfileCreatedVideo.setViews(snapshot.getString("view_count"));
                                 inProfileCreatedVideo.setThumbnail(snapshot.getString("id"));
+                                inProfileCreatedVideo.setUser_id(snapshot.getString("user_id"));
                                 inProfileCreatedVideoList.add(inProfileCreatedVideo);
                             }
                             
                             inProfileCreatedVideoAdapter = new InProfileCreatedVideoAdapter(getContext(), inProfileCreatedVideoList);
                             inProfileCreatedVideoAdapter.notifyDataSetChanged();
-                            recyclerCreatedVideo.setAdapter(inProfileCreatedVideoAdapter);
+                            recyclerVideos.setAdapter(inProfileCreatedVideoAdapter);
+                            
                         }
                     }
                 });

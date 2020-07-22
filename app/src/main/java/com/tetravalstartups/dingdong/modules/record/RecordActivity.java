@@ -90,6 +90,9 @@ public class RecordActivity extends AppCompatActivity implements View.OnClickLis
     private LinearLayout lvGallery;
     private LinearLayout lvFilters;
     private LinearLayout lhSound;
+    private LinearLayout lvSpeed;
+    private LinearLayout lvBeauty;
+    private LinearLayout lvTimer;
     private LinearLayout lhRecordControl;
     private LinearLayout lhDiscardNext;
     private LinearLayout lvFlip;
@@ -153,6 +156,15 @@ public class RecordActivity extends AppCompatActivity implements View.OnClickLis
         lvGallery = findViewById(R.id.lvGallery);
         lvGallery.setOnClickListener(this);
 
+        lvSpeed = findViewById(R.id.lvSpeed);
+        lvSpeed.setOnClickListener(this);
+
+        lvBeauty = findViewById(R.id.lvBeauty);
+        lvBeauty.setOnClickListener(this);
+
+        lvTimer = findViewById(R.id.lvTimer);
+        lvTimer.setOnClickListener(this);
+
         lhSound = findViewById(R.id.lhSound);
         lhSound.setOnClickListener(this);
 
@@ -185,10 +197,17 @@ public class RecordActivity extends AppCompatActivity implements View.OnClickLis
         ivRemoveSound = findViewById(R.id.ivRemoveSound);
         ivRemoveSound.setOnClickListener(this);
 
+        Bundle bundle = getIntent().getExtras();
         preferences = getSharedPreferences("selected_sound", 0);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.clear();
-        editor.apply();
+
+        if (bundle != null){
+            soundStatus = SOUND_STATUS.WITH_SOUND;
+        } else {
+            SharedPreferences.Editor editor = preferences.edit();
+            editor.clear();
+            editor.apply();
+            soundStatus = SOUND_STATUS.WITHOUT_SOUND;
+        }
 
         alphaAnimation = new AlphaAnimation(0.0f, 1.0f);
         alphaAnimation.setDuration(1000);
@@ -268,6 +287,18 @@ public class RecordActivity extends AppCompatActivity implements View.OnClickLis
             }
         }
 
+        if (v == lvSpeed) {
+            Toast.makeText(this, "Coming Soon", Toast.LENGTH_SHORT).show();
+        }
+
+        if (v == lvBeauty) {
+            Toast.makeText(this, "Coming Soon", Toast.LENGTH_SHORT).show();
+        }
+
+        if (v == lvTimer) {
+            Toast.makeText(this, "Coming Soon", Toast.LENGTH_SHORT).show();
+        }
+
     }
 
     @Override
@@ -299,7 +330,6 @@ public class RecordActivity extends AppCompatActivity implements View.OnClickLis
         soundPlayer = new MediaPlayer();
 
         recorderStatus = RECORDER_STATUS.STOPPED;
-        soundStatus = SOUND_STATUS.WITHOUT_SOUND;
 
         camera.addCameraListener(new CameraListener() {
             @Override
@@ -350,6 +380,7 @@ public class RecordActivity extends AppCompatActivity implements View.OnClickLis
             startActivity(intent);
             overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
         } else {
+            ddLoadingProgress.showProgress(RecordActivity.this, "Loading...", false);
             transcodeVideoWithSound();
         }
     }
@@ -575,7 +606,6 @@ public class RecordActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     private void transcodeVideoWithSound() {
-        ddLoadingProgress.showProgress(RecordActivity.this, "Loading...", false);
         DataSink sink;
         File transFile = new File(Environment.getExternalStorageDirectory() + "/dingdong/transcode/");
         transFile.mkdirs();
@@ -596,12 +626,10 @@ public class RecordActivity extends AppCompatActivity implements View.OnClickLis
     public void onTranscodeProgress(double progress) {
         int percent = (int) ((progress / 1) * 100);
         ddLoadingProgress.updateProgress(percent);
-        Log.e("fuck", percent+"");
     }
 
     @Override
     public void onTranscodeCompleted(int successCode) {
-        ddLoading.hideProgress();
         Intent intent = new Intent(RecordActivity.this, PreviewActivity.class);
         intent.putExtra("video_path", mTranscodeOutputFile.getPath());
         if (soundStatus == SOUND_STATUS.WITH_SOUND){
@@ -609,6 +637,7 @@ public class RecordActivity extends AppCompatActivity implements View.OnClickLis
         } else {
             intent.putExtra("sound_title", "Original");
         }
+        ddLoading.hideProgress();
         startActivity(intent);
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
     }

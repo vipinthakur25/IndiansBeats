@@ -17,11 +17,18 @@ import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.krishna.fileloader.FileLoader;
 import com.krishna.fileloader.listener.FileRequestListener;
 import com.krishna.fileloader.pojo.FileResponse;
 import com.krishna.fileloader.request.FileLoadRequest;
+import com.like.LikeButton;
+import com.like.OnLikeListener;
 import com.tetravalstartups.dingdong.R;
+import com.tetravalstartups.dingdong.auth.Master;
 import com.tetravalstartups.dingdong.utils.DDLoading;
 import com.tetravalstartups.dingdong.utils.MediaPlayerUtils;
 
@@ -36,6 +43,8 @@ public class ExploreSoundAdapter extends RecyclerView.Adapter<ExploreSoundAdapte
     SharedPreferences preferences;
     int row_index = -1;
     DDLoading ddLoading;
+    Master master;
+    FirebaseFirestore db;
 
     public ExploreSoundAdapter(Context context, List<Sound> soundList) {
         this.context = context;
@@ -48,6 +57,8 @@ public class ExploreSoundAdapter extends RecyclerView.Adapter<ExploreSoundAdapte
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.sounds_list_item, parent, false);
         preferences = context.getSharedPreferences("selected_sound", 0);
         ddLoading = DDLoading.getInstance();
+        db = FirebaseFirestore.getInstance();
+        master = new Master(context);
         return new ViewHolder(view);
     }
 
@@ -60,10 +71,10 @@ public class ExploreSoundAdapter extends RecyclerView.Adapter<ExploreSoundAdapte
 
         if (sound.getBanner().isEmpty()) {
             holder.ivMusicBanner.setImageDrawable(context.getResources()
-                    .getDrawable(R.drawable.dd_logo_placeholder));
+                    .getDrawable(R.drawable.dd_white_small_logo));
         } else {
             Glide.with(context).load(sound.getBanner())
-                    .placeholder(R.drawable.dd_logo_placeholder)
+                    .placeholder(R.drawable.dd_white_small_logo)
                     .into(holder.ivMusicBanner);
         }
 
@@ -166,6 +177,44 @@ public class ExploreSoundAdapter extends RecyclerView.Adapter<ExploreSoundAdapte
             holder.lhUseSound.setVisibility(View.GONE);
         }
 
+        holder.ivFav.setOnLikeListener(new OnLikeListener() {
+            @Override
+            public void liked(LikeButton likeButton) {
+                db.collection("users")
+                        .document(master.getId())
+                        .collection("sounds")
+                        .document(sound.getId())
+                        .set(sound);
+            }
+
+            @Override
+            public void unLiked(LikeButton likeButton) {
+                db.collection("users")
+                        .document(master.getId())
+                        .collection("sounds")
+                        .document(sound.getId())
+                        .delete();
+            }
+        });
+
+        db.collection("users")
+                .document(master.getId())
+                .collection("sounds")
+                .document(sound.getId())
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if (task.isSuccessful()) {
+                            if (task.getResult().exists()) {
+                                holder.ivFav.setLiked(true);
+                            } else {
+                                holder.ivFav.setLiked(false);
+                            }
+                        }
+                    }
+                });
+
     }
 
     @Override
@@ -178,7 +227,7 @@ public class ExploreSoundAdapter extends RecyclerView.Adapter<ExploreSoundAdapte
         LinearLayout lhMusic, lhUseSound;
         ImageView ivPlayPause, ivMusicBanner;
         TextView tvName, tvArtist, tvDuration;
-        ImageView ivFav;
+        LikeButton ivFav;
         CardView cardSound;
 
         public ViewHolder(@NonNull View itemView) {

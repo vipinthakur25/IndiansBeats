@@ -21,10 +21,10 @@
 
             <ImageView
                 android:id="@+id/ivGoBack"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
+                android:layout_width="50dp"
+                android:layout_height="match_parent"
                 android:layout_gravity="center_vertical|start"
-                android:layout_marginStart="16dp"
+                android:padding="14dp"
                 app:srcCompat="@drawable/ic_dd_back_white" />
 
             <TextView
@@ -151,6 +151,7 @@
                 android:background="@drawable/bg_edittext"
                 android:fontFamily="@font/montserrat_bold"
                 android:hint="Bio"
+                android:maxLength="80"
                 android:textSize="16sp"
                 android:autofillHints="password"
                 android:inputType="text|none"
@@ -167,6 +168,7 @@
                 android:background="@drawable/bg_button_gradient"
                 android:fontFamily="@font/montserrat_bold"
                 android:text="Update"
+                android:visibility="gone"
                 android:textColor="@color/colorAccentV1"
                 android:textSize="18sp"
                 android:gravity="center"

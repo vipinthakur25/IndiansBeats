@@ -3,6 +3,7 @@ package com.tetravalstartups.dingdong.modules.create;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
@@ -18,6 +19,7 @@ import com.krishna.fileloader.listener.FileRequestListener;
 import com.krishna.fileloader.pojo.FileResponse;
 import com.krishna.fileloader.request.FileLoadRequest;
 import com.tetravalstartups.dingdong.R;
+import com.tetravalstartups.dingdong.modules.record.RecordActivity;
 import com.tetravalstartups.dingdong.utils.DDLoading;
 
 import java.io.File;
@@ -32,6 +34,7 @@ public class SoundDetailActivity extends AppCompatActivity implements View.OnCli
     private String user_id;
 
     private ImageView ivPhoto;
+    private ImageView ivGoBack;
     private TextView tvSoundTitle;
     private TextView tvUserHandle;
     private TextView tvVideoCount;
@@ -53,6 +56,8 @@ public class SoundDetailActivity extends AppCompatActivity implements View.OnCli
         tvSoundTitle = findViewById(R.id.tvSoundTitle);
         tvUserHandle = findViewById(R.id.tvUserHandle);
         tvVideoCount = findViewById(R.id.tvVideoCount);
+        ivGoBack = findViewById(R.id.ivGoBack);
+        ivGoBack.setOnClickListener(this);
 
         bundle = getIntent().getExtras();
 
@@ -89,10 +94,14 @@ public class SoundDetailActivity extends AppCompatActivity implements View.OnCli
                         public void onLoad(FileLoadRequest request, FileResponse<File> response) {
                             File loadedFile = response.getBody();
                             ddLoading.hideProgress();
-                            Intent intent = new Intent(SoundDetailActivity.this, ScreenCamActivity.class);
+                            SharedPreferences preferences = getSharedPreferences("selected_sound", 0);
+                            SharedPreferences.Editor editor = preferences.edit();
+                            Intent intent = new Intent(SoundDetailActivity.this, RecordActivity.class);
+                            editor.putString("sound_path", loadedFile.getPath());
+                            editor.putString("sound_name", sound_title);
+                            editor.apply();
                             Bundle bundle = new Bundle();
-                            bundle.putString("sound_path", loadedFile.getPath());
-                            bundle.putString("sound_title", sound_title);
+                            bundle.putString("sound", "true");
                             intent.putExtras(bundle);
                             startActivity(intent);
                         }
@@ -103,5 +112,12 @@ public class SoundDetailActivity extends AppCompatActivity implements View.OnCli
                         }
                     });
         }
+
+        if (v == ivGoBack) {
+            onBackPressed();
+            finish();
+            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+        }
+
     }
 }

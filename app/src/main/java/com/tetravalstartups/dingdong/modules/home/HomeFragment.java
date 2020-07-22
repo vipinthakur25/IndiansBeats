@@ -3,6 +3,10 @@ package com.tetravalstartups.dingdong.modules.home;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.PagerSnapHelper;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.SnapHelper;
 import androidx.viewpager2.widget.ViewPager2;
 
 import android.view.LayoutInflater;
@@ -31,6 +35,7 @@ public class HomeFragment extends Fragment implements VideoPresenter.IVideo {
     private VideoAdapter videoAdapter;
     private FirebaseAuth auth;
     private VideoPresenter videoPresenter;
+    private RecyclerView recyclerVideos;
 
     public HomeFragment() {
     }
@@ -44,7 +49,7 @@ public class HomeFragment extends Fragment implements VideoPresenter.IVideo {
     }
 
     private void initView() {
-        viewPager = view.findViewById(R.id.viewPager);
+        recyclerVideos = view.findViewById(R.id.recyclerVideos);
         auth = FirebaseAuth.getInstance();
         if (auth.getCurrentUser() != null){
             ((MainActivity)getActivity()).getProfileData(auth.getCurrentUser().getUid());
@@ -58,12 +63,21 @@ public class HomeFragment extends Fragment implements VideoPresenter.IVideo {
     public void fetchVideosSuccess(List<Video> videoList) {
         videoAdapter = new VideoAdapter(getContext(), videoList);
         videoAdapter.notifyDataSetChanged();
-        viewPager.setOrientation(ViewPager2.ORIENTATION_VERTICAL);
-        viewPager.setAdapter(videoAdapter);
+        SnapHelper snapHelper = new PagerSnapHelper();
+        recyclerVideos.setLayoutManager(new LinearLayoutManager(getContext()));
+        if (recyclerVideos.getOnFlingListener() == null)
+            snapHelper.attachToRecyclerView(recyclerVideos);
+        recyclerVideos.setAdapter(videoAdapter);
     }
 
     @Override
     public void fetchVideosError(String error) {
         Toast.makeText(getContext(), ""+error, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        videoPresenter.fetchVideos();
     }
 }

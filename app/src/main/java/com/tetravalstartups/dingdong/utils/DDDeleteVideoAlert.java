@@ -10,6 +10,8 @@ import com.bumptech.glide.Glide;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.tetravalstartups.dingdong.R;
 
+import java.util.HashMap;
+
 public class DDDeleteVideoAlert {
 
     public static DDDeleteVideoAlert ddAlert = null;
@@ -39,9 +41,11 @@ public class DDDeleteVideoAlert {
         tvDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                HashMap hashMap = new HashMap();
+                hashMap.put("video_status", Constants.VIDEO_STATUS_MODERATE);
                 db.collection("videos")
                         .document(video_id)
-                        .delete();
+                        .update(hashMap);
                 mDialog.dismiss();
             }
         });

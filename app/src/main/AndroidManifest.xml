@@ -20,8 +20,12 @@
         android:requestLegacyExternalStorage="true"
         android:roundIcon="@mipmap/ic_launcher_foreground"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
-        <activity android:name=".BaseActivity"></activity>
+        android:theme="@style/AppTheme"
+        android:usesCleartextTraffic="true">
+        <activity android:name=".modules.profile.view.activity.FollowingActivity"></activity>
+        <activity android:name=".modules.player.PlayerActivity" />
+        <activity android:name=".modules.profile.view.activity.PublicProfileActivity" />
+        <activity android:name=".BaseActivity" />
         <activity android:name=".modules.profile.view.activity.PlayVideoActivity" />
         <activity
             android:name=".modules.record.RecordActivity"

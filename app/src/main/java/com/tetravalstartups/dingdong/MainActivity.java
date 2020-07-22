@@ -1,18 +1,17 @@
 package com.tetravalstartups.dingdong;
 
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
-
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.view.View;
-import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
 import com.google.firebase.auth.FirebaseAuth;
@@ -23,11 +22,9 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.tetravalstartups.dingdong.auth.LoginActivity;
 import com.tetravalstartups.dingdong.auth.Master;
 import com.tetravalstartups.dingdong.auth.Profile;
-import com.tetravalstartups.dingdong.modules.create.ScreenCamActivity;
 import com.tetravalstartups.dingdong.modules.home.HomeFragment;
-import com.tetravalstartups.dingdong.modules.notification.NotificationFragment;
+import com.tetravalstartups.dingdong.modules.player.PlayerFragment;
 import com.tetravalstartups.dingdong.modules.profile.view.fragment.ProfileFragment;
-import com.tetravalstartups.dingdong.modules.discover.DiscoverFragment;
 import com.tetravalstartups.dingdong.modules.record.RecordActivity;
 
 public class MainActivity extends BaseActivity implements View.OnClickListener {
@@ -91,7 +88,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         db = FirebaseFirestore.getInstance();
         auth = FirebaseAuth.getInstance();
 
-        fragment = new HomeFragment();
+        fragment = new PlayerFragment();
         loadFragment(fragment);
         switchHome();
 
@@ -105,14 +102,15 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     @Override
     public void onClick(View v) {
         if (v == lvHome){
-            fragment = new HomeFragment();
+            fragment = new PlayerFragment();
             loadFragment(fragment);
             switchHome();
         }
         if (v == lvDiscover){
-            fragment = new DiscoverFragment();
-            loadFragment(fragment);
-            switchSearch();
+            Toast.makeText(this, "Coming Soon", Toast.LENGTH_SHORT).show();
+//            fragment = new DiscoverFragment();
+//            loadFragment(fragment);
+//            switchSearch();
         }
         if (v == ivCreate){
             if (auth.getCurrentUser() != null){
@@ -124,14 +122,15 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
         }
         if (v == lvNotification){
-            if (auth.getCurrentUser() != null){
-                fragment = new NotificationFragment();
-                loadFragment(fragment);
-                switchNotification();
-            } else {
-                startActivity(new Intent(MainActivity.this, LoginActivity.class));
-                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-            }
+//            if (auth.getCurrentUser() != null){
+//                fragment = new NotificationFragment();
+//                loadFragment(fragment);
+//                switchNotification();
+//            } else {
+//                startActivity(new Intent(MainActivity.this, LoginActivity.class));
+//                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+//            }
+            Toast.makeText(this, "Coming Soon", Toast.LENGTH_SHORT).show();
         }
         if (v == lvProfile){
             fragment = new ProfileFragment();
@@ -230,4 +229,15 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 });
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+    }
 }

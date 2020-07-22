@@ -48,7 +48,7 @@ public class AvatarAdapter extends RecyclerView.Adapter<AvatarAdapter.ViewHolder
         final Avatar avatar = avatarList.get(position);
         Glide.with(context)
                 .load(avatar.getPhoto())
-                .placeholder(R.drawable.dingdong_placeholder)
+                .placeholder(R.drawable.dd_logo_placeholder)
                 .into(holder.ivPhoto);
         holder.lvPhoto.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -59,9 +59,7 @@ public class AvatarAdapter extends RecyclerView.Adapter<AvatarAdapter.ViewHolder
                 db.collection("users")
                         .document(new Master(context).getId())
                         .update(hashMap);
-                ProfilePhotoBottomSheet bottomSheet = new ProfilePhotoBottomSheet();
-                bottomSheet.dismiss();
-                //((EditProfileActivity)context).finish();
+                ((EditProfileActivity)context).closeSheet();
             }
         });
     }

@@ -33,10 +33,10 @@
             android:id="@+id/progressBar"
             style="?android:attr/progressBarStyleHorizontal"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:visibility="invisible"
+            android:layout_height="2dp"
+            android:indeterminate="true"
             android:indeterminateTint="@color/colorAccentV1"
-            android:indeterminate="true"/>
+            android:visibility="invisible" />
 
 
     </LinearLayout>

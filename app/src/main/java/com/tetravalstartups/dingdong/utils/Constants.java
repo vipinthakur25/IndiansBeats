@@ -46,6 +46,7 @@ public class Constants {
     public static final String INITIAL_VIDEO_SHARES = "0";
     public static final String INITIAL_VIDEO_COMMENTS = "0";
     public static final String INITIAL_VIDEO_STATUS = "0";
+    public static final String INITIAL_VIDEO_VIEWS = "0";
 
     // video status
     public static final String VIDEO_STATUS_PUBLIC = "1";

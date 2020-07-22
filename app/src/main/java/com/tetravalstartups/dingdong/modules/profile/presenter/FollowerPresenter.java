@@ -9,6 +9,7 @@ import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.tetravalstartups.dingdong.auth.Master;
 import com.tetravalstartups.dingdong.modules.profile.model.Followers;
 import com.tetravalstartups.dingdong.utils.Constants;
 
@@ -32,11 +33,11 @@ public class FollowerPresenter {
         void followerFetchError(String error);
     }
 
-    public void fetchFollowers(){
+    public void fetchFollowers(String user_id){
         db = FirebaseFirestore.getInstance();
         final List<Followers> followersList = new ArrayList<>();
         db.collection("users")
-                .document(Constants.SAMPLE_USER_ID)
+                .document(user_id)
                 .collection("followers")
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override

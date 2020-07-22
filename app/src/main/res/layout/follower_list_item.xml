@@ -50,15 +50,15 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="8dp"
-            android:background="@drawable/bg_button_white"
-            android:fontFamily="@font/montserrat"
+            android:background="@drawable/bg_button_gradient"
+            android:fontFamily="@font/montserrat_bold"
             android:gravity="center"
             android:minWidth="100dp"
             android:paddingStart="8dp"
             android:paddingTop="4dp"
             android:paddingEnd="8dp"
             android:paddingBottom="4dp"
-            android:textColor="@color/colorPrimary" />
+            android:textColor="@color/colorTextTitle" />
     </LinearLayout>
 
 <!--    <View-->

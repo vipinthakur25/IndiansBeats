@@ -24,6 +24,7 @@ public class App extends Application {
         super.onCreate();
         MediaManager.init(this);
 
+
         if (leastRecentlyUsedCacheEvictor == null) {
             leastRecentlyUsedCacheEvictor = new LeastRecentlyUsedCacheEvictor(exoPlayerCacheSize);
         }
@@ -39,6 +40,8 @@ public class App extends Application {
             }
             Log.i(TAG, "onCreate: " + simpleCache.getCacheSpace());
         }
+
+
 
     }
 

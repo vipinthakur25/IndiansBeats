@@ -20,6 +20,7 @@ import com.tetravalstartups.dingdong.modules.profile.model.InProfileCreatedVideo
 import com.tetravalstartups.dingdong.modules.profile.view.activity.PlayVideoActivity;
 import com.tetravalstartups.dingdong.utils.DDDeleteVideoAlert;
 
+import java.io.Serializable;
 import java.util.List;
 
 public class
@@ -55,11 +56,14 @@ InProfileCreatedVideoAdapter extends RecyclerView.Adapter<InProfileCreatedVideoA
                 return true;
             }
         });
+
         holder.frameVideo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(context, PlayVideoActivity.class);
-                intent.putExtra("video_id", video.getId());
+                intent.putExtra("video_type", "created");
+                intent.putExtra("pos", position+"");
+                intent.putExtra("user_id", video.getUser_id());
                 context.startActivity(intent);
             }
         });

@@ -61,10 +61,10 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
 //            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
 //        }
 //
-//        if (v == lhSubscription){
-//            startActivity(new Intent(SettingsActivity.this, SubscriptionActivity.class));
-//            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-//        }
+        if (v == lhSubscription){
+            startActivity(new Intent(SettingsActivity.this, SubscriptionActivity.class));
+            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+        }
 
         if (v == lhLogout){
             new Master(SettingsActivity.this).userLogout();

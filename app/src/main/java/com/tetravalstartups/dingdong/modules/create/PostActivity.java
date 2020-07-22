@@ -15,6 +15,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
+import com.cloudinary.Transformation;
 import com.cloudinary.android.MediaManager;
 import com.cloudinary.android.callback.ErrorInfo;
 import com.cloudinary.android.callback.UploadCallback;
@@ -42,6 +43,7 @@ public class PostActivity extends AppCompatActivity implements View.OnClickListe
     private EditText etVideoDesc;
     private TextView tvHashTag;
     private TextView tvAtTheRate;
+    private ImageView ivGoBack;
 
     private Switch switchVideoStatus;
     private boolean video_status = false;
@@ -74,6 +76,9 @@ public class PostActivity extends AppCompatActivity implements View.OnClickListe
         tvAtTheRate = findViewById(R.id.tvAtTheRate);
         tvAtTheRate.setOnClickListener(this);
 
+        ivGoBack = findViewById(R.id.ivGoBack);
+        ivGoBack.setOnClickListener(this);
+
         switchVideoStatus = findViewById(R.id.switchVideoStatus);
         switchVideoStatus.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -100,50 +105,32 @@ public class PostActivity extends AppCompatActivity implements View.OnClickListe
         }
 
         if (v == tvHashTag) {
-            etVideoDesc.append(" #");
+            etVideoDesc.append("#");
         }
 
         if (v == tvAtTheRate) {
-            etVideoDesc.append(" @");
+            etVideoDesc.append("@");
+        }
+
+        if (v == ivGoBack) {
+            onBackPressed();
+            finish();
+            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
         }
 
     }
 
     private void postVideo() {
         ddLoadingProgress.showProgress(PostActivity.this, "Uploading...", false);
+        doUpload(video_path);
+    }
+
+    private void doUpload(String path) {
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         DocumentReference documentReference = db.collection("videos").document();
         String public_id = documentReference.getId();
-
-        Video video = new Video();
-        video.setId(public_id);
-        video.setVideo_desc(etVideoDesc.getText().toString());
-        video.setSound_id(public_id);
-
-        if (getIntent().getStringExtra("sound_title").equals("Original")){
-            video.setSound_title("Original sound by "+master.getHandle());
-        } else {
-            video.setSound_title(getIntent().getStringExtra("sound_title"));
-        }
-
-        video.setLikes_count(Constants.INITIAL_VIDEO_LIKES);
-        video.setShare_count(Constants.INITIAL_VIDEO_SHARES);
-        video.setComment_count(Constants.INITIAL_VIDEO_COMMENTS);
-        video.setUser_id(master.getId());
-        video.setUser_handle(master.getHandle());
-        video.setUser_photo(master.getPhoto());
-        video.setVideo_thumbnail("");
-
-        if (video_status) {
-            video.setVideo_status(Constants.VIDEO_STATUS_PRIVATE);
-        } else {
-            video.setVideo_status(Constants.VIDEO_STATUS_PUBLIC);
-        }
-
-
-
-        String requestId = MediaManager.get().upload(Uri.fromFile(new File(video_path)))
+        String requestId = MediaManager.get().upload(Uri.fromFile(new File(path)))
                 .callback(new UploadCallback() {
                     @Override
                     public void onStart(String requestId) {
@@ -152,12 +139,47 @@ public class PostActivity extends AppCompatActivity implements View.OnClickListe
 
                     @Override
                     public void onProgress(String requestId, long bytes, long totalBytes) {
-
+                        int progress = (int) ((bytes / new File(path).length()) * 100);
+                        ddLoadingProgress.updateProgress(progress);
                     }
 
                     @Override
                     public void onSuccess(String requestId, Map resultData) {
-                        ddLoadingProgress.hideProgress();
+
+                        String media_url = MediaManager.get().url().transformation(new Transformation().quality(50))
+                                .resourceType("video").generate("user_uploaded_videos/" +public_id+".mp4");
+
+                        String thumbnail = MediaManager.get().url().transformation(new Transformation().quality(50))
+                                .resourceType("video").generate("user_uploaded_videos/" +public_id+".webp");
+
+                        Video video = new Video();
+                        video.setId(public_id);
+                        video.setVideo_desc(etVideoDesc.getText().toString());
+                        video.setSound_id(public_id);
+
+                        if (getIntent().getStringExtra("sound_title").equals("Original")){
+                            video.setSound_title("Original sound by "+master.getHandle());
+                        } else {
+                            video.setSound_title(getIntent().getStringExtra("sound_title"));
+                        }
+
+                        video.setLikes_count(Constants.INITIAL_VIDEO_LIKES);
+                        video.setShare_count(Constants.INITIAL_VIDEO_SHARES);
+                        video.setComment_count(Constants.INITIAL_VIDEO_COMMENTS);
+                        video.setView_count(Constants.INITIAL_VIDEO_VIEWS);
+                        video.setUser_id(master.getId());
+                        video.setUser_handle(master.getHandle());
+                        video.setUser_name(master.getName());
+                        video.setUser_photo(master.getPhoto());
+                        video.setVideo_thumbnail(thumbnail);
+                        video.setVideo_url(media_url);
+
+                        if (video_status) {
+                            video.setVideo_status(Constants.VIDEO_STATUS_PRIVATE);
+                        } else {
+                            video.setVideo_status(Constants.VIDEO_STATUS_PUBLIC);
+                        }
+
                         db.collection("videos").document(public_id)
                                 .set(video)
                                 .addOnCompleteListener(task -> {
@@ -165,6 +187,7 @@ public class PostActivity extends AppCompatActivity implements View.OnClickListe
                                         startActivity(new Intent(PostActivity.this, MainActivity.class));
                                         finish();
                                         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                                        ddLoadingProgress.hideProgress();
                                     }
                                 });
                     }
@@ -185,9 +208,14 @@ public class PostActivity extends AppCompatActivity implements View.OnClickListe
                 .option("overwrite", true)
                 .dispatch();
 
-
         Log.e("requestId", requestId);
     }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+    }
 }
 

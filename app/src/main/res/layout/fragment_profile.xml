@@ -57,7 +57,7 @@
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:gravity="center"
                     android:orientation="vertical">
 
@@ -85,15 +85,21 @@
                         android:textSize="16sp" />
 
                     <TextView
-                        android:id="@+id/tvBio"
-                        android:layout_width="match_parent"
+                        android:id="@+id/tvVideosCount"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
                         android:layout_marginEnd="16dp"
-                        android:fontFamily="@font/montserrat"
+                        android:fontFamily="@font/montserrat_bold"
                         android:gravity="center"
-                        android:text="Add Bio"
-                        android:textColor="@color/colorAccentV1" />
+                        android:background="@drawable/bg_button_disabled"
+                        android:paddingStart="16dp"
+                        android:paddingTop="2dp"
+                        android:paddingEnd="16dp"
+                        android:paddingBottom="2dp"
+                        android:text="6 Videos"
+                        android:textSize="12sp"
+                        android:textColor="@color/colorPrimary" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -198,12 +204,16 @@
                         </LinearLayout>
                     </LinearLayout>
 
+
+
                     <TextView
                         android:id="@+id/tvEditProfile"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_margin="16dp"
-                        android:background="@drawable/bg_button_white"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginEnd="8dp"
+                        android:background="@drawable/bg_gradient_no_corner"
                         android:fontFamily="@font/montserrat"
                         android:gravity="center"
                         android:paddingStart="8dp"
@@ -211,7 +221,22 @@
                         android:paddingEnd="8dp"
                         android:paddingBottom="4dp"
                         android:text="Edit Profile"
-                        android:textColor="@color/colorPrimary" />
+                        android:textColor="@color/colorTextTitle" />
+
+                    <TextView
+                        android:id="@+id/tvBio"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginEnd="16dp"
+                        android:layout_marginTop="16dp"
+                        android:layout_marginBottom="16dp"
+                        android:layout_margin="8dp"
+                        android:fontFamily="@font/montserrat"
+                        android:gravity="center"
+                        android:text="Add Bio"
+                        android:textColor="@color/colorAccentV1" />
+
                 </LinearLayout>
 
 
@@ -229,24 +254,25 @@
                 <com.google.android.material.tabs.TabItem
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:icon="@drawable/ic_dd_created_video_inactive" />
+                    android:icon="@drawable/ic_dd_public_videos_active" />
 
                 <com.google.android.material.tabs.TabItem
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:icon="@drawable/ic_dd_liked_video_inactive" />
+                    android:icon="@drawable/ic_dd_liked_videos_inactive" />
 
                 <com.google.android.material.tabs.TabItem
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:icon="@drawable/ic_dd_private_draft_video" />
+                    android:icon="@drawable/ic_dd_private_videos_inactive" />
 
             </com.google.android.material.tabs.TabLayout>
 
             <androidx.viewpager.widget.ViewPager
                 android:id="@+id/videoPager"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+                android:layout_height="match_parent"
+                android:layout_marginBottom="56dp"/>
 
         </ru.noties.scrollable.ScrollableLayout>
 

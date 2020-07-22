@@ -20,10 +20,9 @@ public class ProfilePhotoPagerAdapter extends FragmentPagerAdapter {
     public Fragment getItem(int position) {
         switch (position){
             case 0:
-                return new AvatarPhotoFragment();
-            case 1:
                 return new UploadPhotoFragment();
-
+            case 1:
+                return new AvatarPhotoFragment();
             default:
                 return null;
         }
@@ -39,10 +38,9 @@ public class ProfilePhotoPagerAdapter extends FragmentPagerAdapter {
     public CharSequence getPageTitle(int position) {
         switch (position){
             case 0:
-                return "Avatar";
+                return "Gallery";
             case 1:
-                return "Upload";
-
+                return "Avatar";
             default:
                 return null;
         }

@@ -20,10 +20,10 @@
 
             <ImageView
                 android:id="@+id/ivGoBack"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
+                android:layout_width="50dp"
+                android:layout_height="match_parent"
                 android:layout_gravity="center_vertical|start"
-                android:layout_marginStart="16dp"
+                android:padding="14dp"
                 app:srcCompat="@drawable/ic_dd_back_white" />
 
             <TextView
@@ -43,7 +43,7 @@
             android:id="@+id/progressBar"
             style="?android:attr/progressBarStyleHorizontal"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="2dp"
             android:indeterminate="true"/>
 
 
@@ -61,7 +61,7 @@
             android:fontFamily="@font/montserrat"
             android:layout_gravity="center"
             android:textColor="@color/colorTextTitle"
-            android:text="Hmm, No Followers" />
+            android:text="No Followers" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerFollowers"
