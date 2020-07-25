@@ -103,12 +103,12 @@ public class RecordActivity extends AppCompatActivity implements View.OnClickLis
     private TextView tvDiscard;
     private TextView tvNext;
 
-    public enum RECORDER_STATUS {
+    private enum RECORDER_STATUS {
         STOPPED,
         RECORDING
     }
 
-    public enum SOUND_STATUS {
+    private enum SOUND_STATUS {
         WITHOUT_SOUND,
         WITH_SOUND
     }
@@ -630,6 +630,7 @@ public class RecordActivity extends AppCompatActivity implements View.OnClickLis
 
     @Override
     public void onTranscodeCompleted(int successCode) {
+        ddLoading.hideProgress();
         Intent intent = new Intent(RecordActivity.this, PreviewActivity.class);
         intent.putExtra("video_path", mTranscodeOutputFile.getPath());
         if (soundStatus == SOUND_STATUS.WITH_SOUND){
@@ -637,7 +638,7 @@ public class RecordActivity extends AppCompatActivity implements View.OnClickLis
         } else {
             intent.putExtra("sound_title", "Original");
         }
-        ddLoading.hideProgress();
+
         startActivity(intent);
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
     }

@@ -32,6 +32,7 @@ import com.tetravalstartups.dingdong.auth.Master;
 import com.tetravalstartups.dingdong.auth.Profile;
 import com.tetravalstartups.dingdong.modules.profile.view.adapter.PublicProfilePagerAdapter;
 import com.tetravalstartups.dingdong.modules.profile.view.adapter.VideoTabPagerAdapter;
+import com.tetravalstartups.dingdong.utils.Constants;
 import com.tetravalstartups.dingdong.utils.DDLoading;
 import com.tetravalstartups.dingdong.utils.LightBox;
 
@@ -55,6 +56,7 @@ public class PublicProfileActivity extends AppCompatActivity implements View.OnC
     private TextView tvFollowerCount;
     private TextView tvFollowingCount;
     private TextView tvFollow;
+    private TextView tvVideosCount;
     private LinearLayout lvParent;
 
     private FirebaseFirestore db;
@@ -103,6 +105,7 @@ public class PublicProfileActivity extends AppCompatActivity implements View.OnC
         tvFollowingCount = findViewById(R.id.tvFollowingCount);
         lvParent = findViewById(R.id.lvParent);
         ivGoBack = findViewById(R.id.ivGoBack);
+        tvVideosCount = findViewById(R.id.tvVideosCount);
         ivGoBack.setOnClickListener(this);
 
         ddLoading = DDLoading.getInstance();
@@ -124,6 +127,7 @@ public class PublicProfileActivity extends AppCompatActivity implements View.OnC
                         Profile profile = documentSnapshot.toObject(Profile.class);
                         userProfile = profile;
                         setupProfile(profile);
+                        fetchVideosCount(id);
                     }
                 });
 
@@ -402,6 +406,22 @@ public class PublicProfileActivity extends AppCompatActivity implements View.OnC
             overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
         }
 
+    }
+
+    private void fetchVideosCount(String id) {
+        Query query = db.collection("videos").whereEqualTo("user_id", id)
+                .whereEqualTo("video_status", Constants.VIDEO_STATUS_PUBLIC);
+        query.addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                if (queryDocumentSnapshots.getDocuments().isEmpty()) {
+                    tvVideosCount.setText("0 Videos");
+                } else {
+                    String videos_count = String.valueOf(queryDocumentSnapshots.getDocuments().size());
+                    tvVideosCount.setText(videos_count+" Videos");
+                }
+            }
+        });
     }
 
     @Override

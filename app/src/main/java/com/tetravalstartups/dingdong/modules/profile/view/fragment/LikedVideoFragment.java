@@ -62,10 +62,8 @@ public class LikedVideoFragment extends Fragment {
         SharedPreferences preferences = getActivity().getSharedPreferences("videoPref", 0);
         if (preferences.getString("profile_type", "none").equals("public")) {
             fetchCreatedVideos(preferences.getString("user_id", "none"));
-            Toast.makeText(getContext(), "public", Toast.LENGTH_SHORT).show();
 
         } else if (preferences.getString("profile_type", "none").equals("private")) {
-            Toast.makeText(getContext(), "private", Toast.LENGTH_SHORT).show();
             fetchCreatedVideos(master.getId());
         }
     }

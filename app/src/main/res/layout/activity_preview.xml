@@ -56,5 +56,48 @@
 
     </LinearLayout>
 
+    <LinearLayout
+        android:id="@+id/lhSound"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:orientation="horizontal"
+        android:layout_gravity="center|top"
+        android:layout_marginTop="28dp"
+        android:visibility="gone"
+        android:gravity="center">
+
+        <ImageView
+            android:id="@+id/ivSoundSelected"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@drawable/dd_sound"/>
+
+        <TextView
+            android:id="@+id/tvAddSound"
+            android:layout_width="80dp"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/montserrat"
+            android:text="Add Sound"
+            android:layout_marginStart="4dp"
+            android:focusable="true"
+            android:ellipsize="marquee"
+            android:marqueeRepeatLimit="marquee_forever"
+            android:textSize="14sp"
+            android:textColor="@color/colorTextTitle"
+            android:singleLine="true" />
+
+
+        <ImageView
+            android:id="@+id/ivRemoveSound"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:padding="4dp"
+            android:visibility="gone"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="16dp"
+            app:srcCompat="@drawable/ic_dd_cancel_white"/>
+
+    </LinearLayout>
+
 
 </FrameLayout>

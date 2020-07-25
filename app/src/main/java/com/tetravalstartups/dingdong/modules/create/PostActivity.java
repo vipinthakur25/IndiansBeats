@@ -30,6 +30,7 @@ import com.tetravalstartups.dingdong.utils.DDLoadingProgress;
 import com.tetravalstartups.dingdong.utils.DDVideoPreview;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.Map;
 
 public class PostActivity extends AppCompatActivity implements View.OnClickListener {
@@ -47,6 +48,8 @@ public class PostActivity extends AppCompatActivity implements View.OnClickListe
 
     private Switch switchVideoStatus;
     private boolean video_status = false;
+
+
 
     private Master master;
 
@@ -163,6 +166,10 @@ public class PostActivity extends AppCompatActivity implements View.OnClickListe
                             video.setSound_title(getIntent().getStringExtra("sound_title"));
                         }
 
+                        double randomDouble = Math.random();
+                        randomDouble = randomDouble * 1000 + 1;
+                        int randomInt = (int) randomDouble;
+
                         video.setLikes_count(Constants.INITIAL_VIDEO_LIKES);
                         video.setShare_count(Constants.INITIAL_VIDEO_SHARES);
                         video.setComment_count(Constants.INITIAL_VIDEO_COMMENTS);
@@ -173,6 +180,7 @@ public class PostActivity extends AppCompatActivity implements View.OnClickListe
                         video.setUser_photo(master.getPhoto());
                         video.setVideo_thumbnail(thumbnail);
                         video.setVideo_url(media_url);
+                        video.setVideo_index(randomInt+"");
 
                         if (video_status) {
                             video.setVideo_status(Constants.VIDEO_STATUS_PRIVATE);
@@ -184,7 +192,9 @@ public class PostActivity extends AppCompatActivity implements View.OnClickListe
                                 .set(video)
                                 .addOnCompleteListener(task -> {
                                     if (task.isSuccessful()) {
-                                        startActivity(new Intent(PostActivity.this, MainActivity.class));
+                                        Intent intent = new Intent(PostActivity.this, MainActivity.class);
+                                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                        startActivity(intent);
                                         finish();
                                         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
                                         ddLoadingProgress.hideProgress();

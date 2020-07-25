@@ -34,6 +34,7 @@ import com.tetravalstartups.dingdong.modules.profile.view.activity.FollowersActi
 import com.tetravalstartups.dingdong.modules.profile.view.activity.FollowingActivity;
 import com.tetravalstartups.dingdong.modules.profile.view.activity.SettingsActivity;
 import com.tetravalstartups.dingdong.modules.profile.view.adapter.VideoTabPagerAdapter;
+import com.tetravalstartups.dingdong.utils.Constants;
 import com.tetravalstartups.dingdong.utils.LightBox;
 
 import java.util.HashMap;
@@ -262,12 +263,13 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     }
 
     private void fetchVideosCount() {
-        Query query = db.collection("videos").whereEqualTo("user_id", master.getId());
+        Query query = db.collection("videos").whereEqualTo("user_id", master.getId()).whereEqualTo("video_status", Constants.VIDEO_STATUS_PUBLIC);
         query.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
                 if (queryDocumentSnapshots.getDocuments().isEmpty()) {
                     tvVideosCount.setText("0 Videos");
+
                 } else {
                     String videos_count = String.valueOf(queryDocumentSnapshots.getDocuments().size());
                     tvVideosCount.setText(videos_count+" Videos");

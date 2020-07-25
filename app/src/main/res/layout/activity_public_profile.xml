@@ -10,7 +10,7 @@
         android:id="@+id/lvParent"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="gone"
+        android:visibility="visible"
         android:orientation="vertical">
 
         <LinearLayout
@@ -85,6 +85,8 @@
                         android:textColor="@color/colorTextTitle"
                         android:textSize="16sp" />
 
+
+
                     <TextView
                         android:id="@+id/tvBio"
                         android:layout_width="match_parent"
@@ -95,6 +97,24 @@
                         android:gravity="center"
                         android:text="Add Bio"
                         android:textColor="@color/colorAccentV1" />
+
+                    <TextView
+                        android:id="@+id/tvVideosCount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginEnd="16dp"
+                        android:layout_marginTop="16dp"
+                        android:fontFamily="@font/montserrat_bold"
+                        android:gravity="center"
+                        android:background="@drawable/bg_button_disabled"
+                        android:paddingStart="16dp"
+                        android:paddingTop="2dp"
+                        android:paddingEnd="16dp"
+                        android:paddingBottom="2dp"
+                        android:text="0 Videos"
+                        android:textSize="12sp"
+                        android:textColor="@color/colorPrimary" />
 
                     <LinearLayout
                         android:layout_width="match_parent"

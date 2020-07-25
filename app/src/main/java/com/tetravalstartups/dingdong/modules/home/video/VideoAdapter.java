@@ -53,6 +53,7 @@ import com.tetravalstartups.dingdong.auth.LoginActivity;
 import com.tetravalstartups.dingdong.auth.Master;
 import com.tetravalstartups.dingdong.modules.comment.InVideoCommentBottomSheet;
 import com.tetravalstartups.dingdong.modules.create.SoundDetailActivity;
+import com.tetravalstartups.dingdong.modules.profile.view.activity.PlayVideoActivity;
 import com.tetravalstartups.dingdong.modules.profile.view.activity.PublicProfileActivity;
 import com.tetravalstartups.dingdong.utils.DDLoading;
 import com.vincan.medialoader.MediaLoader;
@@ -111,17 +112,21 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.VideoViewHol
         // Glide.with(context).load(R.drawable.dd_w)
 
         String url = MediaManager.get().url().transformation(new Transformation().quality(5)).resourceType("video").generate("user_uploaded_videos/" + video.getId() + ".webm");
-        String proxyUrl = MediaLoader.getInstance(context).getProxyUrl(url);
 
         holder.lvComment.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                SharedPreferences commentsPref = context.getSharedPreferences("comments", 0);
-                SharedPreferences.Editor editor = commentsPref.edit();
-                editor.putString("video_id", video.getId());
-                editor.apply();
-                inVideoCommentBottomSheet.setStyle(DialogFragment.STYLE_NORMAL, R.style.DialogStyle);
-                inVideoCommentBottomSheet.show(((MainActivity)context).getSupportFragmentManager(), "addBanks");
+                if (firebaseAuth.getCurrentUser() != null) {
+                    SharedPreferences commentsPref = context.getSharedPreferences("comments", 0);
+                    SharedPreferences.Editor editor = commentsPref.edit();
+                    editor.putString("video_id", video.getId());
+                    editor.apply();
+                    inVideoCommentBottomSheet.setStyle(DialogFragment.STYLE_NORMAL, R.style.DialogStyle);
+                    inVideoCommentBottomSheet.show(((PlayVideoActivity)context).getSupportFragmentManager(), "addBanks");
+                } else {
+                    context.startActivity(new Intent(context, LoginActivity.class));
+                }
+
             }
         });
 
@@ -215,7 +220,8 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.VideoViewHol
 
         Glide.with(context).load(video.getUser_photo()).into(holder.ivPhoto);
 
-        holder.videoView.setVideoURI(Uri.parse(proxyUrl));
+        Uri uri = Uri.parse(url);
+        holder.videoView.setVideoURI(uri);
         holder.videoView.requestFocus();
 
         String thumb_url = MediaManager.get().url()

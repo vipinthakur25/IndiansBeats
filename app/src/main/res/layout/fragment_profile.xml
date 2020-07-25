@@ -85,11 +85,23 @@
                         android:textSize="16sp" />
 
                     <TextView
+                        android:id="@+id/tvBio"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginEnd="16dp"
+                        android:fontFamily="@font/montserrat"
+                        android:gravity="center"
+                        android:text="Add Bio"
+                        android:textColor="@color/colorAccentV1" />
+
+                    <TextView
                         android:id="@+id/tvVideosCount"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
                         android:layout_marginEnd="16dp"
+                        android:layout_marginTop="16dp"
                         android:fontFamily="@font/montserrat_bold"
                         android:gravity="center"
                         android:background="@drawable/bg_button_disabled"
@@ -222,20 +234,6 @@
                         android:paddingBottom="4dp"
                         android:text="Edit Profile"
                         android:textColor="@color/colorTextTitle" />
-
-                    <TextView
-                        android:id="@+id/tvBio"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="16dp"
-                        android:layout_marginEnd="16dp"
-                        android:layout_marginTop="16dp"
-                        android:layout_marginBottom="16dp"
-                        android:layout_margin="8dp"
-                        android:fontFamily="@font/montserrat"
-                        android:gravity="center"
-                        android:text="Add Bio"
-                        android:textColor="@color/colorAccentV1" />
 
                 </LinearLayout>
 

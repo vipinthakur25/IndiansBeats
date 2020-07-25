@@ -1,5 +1,6 @@
 package com.tetravalstartups.dingdong.modules.player;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -13,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.view.animation.LinearInterpolator;
 import android.view.animation.RotateAnimation;
 import android.widget.ImageView;
@@ -33,22 +35,28 @@ import com.google.android.exoplayer2.ui.PlayerView;
 import com.google.android.exoplayer2.upstream.cache.CacheDataSourceFactory;
 import com.google.android.exoplayer2.upstream.cache.SimpleCache;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.dynamiclinks.FirebaseDynamicLinks;
 import com.google.firebase.dynamiclinks.ShortDynamicLink;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.Transaction;
 import com.krishna.fileloader.FileLoader;
 import com.krishna.fileloader.listener.FileRequestListener;
 import com.krishna.fileloader.pojo.FileResponse;
 import com.krishna.fileloader.request.FileLoadRequest;
 import com.like.LikeButton;
 import com.like.OnLikeListener;
+import com.nabinbhandari.android.permissions.PermissionHandler;
+import com.nabinbhandari.android.permissions.Permissions;
 import com.tetravalstartups.dingdong.MainActivity;
 import com.tetravalstartups.dingdong.R;
 import com.tetravalstartups.dingdong.auth.LoginActivity;
@@ -175,31 +183,13 @@ public class PlayerViewHolder extends RecyclerView.ViewHolder implements View.On
 
         });
 
-        animateSoundCD();
-    }
-
-    private void animateSoundCD() {
-        RotateAnimation rotate = new RotateAnimation(0, 180, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
-        rotate.setDuration(2000);
-        rotate.setRepeatMode(Animation.RESTART);
-        rotate.setRepeatCount(Animation.INFINITE);
-        rotate.setInterpolator(new LinearInterpolator());
-        ivSoundCD.startAnimation(rotate);
     }
 
     public void playVideo(Video model) {
-        if (videoView.isPlaying()) {
-            int current_views = Integer.parseInt(videoModel.getView_count());
-            int updated_view = current_views + 1;
-            HashMap hmView = new HashMap();
-            hmView.put("view_count", updated_view + "");
-            db.collection("videos")
-                    .document(videoModel.getId())
-                    .update(hmView);
-        }
         if (model.getVideo_url() != null) {
             videoView.requestFocus();
-            videoView.setVideoPath(model.getVideo_url());
+            Uri uri = Uri.parse(model.getVideo_url());
+            videoView.setVideoURI(uri);
             videoView.setOnPreparedListener(mp -> {
                 videoView.start();
 
@@ -225,6 +215,16 @@ public class PlayerViewHolder extends RecyclerView.ViewHolder implements View.On
                     lp.height = (int) screenHeight;
                 }
 
+                if (mp.isPlaying()) {
+                    int current_views = Integer.parseInt(model.getView_count());
+                    int updated_view = current_views + 1;
+                    HashMap hmView = new HashMap();
+                    hmView.put("view_count", updated_view + "");
+                    db.collection("videos")
+                            .document(videoModel.getId())
+                            .update(hmView);
+                }
+
                 mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                     @Override
                     public void onCompletion(MediaPlayer mp) {
@@ -233,6 +233,18 @@ public class PlayerViewHolder extends RecyclerView.ViewHolder implements View.On
                 });
 
             });
+
+            double randomDouble = Math.random();
+            randomDouble = randomDouble * 1000 + 1;
+            int randomInt = (int) randomDouble;
+
+            HashMap hashMap = new HashMap();
+            hashMap.put("video_index", randomInt+"");
+
+            db.collection("videos")
+                    .document(model.getId())
+                    .update(hashMap);
+
         }
 
 //        if (player != null) {
@@ -265,12 +277,22 @@ public class PlayerViewHolder extends RecyclerView.ViewHolder implements View.On
 
     }
 
+    public void cdSpinAnimation() {
+        RotateAnimation rotate = new RotateAnimation(0,
+                180, Animation.RELATIVE_TO_SELF,
+                0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+
+        rotate.setDuration(1000);
+        rotate.setRepeatCount(Animation.INFINITE);
+        rotate.setInterpolator(new LinearInterpolator());
+        ivSoundCD.startAnimation(rotate);
+    }
+
     private void setVideoData(Video video) {
         tvSoundName.setSelected(true);
         tvSoundName.setText(video.getSound_title());
         tvUserHandle.setText("@"+video.getUser_handle());
         tvCommentCount.setText(video.getComment_count());
-        tvLikeCount.setText(video.getLikes_count());
         tvShareCount.setText(video.getShare_count());
         tvVideoDesc.setText(video.getVideo_desc());
 
@@ -285,6 +307,16 @@ public class PlayerViewHolder extends RecyclerView.ViewHolder implements View.On
         if (videoModel.getVideo_desc().isEmpty()){
             tvVideoDesc.setVisibility(View.GONE);
         }
+
+        db.collection("videos").document(video.getId())
+                .collection("liked_by")
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                        String likes_count = String.valueOf(queryDocumentSnapshots.getDocuments().size());
+                        tvLikeCount.setText(likes_count);
+                    }
+                });
 
         fetchLatestComments();
 
@@ -373,51 +405,6 @@ public class PlayerViewHolder extends RecyclerView.ViewHolder implements View.On
                 .collection("liked_by")
                 .document(firebaseAuth.getCurrentUser().getUid())
                 .set(hmVideo);
-
-        db.collection("videos")
-                .document(videoModel.getId())
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                        if (task.isSuccessful()) {
-                            String like_count = task.getResult().getString("likes_count");
-                            int likes = Integer.parseInt(like_count);
-                            int update_like = likes + 1;
-                            tvLikeCount.setText(update_like + "");
-
-                            HashMap hashMap = new HashMap();
-                            hashMap.put("likes_count", update_like + "");
-
-                            db.collection("videos")
-                                    .document(videoModel.getId())
-                                    .update(hashMap);
-                        }
-                    }
-                });
-
-        db.collection("users")
-                .document(videoModel.getUser_id())
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                        if (task.isSuccessful()) {
-                            String like_count = task.getResult().getString("likes");
-                            int likes = Integer.parseInt(like_count);
-                            int update_like = likes + 1;
-                            tvLikeCount.setText(update_like + "");
-
-                            HashMap hashMap = new HashMap();
-                            hashMap.put("likes", update_like + "");
-
-                            db.collection("users")
-                                    .document(videoModel.getUser_id())
-                                    .update(hashMap);
-                        }
-                    }
-                });
-
     }
 
     private void doUnLikeVideo() {
@@ -433,52 +420,6 @@ public class PlayerViewHolder extends RecyclerView.ViewHolder implements View.On
                 .collection("liked_videos")
                 .document(videoModel.getId())
                 .delete();
-
-
-        db.collection("videos")
-                .document(videoModel.getId())
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                        if (task.isSuccessful()) {
-                            String like_count = task.getResult().getString("likes_count");
-                            int likes = Integer.parseInt(like_count);
-                            int update_like = likes - 1;
-                            tvLikeCount.setText(update_like + "");
-
-                            HashMap hashMap = new HashMap();
-                            hashMap.put("likes_count", update_like + "");
-
-                            db.collection("videos")
-                                    .document(videoModel.getId())
-                                    .update(hashMap);
-                        }
-                    }
-                });
-
-        db.collection("users")
-                .document(videoModel.getUser_id())
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                        if (task.isSuccessful()) {
-                            String like_count = task.getResult().getString("likes");
-                            int likes = Integer.parseInt(like_count);
-                            int update_like = likes - 1;
-                            tvLikeCount.setText(update_like + "");
-
-                            HashMap hashMap = new HashMap();
-                            hashMap.put("likes", update_like + "");
-
-                            db.collection("users")
-                                    .document(videoModel.getUser_id())
-                                    .update(hashMap);
-                        }
-                    }
-                });
-
     }
 
     private void doShareVideos() {
@@ -506,7 +447,7 @@ public class PlayerViewHolder extends RecyclerView.ViewHolder implements View.On
                                             File loadedFile = response.getBody();
                                             Intent shareIntent = new Intent();
                                             shareIntent.setAction(Intent.ACTION_SEND);
-                                            shareIntent.putExtra(Intent.EXTRA_TEXT,link);
+                                            shareIntent.putExtra(Intent.EXTRA_TEXT, "https://bit.ly/3fSqiQq");
                                             shareIntent.putExtra(Intent.EXTRA_STREAM, Uri.parse(loadedFile.getPath()));
                                             shareIntent.setType("video/*");
                                             shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
@@ -535,7 +476,6 @@ public class PlayerViewHolder extends RecyclerView.ViewHolder implements View.On
                                         }
                                     }
                                 });
-
 
                     }
 
@@ -600,7 +540,16 @@ public class PlayerViewHolder extends RecyclerView.ViewHolder implements View.On
         }
 
         if (v == lvShare) {
-            doShareVideos();
+            String[] permissions = {Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                    Manifest.permission.READ_EXTERNAL_STORAGE};
+            Permissions.check(context/*context*/, permissions,
+                    null/*rationale*/, null/*options*/,
+                    new PermissionHandler() {
+                        @Override
+                        public void onGranted() {
+                            doShareVideos();
+                        }
+                    });
         }
 
         if (v == ivPhoto) {
@@ -638,5 +587,6 @@ public class PlayerViewHolder extends RecyclerView.ViewHolder implements View.On
 
         }
     }
+
 
 }

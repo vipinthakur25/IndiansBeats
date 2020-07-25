@@ -19,6 +19,8 @@ public class App extends Application {
     public static ExoDatabaseProvider exoDatabaseProvider = null;
     public static Long exoPlayerCacheSize = (long) (90 * 1024 * 1024);
 
+
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -74,5 +76,7 @@ public class App extends Application {
             return false;
         }
     }
+
+
 
 }
