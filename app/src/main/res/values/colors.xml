@@ -24,7 +24,8 @@
     <color name="colorSingleGrad">#8B27B0</color>
 
     <color name="colorBrandYellow">#FFDD37</color>
-    <color name="colorBrandPink">#E05FB5</color>
+    <color name="colorBrandYellowV2">#F1D75A</color>
+    <color name="colorBrandPink">#D686BB</color>
 
     <color name="colorDisable">#AEA7A7</color>
     <color name="colorDisableText">#615A5A</color>

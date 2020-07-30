@@ -28,6 +28,7 @@ import com.otaliastudios.transcoder.strategy.TrackStrategy;
 import com.tetravalstartups.dingdong.R;
 import com.tetravalstartups.dingdong.modules.create.PostActivity;
 import com.tetravalstartups.dingdong.modules.create.sound.SoundActivity;
+import com.tetravalstartups.dingdong.utils.DDAlert;
 
 import java.io.File;
 import java.io.IOException;
@@ -82,24 +83,16 @@ public class PreviewActivity extends AppCompatActivity implements View.OnClickLi
 
     private void playVideo() {
         videoView.setVideoPath(video_path);
-        videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-            @Override
-            public void onPrepared(MediaPlayer mp) {
-                ViewGroup.LayoutParams lp = videoView.getLayoutParams();
-                float videoWidth = mp.getVideoWidth();
-                float videoHeight = mp.getVideoHeight();
-                float viewWidth = videoView.getWidth();
-                lp.height = (int) (viewWidth * (videoHeight / videoWidth));
-                videoView.setLayoutParams(lp);
-                if (!videoView.isPlaying()) {
-                    videoView.start();
-                    videoView.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                        @Override
-                        public void onCompletion(MediaPlayer mp) {
-                            mp.start();
-                        }
-                    });
-                }
+        videoView.setOnPreparedListener(mp -> {
+            ViewGroup.LayoutParams lp = videoView.getLayoutParams();
+            float videoWidth = mp.getVideoWidth();
+            float videoHeight = mp.getVideoHeight();
+            float viewWidth = videoView.getWidth();
+            lp.height = (int) (viewWidth * (videoHeight / videoWidth));
+            videoView.setLayoutParams(lp);
+            if (!videoView.isPlaying()) {
+                videoView.start();
+                videoView.setOnCompletionListener(mp1 -> mp1.start());
             }
         });
     }
@@ -117,10 +110,6 @@ public class PreviewActivity extends AppCompatActivity implements View.OnClickLi
             intent.putExtra("sound_title", sound_title);
             startActivity(intent);
             overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-        }
-
-        if (v == lhSound) {
-            startActivity(new Intent(PreviewActivity.this, SoundActivity.class));
         }
 
     }

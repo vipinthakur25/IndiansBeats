@@ -1,49 +1,39 @@
 package com.tetravalstartups.dingdong.modules.passbook;
 
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.DialogFragment;
-import androidx.viewpager.widget.ViewPager;
-
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.Handler;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.google.android.material.tabs.TabLayout;
-import com.google.firebase.auth.FirebaseAuth;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.DialogFragment;
+
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.tetravalstartups.dingdong.R;
-import com.tetravalstartups.dingdong.utils.ProfilePhotoBottomSheet;
+import com.tetravalstartups.dingdong.auth.Master;
 
 public class PassbookActivity extends AppCompatActivity implements View.OnClickListener, BuyCoinBottomSheetFragment.BuyCoinListener {
 
-    private TabLayout passbookTab;
-    private ViewPager passbookPager;
-    private LinearLayout lvBuyCoins;
-    private LinearLayout lvBanks;
-    private TextView tvTotalCoins;
-    private TextView tvReservedCoins;
-    private TextView tvUnReservedCoins;
-    private TextView tvCashbackCoin;
-    private FirebaseFirestore db;
-    private FirebaseAuth firebaseAuth;
-
-    private String reserved_coin;
-    private String unreserved_coin;
-    private String cashback_coin;
-
     private ImageView ivGoBack;
+    private TextView tvVideoUploads;
+    private TextView tvTotalEarning;
+    private TextView tvAvailableCoins;
+    private TextView tvBuyCoin;
+    private TextView tvTotalSpending;
+    private TextView tvTimeSpend;
+    private TextView tvDailyCheckIn;
+    private TextView tvFromYourFans;
+    private TextView tvRedeemCoin;
+    private TextView tvSubscriptionCoin;
+    private FirebaseFirestore db;
 
+    private Master master;
     private BuyCoinBottomSheetFragment bottomSheetFragment;
 
     @Override
@@ -54,70 +44,31 @@ public class PassbookActivity extends AppCompatActivity implements View.OnClickL
     }
 
     private void initView() {
-        passbookTab = findViewById(R.id.passbookTab);
-        passbookPager = findViewById(R.id.passbookPager);
-        lvBuyCoins = findViewById(R.id.lvBuyCoins);
-        lvBanks = findViewById(R.id.lvBanks);
-
-        tvTotalCoins = findViewById(R.id.tvTotalCoins);
-        tvReservedCoins = findViewById(R.id.tvReservedCoins);
-        tvUnReservedCoins = findViewById(R.id.tvUnReservedCoins);
-        tvCashbackCoin = findViewById(R.id.tvCashbackCoin);
-
         ivGoBack = findViewById(R.id.ivGoBack);
+        tvVideoUploads = findViewById(R.id.tvVideoUploads);
+        tvTotalEarning = findViewById(R.id.tvTotalEarning);
+        tvAvailableCoins = findViewById(R.id.tvAvailableCoins);
+        tvTotalSpending = findViewById(R.id.tvTotalSpending);
+        tvBuyCoin = findViewById(R.id.tvBuyCoin);
+        tvTimeSpend = findViewById(R.id.tvTimeSpend);
+        tvDailyCheckIn = findViewById(R.id.tvDailyCheckIn);
+        tvFromYourFans = findViewById(R.id.tvFromYourFans);
+        tvSubscriptionCoin = findViewById(R.id.tvSubscriptionCoin);
+        tvRedeemCoin = findViewById(R.id.tvRedeemCoin);
+
         ivGoBack.setOnClickListener(this);
+        tvBuyCoin.setOnClickListener(this);
+        tvRedeemCoin.setOnClickListener(this);
 
         db = FirebaseFirestore.getInstance();
-        firebaseAuth = FirebaseAuth.getInstance();
+        master = new Master(PassbookActivity.this);
 
         bottomSheetFragment = new BuyCoinBottomSheetFragment();
 
-        lvBuyCoins.setOnClickListener(this);
-        lvBanks.setOnClickListener(this);
-        setupViewPager();
-        setCoinBalance();
+        fetchBalances();
+
     }
 
-    private void setupViewPager() {
-        PassbookPagerAdapter passbookPagerAdapter = new PassbookPagerAdapter(getSupportFragmentManager());
-        passbookPager.setAdapter(passbookPagerAdapter);
-        passbookTab.setupWithViewPager(passbookPager);
-    }
-
-    private void setCoinBalance(){
-
-        db.collection("users")
-                .document(firebaseAuth.getCurrentUser().getUid())
-                .collection("passbook")
-                .document("balance")
-                .addSnapshotListener(new EventListener<DocumentSnapshot>() {
-                    @Override
-                    public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
-                        if (documentSnapshot.getString("reserved") != null){
-                            reserved_coin = documentSnapshot.getString("reserved");
-                            tvReservedCoins.setText(reserved_coin);
-                        }
-                        if (documentSnapshot.getString("unreserved") != null){
-                            unreserved_coin = documentSnapshot.getString("unreserved");
-                            tvUnReservedCoins.setText(unreserved_coin);
-                        }
-                        if (documentSnapshot.getString("cashback") != null){
-                            cashback_coin = documentSnapshot.getString("cashback");
-                            tvCashbackCoin.setText(cashback_coin);
-                        }
-
-                        if (documentSnapshot.getString("reserved") != null && documentSnapshot.getString("unreserved") != null){
-                            int rs_coin = Integer.parseInt(reserved_coin);
-                            int us_coin = Integer.parseInt(unreserved_coin);
-                            int cb_coin = Integer.parseInt(cashback_coin);
-                            int ttl_coin = rs_coin+us_coin+cb_coin;
-                            String total_coin = String.valueOf(ttl_coin);
-                            tvTotalCoins.setText(total_coin);
-                        }
-
-                    }
-                });
-    }
 
     @Override
     public void onBackPressed() {
@@ -128,29 +79,57 @@ public class PassbookActivity extends AppCompatActivity implements View.OnClickL
 
     @Override
     public void onClick(View v) {
-        if (v == ivGoBack){
+        if (v == ivGoBack) {
             onBackPressed();
             finish();
             overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
         }
-        if (v == lvBuyCoins){
+
+        if (v == tvBuyCoin) {
             bottomSheetFragment.setStyle(DialogFragment.STYLE_NORMAL, R.style.DialogStyle);
-            bottomSheetFragment.show(getSupportFragmentManager(), "profilePhotoBottomSheet");
+            bottomSheetFragment.show(getSupportFragmentManager(), "addCoin");
         }
-        if (v == lvBanks){
-            startActivity(new Intent(PassbookActivity.this, BanksActivity.class));
+
+        if (v == tvRedeemCoin) {
+            Intent intent = new Intent(PassbookActivity.this, RedeemActivity.class);
+            startActivity(intent);
             overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
         }
+
+    }
+
+    private void fetchBalances() {
+        db.collection("users")
+                .document(master.getId())
+                .collection("passbook")
+                .document("balance")
+                .addSnapshotListener(new EventListener<DocumentSnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
+                        assert documentSnapshot != null;
+                        String subscription_balance = documentSnapshot.getString("subscription");
+                        tvSubscriptionCoin.setText(subscription_balance);
+                    }
+                });
+    }
+
+    private void dailyCheckInStatus() {
+        String current_date = "01/01/2020";
+        String date2 = "02/01/2020";
+        SharedPreferences preferences = getSharedPreferences("check_in", 0);
+        if (preferences.getString("checked_in", "0").equals(current_date)) {
+
+        }
+        SharedPreferences.Editor editor = preferences.edit();
+
     }
 
     @Override
     public void onButtonClicked(String text) {
-            if (text.equals("cancel_false")){
-                bottomSheetFragment.setCancelable(false);
-            }
-            else
-            if (text.equals("cancel_true")){
-                bottomSheetFragment.setCancelable(true);
-            }
+        if (text.equals("cancel_false")) {
+            bottomSheetFragment.setCancelable(false);
+        } else if (text.equals("cancel_true")) {
+            bottomSheetFragment.setCancelable(true);
+        }
     }
 }

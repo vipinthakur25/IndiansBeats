@@ -53,7 +53,7 @@ public class CustomerReviewAdapter extends PagerAdapter {
         TextView tvReview = view.findViewById(R.id.tvReview);
         TextView tvName = view.findViewById(R.id.tvName);
 
-        Glide.with(context).load(customerRating.getPhoto()).placeholder(R.drawable.dingdong_placeholder).into(ivPhoto);
+        Glide.with(context).load(customerRating.getPhoto()).placeholder(R.drawable.dd_logo_placeholder).into(ivPhoto);
         barRating.setRating(customerRating.getRating());
         tvReview.setText(customerRating.getReview());
         tvName.setText(customerRating.getName());

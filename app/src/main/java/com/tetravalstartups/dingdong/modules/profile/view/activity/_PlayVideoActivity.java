@@ -1,171 +1,268 @@
 package com.tetravalstartups.dingdong.modules.profile.view.activity;
 
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
-import android.net.Uri;
 import android.os.Bundle;
-import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
-import android.widget.ImageView;
-import android.widget.TextView;
+import android.util.Log;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.PagerSnapHelper;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.SnapHelper;
 
-import com.bumptech.glide.Glide;
-import com.cloudinary.Transformation;
-import com.cloudinary.android.MediaManager;
-import com.google.android.exoplayer2.C;
-import com.google.android.exoplayer2.PlaybackParameters;
-import com.google.android.exoplayer2.Player;
-import com.google.android.exoplayer2.SimpleExoPlayer;
-import com.google.android.exoplayer2.source.ExtractorMediaSource;
-import com.google.android.exoplayer2.source.MediaSource;
-import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
-import com.google.android.exoplayer2.upstream.DataSource;
-import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
-import com.google.android.exoplayer2.util.Util;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.like.LikeButton;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QuerySnapshot;
+import com.tetravalstartups.dingdong.BaseActivity;
 import com.tetravalstartups.dingdong.R;
+import com.tetravalstartups.dingdong.auth.Master;
+import com.tetravalstartups.dingdong.modules.home.video.Video;
+import com.tetravalstartups.dingdong.modules.home.video.VideoAdapter;
+import com.tetravalstartups.dingdong.utils.Constants;
 
-public class _PlayVideoActivity extends AppCompatActivity implements View.OnClickListener {
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
-    private ImageView ivGoBack;
-    private ImageView ivPhoto;
-    private ImageView ivFollowUser;
-    private ImageView ivComment;
-    private ImageView ivShare;
-    private ImageView ivSoundCD;
-
-    private TextView tvLikeCount;
-    private TextView tvCommentCount;
-    private TextView tvShareCount;
-    private TextView tvUserHandle;
-    private TextView tvVideoDesc;
-    private TextView tvSoundName;
-
-    private LikeButton likeVideo;
-
-    private SimpleExoPlayer player;
-    private SimpleExoPlayerView exoPlay;
+public class _PlayVideoActivity extends BaseActivity {
 
     private FirebaseFirestore db;
+    private RecyclerView recyclerVideos;
+    private VideoAdapter videoAdapter;
+    private FirebaseAuth auth;
+    private Master master;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-                WindowManager.LayoutParams.FLAG_FULLSCREEN);
-      //  setContentView(R.layout.activity_play_video);
+        setStatusBarTransparentFlag();
+        setContentView(R.layout.activity_play_video);
         this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-       // initView();
+        initView();
     }
 
-//    private void initView() {
-//        db = FirebaseFirestore.getInstance();
-//
-//        ivGoBack = findViewById(R.id.ivGoBack);
-//        ivGoBack.setOnClickListener(this);
-//
-//        ivPhoto = findViewById(R.id.ivPhoto);
-//        ivFollowUser = findViewById(R.id.ivFollowUser);
-//        ivComment = findViewById(R.id.ivComment);
-//        ivShare = findViewById(R.id.ivShare);
-//        ivSoundCD = findViewById(R.id.ivSoundCD);
-//        tvLikeCount = findViewById(R.id.tvLikeCount);
-//        tvCommentCount = findViewById(R.id.tvCommentCount);
-//        tvShareCount = findViewById(R.id.tvShareCount);
-//        tvUserHandle = findViewById(R.id.tvUserHandle);
-//        tvVideoDesc = findViewById(R.id.tvVideoDesc);
-//        tvSoundName = findViewById(R.id.tvSoundName);
-//        likeVideo = findViewById(R.id.likeVideo);
-//
-//        exoPlay = findViewById(R.id.exoPlay);
-//
-//        String video_id = getIntent().getStringExtra("video_id");
-//        String url = MediaManager.get().url().transformation(new Transformation().quality(5)).resourceType("video").generate("user_uploaded_videos/"+video_id+".webm");
-//
-//        setVideoData(video_id);
-//        playVideo(url);
-//    }
+    private void initView() {
+        recyclerVideos = findViewById(R.id.recyclerVideos);
+        auth = FirebaseAuth.getInstance();
+        db = FirebaseFirestore.getInstance();
 
-//    private void setVideoData(String video_id) {
-//        db.collection("videos")
-//                .document(video_id)
-//                .addSnapshotListener(new EventListener<DocumentSnapshot>() {
-//                    @Override
-//                    public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
-//                        assert documentSnapshot != null;
-//                        if (documentSnapshot.exists()){
-//                            String user_photo = documentSnapshot.getString("user_photo");
-//                            String likes_count = documentSnapshot.getString("likes_count");
-//                            String comment_count = documentSnapshot.getString("comment_count");
-//                            String share_count = documentSnapshot.getString("share_count");
-//                            String user_handle = documentSnapshot.getString("user_handle");
-//                            String video_desc = documentSnapshot.getString("video_desc");
-//                            String sound_title = documentSnapshot.getString("sound_title");
-//
-//                            setDataToUI(user_photo, likes_count,
-//                                    comment_count, share_count,
-//                                    user_handle, video_desc,
-//                                    sound_title);
-//
-//                        } else {
-//                            Toast.makeText(_PlayVideoActivity.this, ""+e.getMessage()
-//                                    ,Toast.LENGTH_SHORT).show();
-//                        }
-//                    }
-//                });
-//    }
+        master = new Master(_PlayVideoActivity.this);
+        int pos = Integer.parseInt(getIntent().getStringExtra("pos"));
+        String video_type = getIntent().getStringExtra("video_type");
+        if (video_type.equals("created")){
 
-//    private void setDataToUI(String user_photo, String likes_count, String comment_count, String share_count, String user_handle, String video_desc, String sound_title) {
-//        Glide.with(getApplicationContext())
-//                .load(user_photo)
-//                .into(ivPhoto);
-//
-//        tvLikeCount.setText(likes_count);
-//        tvCommentCount.setText(comment_count);
-//        tvShareCount.setText(share_count);
-//        tvUserHandle.setText(user_handle);
-//        tvVideoDesc.setText(video_desc);
-//        tvSoundName.setText(sound_title);
-//    }
+            fetchCreatedVideos(pos);
 
-//    private void playVideo(String url) {
-//        player = new SimpleExoPlayer.Builder(this).build();
-//        DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(this,
-//                Util.getUserAgent(this, "BubbleTok"));
-//
-//        MediaSource videoSource = new ExtractorMediaSource.Factory(dataSourceFactory)
-//                .createMediaSource(Uri.parse(url));
-//
-//        player.prepare(videoSource);
-//        player.setRepeatMode(Player.REPEAT_MODE_ALL);
-//        player.setVideoScalingMode(C.VIDEO_SCALING_MODE_SCALE_TO_FIT);
-//        player.setPlaybackParameters(PlaybackParameters.DEFAULT);
-//
-//        exoPlay.setPlayer(player);
-//        player.setPlayWhenReady(true);
-//
-//    }
+        } else if (video_type.equals("liked")) {
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-        player.stop();
-    }
+            SharedPreferences preferences = getSharedPreferences("videoPref", 0);
+            if (preferences.getString("profile_type", "none").equals("public")) {
 
-    @Override
-    public void onClick(View v) {
-        if (v == ivGoBack) {
-            onBackPressed();
-            finish();
+                fetchLikedVideos(pos,preferences.getString("user_id", "none"));
+
+            } else if (preferences.getString("profile_type", "none").equals("private")) {
+
+                fetchLikedVideos(pos, master.getId());
+
+            }
+
+        } else if (video_type.equals("draft")) {
+            fetchDraftVideos(pos);
         }
+
     }
+
+    private void fetchDraftVideos(int pos) {
+        Query query = db.collection("videos");
+        List<Video> privateDraftVideosList = new ArrayList<>();
+        query.whereEqualTo("user_id", master.getId())
+                .whereEqualTo("video_status", Constants.VIDEO_STATUS_PRIVATE)
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                        if (queryDocumentSnapshots.getDocuments().isEmpty()){
+                        } else {
+                            privateDraftVideosList.clear();
+                            for (DocumentSnapshot snapshot : queryDocumentSnapshots.getDocuments()){
+                                Video video = new Video();
+                                video.setId(snapshot.getString("id"));
+                                video.setVideo_desc(snapshot.getString("video_desc"));
+                                video.setSound_id(snapshot.getString("sound_id"));
+                                video.setSound_title(snapshot.getString("sound_title"));
+                                video.setLikes_count(snapshot.getString("likes_count"));
+                                video.setShare_count(snapshot.getString("share_count"));
+                                video.setComment_count(snapshot.getString("comment_count"));
+                                video.setView_count(snapshot.getString("view_count"));
+                                video.setUser_id(snapshot.getString("user_id"));
+                                video.setUser_handle(snapshot.getString("user_handle"));
+                                video.setUser_photo(snapshot.getString("user_photo"));
+                                video.setVideo_thumbnail(snapshot.getString("video_thumbnail"));
+                                video.setVideo_status(snapshot.getString("video_status"));
+                                video.setVideo_status(snapshot.getString("video_status"));
+                                privateDraftVideosList.add(video);
+                            }
+
+                            videoAdapter = new VideoAdapter(_PlayVideoActivity.this, privateDraftVideosList);
+                            videoAdapter.notifyDataSetChanged();
+                            SnapHelper snapHelper = new PagerSnapHelper();
+                            recyclerVideos.setLayoutManager(new LinearLayoutManager(_PlayVideoActivity.this));
+                            recyclerVideos.scrollToPosition(pos);
+                            if (recyclerVideos.getOnFlingListener() == null)
+                                snapHelper.attachToRecyclerView(recyclerVideos);
+                            recyclerVideos.setAdapter(videoAdapter);
+                        }
+                    }
+                });
+
+
+    }
+
+    private void fetchLikedVideos(int pos, String id) {
+        FirebaseFirestore likedDB = FirebaseFirestore.getInstance();
+        Query query = likedDB.collection("users").document(id).collection("liked_videos").orderBy("id", Query.Direction.ASCENDING);
+        List<Video> likedVideosList = new ArrayList<>();
+        query.get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        likedVideosList.clear();
+                        for (DocumentSnapshot snapshot : task.getResult()) {
+                           //og.e("taskresult", snapshot.toString());
+                                                    db.collection("videos")
+                                .document(Objects.requireNonNull(snapshot.getString("id")))
+                                .get()
+                                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                        if (task.isSuccessful()) {
+                                            Toast.makeText(_PlayVideoActivity.this, "task success", Toast.LENGTH_SHORT).show();
+                                            Video video = task.getResult().toObject(Video.class);
+                                            Log.e("taskresult", task.getResult().getString("id"));
+                                            likedVideosList.add(video);
+                                        }
+
+                                        videoAdapter = new VideoAdapter(_PlayVideoActivity.this, likedVideosList);
+                                        videoAdapter.notifyDataSetChanged();
+                                        SnapHelper snapHelper = new PagerSnapHelper();
+                                        recyclerVideos.setLayoutManager(new LinearLayoutManager(_PlayVideoActivity.this));
+                                        recyclerVideos.scrollToPosition(pos);
+                                        if (recyclerVideos.getOnFlingListener() == null)
+                                            snapHelper.attachToRecyclerView(recyclerVideos);
+                                        recyclerVideos.setAdapter(videoAdapter);
+                                    }
+                                });
+                        }
+                    }
+                });
+    }
+
+//    {
+//        query.addSnapshotListener(new EventListener<QuerySnapshot>() {
+//            @Override
+//            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+//                if (queryDocumentSnapshots.getDocuments().isEmpty()) {
+//                } else {
+//
+//                    for (DocumentSnapshot snapshot : queryDocumentSnapshots.getDocuments()) {
+//                        db.collection("videos")
+//                                .document(Objects.requireNonNull(snapshot.getString("id")))
+//                                .get()
+//                                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+//                                    @Override
+//                                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+//                                        likedVideosList.clear();
+//                                        if (task.isSuccessful()) {
+//                                            Toast.makeText(PlayVideoActivity.this, "task success", Toast.LENGTH_SHORT).show();
+//                                            Video video = task.getResult().toObject(Video.class);
+//                                            Log.e("taskresult", task.getResult().getString("id"));
+//                                            likedVideosList.add(video);
+//                                        }
+//
+//                                        videoAdapter = new VideoAdapter(PlayVideoActivity.this, likedVideosList);
+//                                        videoAdapter.notifyDataSetChanged();
+//                                        SnapHelper snapHelper = new PagerSnapHelper();
+//                                        recyclerVideos.setLayoutManager(new LinearLayoutManager(PlayVideoActivity.this));
+//                                        recyclerVideos.scrollToPosition(pos);
+//                                        if (recyclerVideos.getOnFlingListener() == null)
+//                                            snapHelper.attachToRecyclerView(recyclerVideos);
+//                                        recyclerVideos.setAdapter(videoAdapter);
+//
+//                                    }
+//                                });
+//
+//
+//                    }
+//
+//                }
+//
+//            }
+//
+//        });
+//
+//    }
+
+
+    private void fetchCreatedVideos(int pos) {
+
+        db = FirebaseFirestore.getInstance();
+        List<Video> videoList = new ArrayList<>();
+
+        Query query = db.collection("videos");
+        query.whereEqualTo("user_id", getIntent().getStringExtra("user_id"))
+                .whereEqualTo("video_status", Constants.VIDEO_STATUS_PUBLIC)
+                .orderBy("timestamp", Query.Direction.DESCENDING)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()){
+                            if (task.getResult().getDocuments().isEmpty()){
+                                Toast.makeText(_PlayVideoActivity.this, "No Videos", Toast.LENGTH_SHORT).show();
+                            } else {
+
+                                videoList.clear();
+                                for (DocumentSnapshot snapshot : task.getResult()) {
+                                    Video video = new Video();
+                                    video.setId(snapshot.getString("id"));
+                                    video.setVideo_desc(snapshot.getString("video_desc"));
+                                    video.setSound_id(snapshot.getString("sound_id"));
+                                    video.setSound_title(snapshot.getString("sound_title"));
+                                    video.setLikes_count(snapshot.getString("likes_count"));
+                                    video.setShare_count(snapshot.getString("share_count"));
+                                    video.setComment_count(snapshot.getString("comment_count"));
+                                    video.setView_count(snapshot.getString("view_count"));
+                                    video.setUser_id(snapshot.getString("user_id"));
+                                    video.setUser_handle(snapshot.getString("user_handle"));
+                                    video.setUser_photo(snapshot.getString("user_photo"));
+                                    video.setVideo_thumbnail(snapshot.getString("video_thumbnail"));
+                                    video.setVideo_status(snapshot.getString("video_status"));
+                                    video.setVideo_status(snapshot.getString("video_status"));
+                                    videoList.add(video);
+                                }
+
+                                videoAdapter = new VideoAdapter(_PlayVideoActivity.this, videoList);
+                                videoAdapter.notifyDataSetChanged();
+                                SnapHelper snapHelper = new PagerSnapHelper();
+                                recyclerVideos.setLayoutManager(new LinearLayoutManager(_PlayVideoActivity.this));
+                                recyclerVideos.scrollToPosition(pos);
+                                if (recyclerVideos.getOnFlingListener() == null)
+                                    snapHelper.attachToRecyclerView(recyclerVideos);
+                                recyclerVideos.setAdapter(videoAdapter);
+                            }
+                        }
+                    }
+                });
+
+
+    }
+
 }

@@ -44,8 +44,10 @@ public class SubscribedPresenter {
                         } else {
                             subscribedList.clear();
                             for (DocumentSnapshot snapshot : documentSnapshots.getDocuments()){
-                                Subscribed subscribed = snapshot.toObject(Subscribed.class);
-                                subscribedList.add(subscribed);
+                                if (snapshot.getString("status").equals("1")) {
+                                    Subscribed subscribed = snapshot.toObject(Subscribed.class);
+                                    subscribedList.add(subscribed);
+                                }
                             }
 
                             iSubscribed.subscribeFetchSuccess(subscribedList);

@@ -109,7 +109,7 @@
                         android:paddingTop="2dp"
                         android:paddingEnd="16dp"
                         android:paddingBottom="2dp"
-                        android:text="6 Videos"
+                        android:text="0 Videos"
                         android:textSize="12sp"
                         android:textColor="@color/colorPrimary" />
 

@@ -118,43 +118,7 @@ public class AddBankBottomSheetFragment extends BottomSheetDialogFragment implem
 
     private void validateIFSC(String ifsc) {
         progressIFSC.setVisibility(View.VISIBLE);
-        RequestQueue queue = Volley.newRequestQueue(getContext());
-        String url = "https://ifsc.razorpay.com/" + ifsc;
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        try {
-                            JSONObject jsonObject = new JSONObject(response);
-                            String BANK = jsonObject.getString("BANK");
-                            String ADDRESS = jsonObject.getString("ADDRESS");
-                            etIFSC.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_dd_check_mark_green, 0);
 
-                            tvBankName.setVisibility(View.VISIBLE);
-                            tvBankAddress.setVisibility(View.VISIBLE);
-
-                            tvBankName.setText(BANK);
-                            tvBankAddress.setText(ADDRESS);
-                            progressIFSC.setVisibility(View.INVISIBLE);
-                            tvAddBank.setEnabled(true);
-
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                etIFSC.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_dd_cancel_red, 0);
-                tvBankName.setText("");
-                tvBankAddress.setText("");
-                tvBankName.setVisibility(View.GONE);
-                tvBankAddress.setVisibility(View.GONE);
-                progressIFSC.setVisibility(View.INVISIBLE);
-                tvAddBank.setEnabled(false);
-            }
-        });
-        queue.add(stringRequest);
     }
 
     private void doUiValidation() {

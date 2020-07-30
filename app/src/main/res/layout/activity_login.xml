@@ -60,7 +60,7 @@
         android:background="@drawable/bg_edittext"
         android:fontFamily="@font/montserrat_bold"
         android:hint="Email"
-        android:textSize="16dp"
+        android:textSize="16sp"
         android:autofillHints="password"
         android:inputType="textEmailAddress|none"
         android:gravity="center_vertical"
@@ -77,7 +77,7 @@
         android:background="@drawable/bg_edittext"
         android:fontFamily="@font/montserrat_bold"
         android:hint="Password"
-        android:textSize="16dp"
+        android:textSize="16sp"
         android:autofillHints="password"
         android:inputType="textPassword|none"
         android:gravity="center_vertical"
@@ -112,17 +112,6 @@
         android:layout_marginTop="16dp"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"/>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginTop="16dp"
-        android:layout_weight="1"
-        android:orientation="vertical">
-
-    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/lhSignUp"

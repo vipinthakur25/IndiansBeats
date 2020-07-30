@@ -54,9 +54,6 @@ public class PlayVideoActivity extends BaseActivity {
         recyclerVideos = findViewById(R.id.recyclerVideos);
         auth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
-//        if (auth.getCurrentUser() != null){
-//            ((MainActivity)getApplicationContext()).getProfileData(auth.getCurrentUser().getUid());
-//        }
 
         master = new Master(PlayVideoActivity.this);
         int pos = Integer.parseInt(getIntent().getStringExtra("pos"));

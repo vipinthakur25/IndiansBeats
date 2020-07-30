@@ -2,8 +2,6 @@ package com.tetravalstartups.dingdong.modules.subscription;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,8 +14,12 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.shreyaspatil.EasyUpiPayment.EasyUpiPayment;
+import com.shreyaspatil.EasyUpiPayment.listener.PaymentStatusListener;
+import com.shreyaspatil.EasyUpiPayment.model.TransactionDetails;
 import com.tetravalstartups.dingdong.R;
 
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -43,67 +45,91 @@ public class SubscriptionAdapter extends RecyclerView.Adapter<SubscriptionAdapte
     @Override
     public void onBindViewHolder(@NonNull SubscriptionAdapter.ViewHolder holder, int position) {
         Subscription subscription = subscriptionList.get(position);
-        holder.tvName.setText("#"+subscription.getName());
-        holder.tvAmount.setText("₹"+subscription.getAmount());
-        holder.tvValidity.setText(subscription.getValidity()+" "+subscription.getValidity_unit());
-        holder.tvBenefit.setText("₹"+subscription.getBenefit()+" benefit every "+subscription.getBenefit_unit());
-        holder.tvTotalBenefit.setText("₹"+subscription.getTotal_benefit()+" total benefit");
-        holder.tvUploads.setText(subscription.getUploads()+" payable video per "+subscription.getUpload_unit());
+        holder.tvName.setText("#" + subscription.getName());
+        holder.tvAmount.setText("₹" + subscription.getAmount());
+        holder.tvValidity.setText(subscription.getValidity() + " " + subscription.getValidity_unit());
+        holder.tvBenefit.setText("₹" + subscription.getBenefit() + " benefit every " + subscription.getBenefit_unit());
+        holder.tvTotalBenefit.setText("₹" + subscription.getTotal_benefit() + " total benefit");
+        holder.tvUploads.setText(subscription.getUploads() + " payable video per " + subscription.getUpload_unit());
         holder.tvCheckout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Calendar current = Calendar.getInstance();
-                current.add(Calendar.MONTH, 10);
-                SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy");
-                Date resultdate = new Date(current.getTimeInMillis());
-                String dueudate = df.format(resultdate);
-//                Toast.makeText(context, ""+dueudate, Toast.LENGTH_SHORT).show();
-//
+
                 FirebaseFirestore db = FirebaseFirestore.getInstance();
                 DocumentReference documentReference = db.collection("subscription").document();
                 String id = documentReference.getId();
-//
-                Calendar current1 = Calendar.getInstance();
-                Date start = new Date(current1.getTimeInMillis());
-                String start_date =df.format(start);
 
-                Subscribed subscribed = new Subscribed();
-                subscribed.setId(id);
-                subscribed.setName(subscription.getName());
-                subscribed.setStart_date(start_date);
-                subscribed.setEnd_date(dueudate);
-                subscribed.setTotal_uploads(String.valueOf(subscription.getUploads()));
-                subscribed.setAvl_uploads(String.valueOf(subscription.getUploads()));
+                double amt = 1.0; //subscription.getAmount();
+                DecimalFormat form = new DecimalFormat("0.00");
 
-                FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
+                final EasyUpiPayment easyUpiPayment = new EasyUpiPayment.Builder()
+                        .with((Activity) context)
+                        .setPayeeVpa("7billionsnetwork@okhdfcbank")
+                        .setPayeeName("Ding Dong")
+                        .setTransactionId(id)
+                        .setTransactionRefId(id)
+                        .setDescription("Ding Dong Subscription Plan: " + subscription.getName())
+                        .setAmount(form.format(amt))
+                        .build();
 
-                db.collection("users")
-                        .document(firebaseAuth.getCurrentUser().getUid())
-                        .collection("subscription")
-                        .document(id)
-                        .set(subscribed);
+                easyUpiPayment.startPayment();
+                easyUpiPayment.setPaymentStatusListener(new PaymentStatusListener() {
+                    @Override
+                    public void onTransactionCompleted(TransactionDetails transactionDetails) {
 
-//                String GOOGLE_PAY_PACKAGE_NAME = "com.google.android.apps.nbu.paisa.user";
-//                int GOOGLE_PAY_REQUEST_CODE = 123;
-//
-//                Uri uri =
-//                        new Uri.Builder()
-//                                .scheme("upi")
-//                                .authority("pay")
-//                                .appendQueryParameter("pa", "7389410182@upi")
-//                                .appendQueryParameter("pn", "7 Billions Network")
-//                                .appendQueryParameter("mc", "7BN")
-//                                .appendQueryParameter("tr", id)
-//                                .appendQueryParameter("tn", "DingDong Subscription")
-//                                .appendQueryParameter("am", String.valueOf(subscription.getAmount()))
-//                                .appendQueryParameter("cu", "INR")
-//                                .appendQueryParameter("url", "your-transaction-url")
-//                                .build();
-//                Intent intent = new Intent(Intent.ACTION_VIEW);
-//                intent.setData(uri);
-//                intent.setPackage(GOOGLE_PAY_PACKAGE_NAME);
-//                ((Activity) context).startActivityForResult(intent, GOOGLE_PAY_REQUEST_CODE);
+                    }
 
+                    @Override
+                    public void onTransactionSuccess() {
+                        Calendar current = Calendar.getInstance();
+                        current.add(Calendar.MONTH, 10);
+                        SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy");
+                        Date resultdate = new Date(current.getTimeInMillis());
+                        String dueudate = df.format(resultdate);
+
+                        Calendar current1 = Calendar.getInstance();
+                        Date start = new Date(current1.getTimeInMillis());
+                        String start_date = df.format(start);
+
+                        Subscribed subscribed = new Subscribed();
+                        subscribed.setId(id);
+                        subscribed.setName(subscription.getName());
+                        subscribed.setStart_date(start_date);
+                        subscribed.setEnd_date(dueudate);
+                        subscribed.setTotal_uploads(String.valueOf(subscription.getUploads()));
+                        subscribed.setAvl_uploads(String.valueOf(subscription.getUploads()));
+                        subscribed.setMonthly_profit(String.valueOf(subscription.getBenefit()));
+                        subscribed.setStatus("1");
+
+                        FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
+
+                        db.collection("users")
+                                .document(firebaseAuth.getCurrentUser().getUid())
+                                .collection("subscription")
+                                .document(id)
+                                .set(subscribed);
+                    }
+
+                    @Override
+                    public void onTransactionSubmitted() {
+                        Toast.makeText(context, "Transaction pending...", Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onTransactionFailed() {
+                        Toast.makeText(context, "Transaction failed...", Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onTransactionCancelled() {
+                        Toast.makeText(context, "Transaction cancelled...", Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onAppNotFound() {
+                        Toast.makeText(context, "App not found...", Toast.LENGTH_SHORT).show();
+                    }
+                });
 
             }
         });

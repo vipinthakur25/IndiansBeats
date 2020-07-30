@@ -140,6 +140,8 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
                     hashMap.put("reserved", "0");
                     hashMap.put("unreserved", "0");
                     hashMap.put("cashback", "0");
+                    hashMap.put("video", "0");
+                    hashMap.put("subscription", "0");
 
 
 

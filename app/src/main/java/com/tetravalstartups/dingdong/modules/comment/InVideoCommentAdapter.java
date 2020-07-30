@@ -1,6 +1,7 @@
 package com.tetravalstartups.dingdong.modules.comment;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +16,7 @@ import com.bumptech.glide.Glide;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.tetravalstartups.dingdong.R;
 import com.tetravalstartups.dingdong.auth.Master;
+import com.tetravalstartups.dingdong.modules.profile.view.activity.PublicProfileActivity;
 
 import java.util.List;
 
@@ -63,6 +65,24 @@ public class InVideoCommentAdapter extends RecyclerView.Adapter<InVideoCommentAd
                         .collection("comments")
                         .document(inVideoComment.getId())
                         .delete();
+            }
+        });
+
+        holder.tvHandle.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(context, PublicProfileActivity.class);
+                intent.putExtra("user_id", inVideoComment.getUser_id());
+                context.startActivity(intent);
+            }
+        });
+
+        holder.ivPhoto.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(context, PublicProfileActivity.class);
+                intent.putExtra("user_id", inVideoComment.getUser_id());
+                context.startActivity(intent);
             }
         });
     }

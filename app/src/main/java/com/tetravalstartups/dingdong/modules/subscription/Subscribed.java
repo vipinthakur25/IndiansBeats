@@ -8,17 +8,21 @@ public class Subscribed {
     private String end_date;
     private String total_uploads;
     private String avl_uploads;
+    private String monthly_profit;
+    private String status;
 
     public Subscribed() {
     }
 
-    public Subscribed(String id, String name, String start_date, String end_date, String total_uploads, String avl_uploads) {
+    public Subscribed(String id, String name, String start_date, String end_date, String total_uploads, String avl_uploads, String monthly_profit, String status) {
         this.id = id;
         this.name = name;
         this.start_date = start_date;
         this.end_date = end_date;
         this.total_uploads = total_uploads;
         this.avl_uploads = avl_uploads;
+        this.monthly_profit = monthly_profit;
+        this.status = status;
     }
 
     public String getId() {
@@ -67,5 +71,21 @@ public class Subscribed {
 
     public void setAvl_uploads(String avl_uploads) {
         this.avl_uploads = avl_uploads;
+    }
+
+    public String getMonthly_profit() {
+        return monthly_profit;
+    }
+
+    public void setMonthly_profit(String monthly_profit) {
+        this.monthly_profit = monthly_profit;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

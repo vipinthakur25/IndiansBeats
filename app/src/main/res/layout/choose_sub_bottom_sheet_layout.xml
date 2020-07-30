@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorPrimary"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:gravity="center"
+        android:text="Choose Subscription"
+        android:textSize="16sp"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:textColor="@color/colorTextTitle"
+        android:fontFamily="@font/montserrat_bold"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:text="Choose Subscription plan from which you want to upload video."
+        android:textColor="@color/colorPrimaryDarkV2"
+        android:fontFamily="@font/montserrat"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerSubs"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
+        android:layout_weight="1"/>
+
+    <TextView
+        android:id="@+id/tvSelectPlan"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/colorTextTitle"
+        android:background="@drawable/bg_button_gradient"
+        android:padding="8dp"
+        android:fontFamily="@font/montserrat_bold"
+        android:textSize="16sp"
+        android:gravity="center"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:text="Select Plan"/>
+
+    <TextView
+        android:id="@+id/tvSkipPlan"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/colorPrimaryDarkV2"
+        android:layout_gravity="center"
+        android:layout_marginBottom="16dp"
+        android:fontFamily="@font/montserrat"
+        android:textSize="14sp"
+        android:text="Skip plan usage"/>
+
+</LinearLayout>

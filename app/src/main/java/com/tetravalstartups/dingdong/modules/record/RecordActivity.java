@@ -324,9 +324,9 @@ public class RecordActivity extends AppCompatActivity implements View.OnClickLis
         camera.setAudio(Audio.STEREO);
         camera.setFlash(Flash.OFF);
         flashState = FlashState.FLASH_OFF;
-        camera.mapGesture(Gesture.PINCH, GestureAction.ZOOM);
+        camera.mapGesture(Gesture.SCROLL_HORIZONTAL, GestureAction.EXPOSURE_CORRECTION);
         camera.mapGesture(Gesture.TAP, GestureAction.AUTO_FOCUS);
-        camera.mapGesture(Gesture.SCROLL_VERTICAL, GestureAction.EXPOSURE_CORRECTION);
+        camera.mapGesture(Gesture.SCROLL_VERTICAL, GestureAction.ZOOM);
         soundPlayer = new MediaPlayer();
 
         recorderStatus = RECORDER_STATUS.STOPPED;

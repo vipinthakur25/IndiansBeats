@@ -1,6 +1,7 @@
 package com.tetravalstartups.dingdong;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.view.View;
@@ -21,6 +22,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.tetravalstartups.dingdong.auth.LoginActivity;
 import com.tetravalstartups.dingdong.auth.Master;
+import com.tetravalstartups.dingdong.auth.PhoneActivity;
 import com.tetravalstartups.dingdong.auth.Profile;
 import com.tetravalstartups.dingdong.modules.home.HomeFragment;
 import com.tetravalstartups.dingdong.modules.player.PlayerFragment;
@@ -49,6 +51,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     private FirebaseAuth auth;
 
     Fragment fragment = null;
+
+    private SharedPreferences preferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,7 +101,11 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             getProfileData(id);
         }
 
+
+
     }
+
+
 
     @Override
     public void onClick(View v) {
@@ -116,7 +124,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             if (auth.getCurrentUser() != null){
                 startActivity(new Intent(MainActivity.this, RecordActivity.class));
             } else {
-                startActivity(new Intent(MainActivity.this, LoginActivity.class));
+                startActivity(new Intent(MainActivity.this, PhoneActivity.class));
             }
             overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
 
@@ -139,7 +147,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                switchProfile();
                 loadFragment(fragment);
             } else {
-                startActivity(new Intent(MainActivity.this, LoginActivity.class));
+                startActivity(new Intent(MainActivity.this, PhoneActivity.class));
                 overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
             }
         }
@@ -227,6 +235,10 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                         new Master(MainActivity.this).setUser(profile);
                     }
                 });
+    }
+
+    private void renewPlan() {
+
     }
 
     @Override

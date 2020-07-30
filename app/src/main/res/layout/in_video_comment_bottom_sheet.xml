@@ -16,13 +16,29 @@
         android:gravity="center"
         android:padding="8dp"
         android:fontFamily="@font/montserrat"/>
-    
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerComments"
+
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        tools:listitem="@layout/in_video_comment_list_item"
-        android:layout_weight="1"/>
+        android:layout_weight="1">
+
+        <TextView
+            android:id="@+id/tvNoComments"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="No Comments"
+            android:textSize="12sp"
+            android:fontFamily="@font/montserrat"
+            android:layout_gravity="top|center"
+            android:layout_marginTop="24dp"
+            android:textColor="@color/colorDisableText"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerComments"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+    </FrameLayout>
     
     <LinearLayout
         android:layout_width="match_parent"
@@ -49,8 +65,9 @@
 
         <ImageView
             android:id="@+id/ivPostComment"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:padding="12dp"
             android:src="@drawable/dd_send_comment_active"/>
 
 

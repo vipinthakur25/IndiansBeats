@@ -17,6 +17,15 @@
        android:layout_height="wrap_content"
        android:layout_gravity="center"/>
 
+   <com.airbnb.lottie.LottieAnimationView
+       android:id="@+id/aniLike"
+       android:layout_width="match_parent"
+       android:layout_height="match_parent"
+       android:visibility="invisible"
+      app:lottie_rawRes="@raw/fly"/>
+
+
+
    <ImageView
        android:id="@+id/ivPause"
        android:layout_width="50dp"

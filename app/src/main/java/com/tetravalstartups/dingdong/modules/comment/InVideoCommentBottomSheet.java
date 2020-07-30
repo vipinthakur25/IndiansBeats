@@ -41,6 +41,7 @@ public class InVideoCommentBottomSheet extends BottomSheetDialogFragment impleme
     private SharedPreferences commentsPref;
     private FirebaseFirestore db;
     private TextView tvCommentsCount;
+    private TextView tvNoComments;
     private EditText etComments;
     private ImageView ivPostComment;
     private Master master;
@@ -60,6 +61,7 @@ public class InVideoCommentBottomSheet extends BottomSheetDialogFragment impleme
         recyclerComments = view.findViewById(R.id.recyclerComments);
         tvCommentsCount = view.findViewById(R.id.tvCommentsCount);
         etComments = view.findViewById(R.id.etComments);
+        tvNoComments = view.findViewById(R.id.tvNoComments);
         ivPostComment = view.findViewById(R.id.ivPostComment);
         ivPostComment.setOnClickListener(this);
         fetchComments(commentsPref.getString("video_id", "none"));
@@ -78,6 +80,7 @@ public class InVideoCommentBottomSheet extends BottomSheetDialogFragment impleme
                    public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
                        int comments_count = queryDocumentSnapshots.getDocuments().size();
                        tvCommentsCount.setText("Comments ("+comments_count+")");
+
                        HashMap hashMap = new HashMap();
                        hashMap.put("comment_count", comments_count+"");
                        db.collection("videos")
@@ -85,7 +88,8 @@ public class InVideoCommentBottomSheet extends BottomSheetDialogFragment impleme
                                .update(hashMap);
 
                        if (queryDocumentSnapshots.getDocuments().isEmpty()){
-                           Toast.makeText(getActivity(), "No Comments", Toast.LENGTH_SHORT).show();
+                           tvNoComments.setVisibility(View.VISIBLE);
+                           recyclerComments.setVisibility(View.GONE);
                        } else {
                            inVideoCommentList.clear();
                            for (DocumentSnapshot snapshot : queryDocumentSnapshots.getDocuments()) {
@@ -97,6 +101,8 @@ public class InVideoCommentBottomSheet extends BottomSheetDialogFragment impleme
                                    new InVideoCommentAdapter(getContext(), inVideoCommentList);
                            inVideoCommentAdapter.notifyDataSetChanged();
                            recyclerComments.setAdapter(inVideoCommentAdapter);
+                           recyclerComments.setVisibility(View.VISIBLE);
+                           tvNoComments.setVisibility(View.GONE);
                        }
                    }
                });

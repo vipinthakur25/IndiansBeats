@@ -73,7 +73,10 @@ public class LikedVideoFragment extends Fragment {
 
         recyclerVideos.setLayoutManager(new GridLayoutManager(getContext(), 3));
         recyclerVideos.addItemDecoration(new EqualSpacingItemDecoration(4, EqualSpacingItemDecoration.GRID));
-        Query query = db.collection("users").document(id).collection("liked_videos").orderBy("id", Query.Direction.ASCENDING);
+        Query query = db.collection("users")
+                .document(id).
+                        collection("liked_videos")
+                .orderBy("timestamp", Query.Direction.DESCENDING);
 
         query.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
@@ -86,30 +89,36 @@ public class LikedVideoFragment extends Fragment {
                     recyclerVideos.setVisibility(View.VISIBLE);
                     likedVideosList.clear();
                     for (DocumentSnapshot snapshot : queryDocumentSnapshots.getDocuments()) {
-                        db.collection("videos")
-                                .document(Objects.requireNonNull(snapshot.getString("id")))
-                                .get()
-                                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                        String id = snapshot.getString("id");
+
+                        Query query1 = db.collection("videos")
+                                .whereEqualTo("id", id)
+                                .orderBy("timestamp", Query.Direction.DESCENDING);
+
+                        query1.get()
+                                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                                     @Override
-                                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
                                         if (task.isSuccessful()) {
-                                            Log.e("tagtag", task.getResult().getString("user_handle"));
-                                            LikedVideos videos = new LikedVideos();
-                                            videos.setId(task.getResult().getString("id"));
-                                            videos.setViews(task.getResult().getString("view_count"));
-                                            videos.setThumbnail(task.getResult().getString("id"));
-                                            videos.setUser_id(task.getResult().getString("user_id"));
-                                            likedVideosList.add(videos);
+                                            for (DocumentSnapshot snapshot1 : task.getResult()) {
+                                                Log.e("tagtag", snapshot1.getString("user_handle"));
+                                                LikedVideos videos = new LikedVideos();
+                                                videos.setId(snapshot1.getString("id"));
+                                                videos.setViews(snapshot1.getString("view_count"));
+                                                videos.setThumbnail(snapshot1.getString("id"));
+                                                videos.setUser_id(snapshot1.getString("user_id"));
+                                                likedVideosList.add(videos);
+                                            }
+
+                                            likedVideoAdapter = new LikedVideoAdapter(getContext(), likedVideosList);
+                                            likedVideoAdapter.notifyDataSetChanged();
+                                            recyclerVideos.setAdapter(likedVideoAdapter);
+
                                         }
 
-                                        likedVideoAdapter = new LikedVideoAdapter(getContext(), likedVideosList);
-                                        likedVideoAdapter.notifyDataSetChanged();
-                                        recyclerVideos.setAdapter(likedVideoAdapter);
 
                                     }
                                 });
-
-
                     }
 
                 }
@@ -120,3 +129,5 @@ public class LikedVideoFragment extends Fragment {
     }
 
 }
+
+

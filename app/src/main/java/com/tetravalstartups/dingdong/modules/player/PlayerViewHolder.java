@@ -1,6 +1,8 @@
 package com.tetravalstartups.dingdong.modules.player;
 
 import android.Manifest;
+import android.animation.Animator;
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -8,13 +10,11 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.PowerManager;
 import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.view.animation.LinearInterpolator;
 import android.view.animation.RotateAnimation;
 import android.widget.ImageView;
@@ -28,27 +28,26 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.airbnb.lottie.LottieAnimationView;
 import com.bumptech.glide.Glide;
+import com.cloudinary.Transformation;
+import com.cloudinary.android.MediaManager;
+import com.cloudinary.transformation.Layer;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.ui.PlayerView;
 import com.google.android.exoplayer2.upstream.cache.CacheDataSourceFactory;
 import com.google.android.exoplayer2.upstream.cache.SimpleCache;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.dynamiclinks.FirebaseDynamicLinks;
-import com.google.firebase.dynamiclinks.ShortDynamicLink;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.google.firebase.firestore.Transaction;
 import com.krishna.fileloader.FileLoader;
 import com.krishna.fileloader.listener.FileRequestListener;
 import com.krishna.fileloader.pojo.FileResponse;
@@ -101,6 +100,8 @@ public class PlayerViewHolder extends RecyclerView.ViewHolder implements View.On
     private PlayerView playerView;
     private SimpleExoPlayer player;
 
+    private LottieAnimationView aniLike;
+
     PlayerViewHolder(@NonNull View itemView) {
         super(itemView);
         context = itemView.getContext();
@@ -120,6 +121,7 @@ public class PlayerViewHolder extends RecyclerView.ViewHolder implements View.On
         likeVideo = itemView.findViewById(R.id.likeVideo);
         ivPlay = itemView.findViewById(R.id.ivPlay);
         ivPause = itemView.findViewById(R.id.ivPause);
+        aniLike = itemView.findViewById(R.id.aniLike);
 //        playerView = itemView.findViewById(R.id.player_view);
 
         ivFollowUser.setOnClickListener(this);
@@ -139,6 +141,29 @@ public class PlayerViewHolder extends RecyclerView.ViewHolder implements View.On
             @Override
             public void liked(LikeButton likeButton) {
                 if (firebaseAuth.getCurrentUser() != null) {
+                    aniLike.setVisibility(View.VISIBLE);
+                    aniLike.playAnimation();
+                    aniLike.addAnimatorListener(new Animator.AnimatorListener() {
+                        @Override
+                        public void onAnimationStart(Animator animator) {
+
+                        }
+
+                        @Override
+                        public void onAnimationEnd(Animator animator) {
+                            aniLike.setVisibility(View.INVISIBLE);
+                        }
+
+                        @Override
+                        public void onAnimationCancel(Animator animator) {
+
+                        }
+
+                        @Override
+                        public void onAnimationRepeat(Animator animator) {
+
+                        }
+                    });
                     doLikeVideo();
                 } else {
                     likeButton.setLiked(false);
@@ -389,10 +414,12 @@ public class PlayerViewHolder extends RecyclerView.ViewHolder implements View.On
 
         HashMap hmVideo = new HashMap();
         hmVideo.put("id", firebaseAuth.getCurrentUser().getUid());
+        hmVideo.put("timestamp", FieldValue.serverTimestamp());
         hmVideo.put("handle", master.getHandle());
 
         HashMap hmUser = new HashMap();
         hmUser.put("id", videoModel.getId());
+        hmUser.put("timestamp", FieldValue.serverTimestamp());
 
         db.collection("users")
                 .document(firebaseAuth.getCurrentUser().getUid())
@@ -424,59 +451,53 @@ public class PlayerViewHolder extends RecyclerView.ViewHolder implements View.On
 
     private void doShareVideos() {
         DDLoading ddLoading = DDLoading.getInstance();
+
+        String url = MediaManager.get().url().transformation(new Transformation()
+                .gravity("north_east").height(50)
+                .overlay(new Layer().publicId("dd_wm_v1")).width(40).x(20).y(20).crop("scale"))
+                .resourceType("video").generate("user_uploaded_videos/"+videoModel.getId()+".mp4");
+        Toast.makeText(context, ""+url, Toast.LENGTH_SHORT).show();
+
+        String message = "Hey your friend is using *Ding Dong* which is an *Hybrid video sharing app*. Here is the *download* link:\nhttps://bit.ly/3jJ2kJU\n\n*Create . Share . Earn*";
+
         ddLoading.showProgress(context, "Loading...", false);
         Intent share = new Intent(Intent.ACTION_SEND);
         share.setType("*/*");
         FileLoader.with(context)
-                .load(videoModel.getVideo_url(),false)
+                .load(url,false)
                 .fromDirectory("dingdong/shared", FileLoader.DIR_EXTERNAL_PUBLIC)
                 .asFile(new FileRequestListener<File>() {
                     @Override
                     public void onLoad(FileLoadRequest request, FileResponse<File> response) {
-
-                        Task<ShortDynamicLink> shortLinkTask = FirebaseDynamicLinks.getInstance().createDynamicLink()
-                                .setLink(Uri.parse(videoModel.getVideo_url()))
-                                .setDomainUriPrefix("https://dingdong7b.page.link")
-                                .buildShortDynamicLink()
-                                .addOnCompleteListener(new OnCompleteListener<ShortDynamicLink>() {
+                        ddLoading.hideProgress();
+                        File loadedFile = response.getBody();
+                        Intent shareIntent = new Intent();
+                        shareIntent.setAction(Intent.ACTION_SEND);
+                        shareIntent.putExtra(Intent.EXTRA_TEXT, message);
+                        shareIntent.putExtra(Intent.EXTRA_STREAM, Uri.parse(loadedFile.getPath()));
+                        shareIntent.setType("*/*");
+                        shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                        HashMap hmFollower = new HashMap();
+                        hmFollower.put("id", master.getId());
+                        db.collection("videos")
+                                .document(videoModel.getId())
+                                .get()
+                                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                                     @Override
-                                    public void onComplete(@NonNull Task<ShortDynamicLink> task) {
-                                        if (task.isSuccessful()) {
-                                            String link = task.getResult().getShortLink().toString();
-                                            ddLoading.hideProgress();
-                                            File loadedFile = response.getBody();
-                                            Intent shareIntent = new Intent();
-                                            shareIntent.setAction(Intent.ACTION_SEND);
-                                            shareIntent.putExtra(Intent.EXTRA_TEXT, "https://bit.ly/3fSqiQq");
-                                            shareIntent.putExtra(Intent.EXTRA_STREAM, Uri.parse(loadedFile.getPath()));
-                                            shareIntent.setType("video/*");
-                                            shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                                            HashMap hmFollower = new HashMap();
-                                            hmFollower.put("id", master.getId());
+                                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                        if (task.isSuccessful()){
+                                            String current_share_count = task.getResult().getString("share_count");
+                                            int current_sc = Integer.parseInt(current_share_count);
+                                            int updated_sc = current_sc + 1;
+                                            HashMap hashMap = new HashMap();
+                                            hashMap.put("share_count", updated_sc+"");
                                             db.collection("videos")
                                                     .document(videoModel.getId())
-                                                    .get()
-                                                    .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                                                        @Override
-                                                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                                                            if (task.isSuccessful()){
-                                                                String current_share_count = task.getResult().getString("share_count");
-                                                                int current_sc = Integer.parseInt(current_share_count);
-                                                                int updated_sc = current_sc + 1;
-                                                                HashMap hashMap = new HashMap();
-                                                                hashMap.put("share_count", updated_sc+"");
-                                                                db.collection("videos")
-                                                                        .document(videoModel.getId())
-                                                                        .update(hashMap);
-                                                            }
-                                                        }
-                                                    });
-                                            context.startActivity(Intent.createChooser(shareIntent, "Share Video"));
-
+                                                    .update(hashMap);
                                         }
                                     }
                                 });
-
+                        context.startActivity(Intent.createChooser(shareIntent, "Share Video"));
                     }
 
                     @Override
@@ -587,6 +608,5 @@ public class PlayerViewHolder extends RecyclerView.ViewHolder implements View.On
 
         }
     }
-
 
 }

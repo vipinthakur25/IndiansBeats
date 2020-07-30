@@ -1,6 +1,7 @@
 package com.tetravalstartups.dingdong.modules.player;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.paging.PagedList;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -13,27 +14,44 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.firebase.ui.firestore.paging.FirestorePagingAdapter;
 import com.firebase.ui.firestore.paging.FirestorePagingOptions;
 import com.firebase.ui.firestore.paging.LoadingState;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.tetravalstartups.dingdong.R;
 import com.tetravalstartups.dingdong.modules.home.video.Video;
 import com.tetravalstartups.dingdong.utils.Constants;
+import com.tetravalstartups.dingdong.utils.DDLoading;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Objects;
 
 public class PlayerActivity extends AppCompatActivity {
 
+    private View view;
     private RecyclerView recyclerVideos;
-    private SwipeRefreshLayout mSwipeRefreshLayout;
-    private FirebaseFirestore mFirestore = FirebaseFirestore.getInstance();
-    private CollectionReference videoRef = mFirestore.collection("videos");
-    private Query query = videoRef.whereEqualTo("video_status", Constants.VIDEO_STATUS_PUBLIC);
+    private ArrayList<Video> videoList = new ArrayList<>();
+    PlayerAdapter playerAdapter;
+    private DDLoading ddLoading;
+
+    private FirebaseFirestore db;
+    private String user_id, video_type, pos;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,77 +62,102 @@ public class PlayerActivity extends AppCompatActivity {
 
     private void initView() {
         recyclerVideos = findViewById(R.id.recyclerVideos);
-        mSwipeRefreshLayout = findViewById(R.id.swipeRefreshLayout);
-        setupAdapter();
+        ddLoading = DDLoading.getInstance();
+        db = FirebaseFirestore.getInstance();
+
+        user_id = getIntent().getStringExtra("user_id");
+        video_type = getIntent().getStringExtra("video_type");
+        pos = getIntent().getStringExtra("pos");
+
+        Toast.makeText(this, "user: "+user_id+" video: "+video_type+"  pos: "+pos, Toast.LENGTH_SHORT).show();
+
+        if (video_type.equals("created")) {
+            setupCreatedVideoAdapter();
+        } else
+            if (video_type.equals("liked")) {
+                setupLikedVideoAdapter();
+        }
+
     }
 
-    private void setupAdapter() {
-        // Init Paging Configuration
-        PagedList.Config config = new PagedList.Config.Builder()
-                .setEnablePlaceholders(false)
-                .setPrefetchDistance(2)
-                .setPageSize(3)
-                .build();
-
-        // Init Adapter Configuration
-        FirestorePagingOptions<Video> options = new FirestorePagingOptions.Builder<Video>()
-                .setLifecycleOwner(this)
-                .setQuery(query, config, Video.class)
-                .build();
-
-        FirestorePagingAdapter<Video, PlayerViewHolder> mAdapter = new FirestorePagingAdapter<Video, PlayerViewHolder>(options) {
-
-            @NonNull
-            @Override
-            public PlayerViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-                View view = getLayoutInflater().inflate(R.layout.video_list_item, parent, false);
-                return new PlayerViewHolder(view);
-            }
-
-            @Override
-            protected void onBindViewHolder(@NonNull PlayerViewHolder holder, int position, @NonNull Video model) {
-                holder.playVideo(model);
-            }
-
-            @Override
-            protected void onError(@NonNull Exception e) {
-                super.onError(e);
-                Log.e("MainActivity", Objects.requireNonNull(e.getMessage()));
-            }
-
-            @Override
-            protected void onLoadingStateChanged(@NonNull LoadingState state) {
-                switch (state) {
-                    case LOADING_INITIAL:
-                    case LOADING_MORE:
-                        mSwipeRefreshLayout.setRefreshing(true);
-                        break;
-
-                    case LOADED:
-
-                    case FINISHED:
-                        mSwipeRefreshLayout.setRefreshing(false);
-                        break;
-
-                    case ERROR:
-                        Toast.makeText(
-                               PlayerActivity.this,
-                                "Error Occurred!",
-                                Toast.LENGTH_SHORT
-                        ).show();
-
-                        mSwipeRefreshLayout.setRefreshing(false);
-                        break;
-                }
-            }
-
-        };
-
+    private void setupCreatedVideoAdapter() {
         SnapHelper snapHelper = new PagerSnapHelper();
-        recyclerVideos.setLayoutManager(new LinearLayoutManager(PlayerActivity.this));
+        recyclerVideos.setLayoutManager(new LinearLayoutManager(this));
         if (recyclerVideos.getOnFlingListener() == null)
             snapHelper.attachToRecyclerView(recyclerVideos);
-        recyclerVideos.setAdapter(mAdapter);
+        playerAdapter = new PlayerAdapter(this, videoList);
+
+        Query query = db.collection("videos")
+                .whereEqualTo("user_id", user_id)
+                .whereEqualTo("video_status", Constants.VIDEO_STATUS_PUBLIC)
+                .orderBy("timestamp", Query.Direction.DESCENDING);
+        query.get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            videoList.clear();
+                            for (DocumentSnapshot snapshot : task.getResult()) {
+                                Video video = snapshot.toObject(Video.class);
+                                videoList.add(video);
+                            }
+
+                            playerAdapter.notifyDataSetChanged();
+                            recyclerVideos.setAdapter(playerAdapter);
+                            recyclerVideos.scrollToPosition(Integer.parseInt(pos));
+
+                        }
+                    }
+                });
+
+    }
+
+    private void setupLikedVideoAdapter() {
+        SnapHelper snapHelper = new PagerSnapHelper();
+        recyclerVideos.setLayoutManager(new LinearLayoutManager(this));
+        if (recyclerVideos.getOnFlingListener() == null)
+            snapHelper.attachToRecyclerView(recyclerVideos);
+        playerAdapter = new PlayerAdapter(this, videoList);
+
+        Query query = db.collection("users")
+                .document(user_id).
+                        collection("liked_videos")
+                .orderBy("timestamp", Query.Direction.DESCENDING);
+
+       query.get()
+               .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                   @Override
+                   public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                       if (task.isSuccessful()) {
+                           videoList.clear();
+                           for (DocumentSnapshot snapshot : task.getResult()) {
+                               String id = snapshot.getString("id");
+                               Query query1 = db.collection("videos")
+                                       .whereEqualTo("id", id)
+                                       .orderBy("timestamp", Query.Direction.DESCENDING);
+                               query1.get()
+                                       .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                           @Override
+                                           public void onComplete(@NonNull Task<QuerySnapshot> task1) {
+                                               if (task.isSuccessful()) {
+
+                                                   for (DocumentSnapshot snapshot1 : task1.getResult()) {
+                                                       Video video = snapshot1.toObject(Video.class);
+                                                       videoList.add(video);
+                                                       Log.e("snap_log", snapshot.toString());
+                                                   }
+
+                                                   playerAdapter.notifyDataSetChanged();
+                                                   recyclerVideos.setAdapter(playerAdapter);
+                                                //   recyclerVideos.scrollToPosition(Integer.parseInt(pos));
+
+                                               }
+                                           }
+                                       });
+                           }
+                       }
+                   }
+               });
 
     }
 }

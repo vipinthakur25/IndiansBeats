@@ -178,7 +178,6 @@ public class EditProfileActivity extends AppCompatActivity implements ProfilePho
                 .load(master.getPhoto())
                 .placeholder(R.drawable.dd_logo_placeholder)
                 .into(ivPhoto);
-
     }
 
     @Override

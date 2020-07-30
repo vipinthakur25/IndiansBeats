@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -16,10 +17,10 @@ import com.tetravalstartups.dingdong.R;
 
 public class PhoneActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private ProgressBar progressBar;
     private EditText etPhoneNumber;
     private TextView tvSendOtp;
     private LinearLayout lvPhone;
+    private ImageView ivGoBack;
 
 
     @Override
@@ -30,10 +31,10 @@ public class PhoneActivity extends AppCompatActivity implements View.OnClickList
     }
 
     private void initView() {
-        progressBar = findViewById(R.id.progressBar);
         etPhoneNumber = findViewById(R.id.etPhoneNumber);
         lvPhone = findViewById(R.id.lvPhone);
-        
+        ivGoBack = findViewById(R.id.ivGoBack);
+
         tvSendOtp = findViewById(R.id.tvSendOtp);
         tvSendOtp.setOnClickListener(this);
     }
@@ -49,6 +50,10 @@ public class PhoneActivity extends AppCompatActivity implements View.OnClickList
     public void onClick(View v) {
         if (v == tvSendOtp){
             doPhoneNumberValidation();
+        }
+
+        if (v == ivGoBack) {
+            onBackPressed();
         }
     }
 

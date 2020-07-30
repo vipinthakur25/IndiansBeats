@@ -70,7 +70,6 @@ public class SubscriptionActivity extends AppCompatActivity implements Subscript
         CustomerRatingPresenter customerRatingPresenter =
                 new CustomerRatingPresenter(SubscriptionActivity.this,
                         SubscriptionActivity.this);
-
         customerRatingPresenter.fetchRating();
     }
 
@@ -113,7 +112,6 @@ public class SubscriptionActivity extends AppCompatActivity implements Subscript
             }
         }, 6000, 5000);
 
-
         indicator.setupWithViewPager(viewPager, true);
     }
 
@@ -125,7 +123,6 @@ public class SubscriptionActivity extends AppCompatActivity implements Subscript
         } else if( position == 0.0F ) {
             view.setAlpha(1.0F);
         } else {
-            // position is between -1.0F & 0.0F OR 0.0F & 1.0F
             view.setAlpha(1.0F - Math.abs(position));
         }
     }
@@ -185,7 +182,6 @@ public class SubscriptionActivity extends AppCompatActivity implements Subscript
 
     @Override
     public void subscribeFetchError(String error) {
-        Toast.makeText(this, "" + error, Toast.LENGTH_SHORT).show();
     }
 
     @Override

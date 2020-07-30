@@ -103,11 +103,20 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.VideoViewHol
         }
 
         holder.tvLikes.setText(video.getLikes_count());
-        holder.tvComments.setText(video.getComment_count());
         holder.tvShares.setText(video.getShare_count());
         holder.tvUserHandle.setText("@" + video.getUser_handle());
         holder.tvVideoDesc.setText(video.getVideo_desc());
         holder.tvSoundName.setText(video.getSound_title());
+
+        db.collection("videos").document(video.getId())
+                .collection("liked_by")
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                        String likes_count = String.valueOf(queryDocumentSnapshots.getDocuments().size());
+                        holder.tvLikes.setText(likes_count);
+                    }
+                });
 
         // Glide.with(context).load(R.drawable.dd_w)
 
@@ -432,27 +441,6 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.VideoViewHol
                 .document(firebaseAuth.getCurrentUser().getUid())
                 .set(hmVideo);
 
-        db.collection("videos")
-                .document(video.getId())
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                        if (task.isSuccessful()) {
-                            String like_count = task.getResult().getString("likes_count");
-                            int likes = Integer.parseInt(like_count);
-                            int update_like = likes + 1;
-                            holder.tvLikes.setText(update_like + "");
-
-                            HashMap hashMap = new HashMap();
-                            hashMap.put("likes_count", update_like + "");
-
-                            db.collection("videos")
-                                    .document(video.getId())
-                                    .update(hashMap);
-                        }
-                    }
-                });
     }
 
     private void doUnLikeVideo(Video video, VideoViewHolder holder) {
@@ -469,28 +457,6 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.VideoViewHol
                 .document(video.getId())
                 .delete();
 
-
-        db.collection("videos")
-                .document(video.getId())
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                        if (task.isSuccessful()) {
-                            String like_count = task.getResult().getString("likes_count");
-                            int likes = Integer.parseInt(like_count);
-                            int update_like = likes - 1;
-                            holder.tvLikes.setText(update_like + "");
-
-                            HashMap hashMap = new HashMap();
-                            hashMap.put("likes_count", update_like + "");
-
-                            db.collection("videos")
-                                    .document(video.getId())
-                                    .update(hashMap);
-                        }
-                    }
-                });
     }
 
     @Override

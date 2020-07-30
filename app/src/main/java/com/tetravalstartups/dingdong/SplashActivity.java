@@ -1,5 +1,6 @@
 package com.tetravalstartups.dingdong;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
@@ -16,12 +17,20 @@ import android.widget.VideoView;
 import com.bumptech.glide.Glide;
 import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.tetravalstartups.dingdong.auth.SetupProfileActivity;
 import com.tetravalstartups.dingdong.utils.Constants;
 
 public class SplashActivity extends BaseActivity {
 
-    private VideoView videoSplash;
     private ImageView ivSplash;
+    private FirebaseFirestore db;
+    private FirebaseAuth firebaseAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,37 +43,45 @@ public class SplashActivity extends BaseActivity {
 
     private void initView() {
 
-//        videoSplash = findViewById(R.id.videoSplash);
         ivSplash = findViewById(R.id.ivSplash);
         Glide.with(this).load(R.drawable.dd_gif_splash).into(ivSplash);
-        //Uri video = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.dd_video);
-        //videoSplash.setVideoURI(video);
+
+        db = FirebaseFirestore.getInstance();
+        firebaseAuth = FirebaseAuth.getInstance();
+
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-
-                Intent splashIntent = new Intent(SplashActivity.this, MainActivity.class);
-                startActivity(splashIntent);
-                finish();
-                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-
-//                YoYo.with(Techniques.Bounce)
-//                        .duration(800)
-//                .repeat(4)
-//                .playOn(videoSplash);
+                if (firebaseAuth.getCurrentUser() != null) {
+                    String uid = firebaseAuth.getCurrentUser().getUid();
+                    DocumentReference profileRef = db.collection("users").document(uid);
+                    profileRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                            if (task.isSuccessful()){
+                                DocumentSnapshot document = task.getResult();
+                                if (document.exists()){
+                                    // progressDialog.dismiss();
+                                    startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                                }else {
+                                    startActivity(new Intent(getApplicationContext(), SetupProfileActivity.class));
+                                }
+                                finish();
+                            } else {
+                                //   progressDialog.dismiss();
+                                //   Toast.makeText(OTPActivity.this, "database error (otp->profile)", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    });
+                } else {
+                    Intent splashIntent = new Intent(SplashActivity.this, MainActivity.class);
+                    startActivity(splashIntent);
+                    finish();
+                    overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                }
             }
         }, 2000);
 
-//        videoSplash.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-//            public void onCompletion(MediaPlayer mp) {
-//                Intent splashIntent = new Intent(SplashActivity.this, MainActivity.class);
-//                startActivity(splashIntent);
-//                finish();
-//                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-//            }
-//        });
-//
-//        videoSplash.start();
     }
 
     @Override

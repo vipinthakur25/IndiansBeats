@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.cloudinary.android.MediaManager;
 import com.tetravalstartups.dingdong.R;
+import com.tetravalstartups.dingdong.modules.player.PlayerActivity;
 import com.tetravalstartups.dingdong.modules.profile.model.InProfileCreatedVideo;
 import com.tetravalstartups.dingdong.modules.profile.view.activity.PlayVideoActivity;
 import com.tetravalstartups.dingdong.utils.DDDeleteVideoAlert;
@@ -60,7 +61,7 @@ InProfileCreatedVideoAdapter extends RecyclerView.Adapter<InProfileCreatedVideoA
         holder.frameVideo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(context, PlayVideoActivity.class);
+                Intent intent = new Intent(context, PlayerActivity.class);
                 intent.putExtra("video_type", "created");
                 intent.putExtra("pos", position+"");
                 intent.putExtra("user_id", video.getUser_id());

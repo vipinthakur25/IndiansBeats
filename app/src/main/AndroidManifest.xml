@@ -22,7 +22,9 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".modules.profile.view.activity.FollowingActivity"></activity>
+        <activity android:name=".modules.passbook.RedeemActivity"></activity>
+        <activity android:name=".auth.SetupProfileActivity" />
+        <activity android:name=".modules.profile.view.activity.FollowingActivity" />
         <activity android:name=".modules.player.PlayerActivity" />
         <activity android:name=".modules.profile.view.activity.PublicProfileActivity" />
         <activity android:name=".BaseActivity" />
@@ -97,7 +99,7 @@
 
         <meta-data
             android:name="CLOUDINARY_URL"
-            android:value="cloudinary://797981641311225:ILAhO04JbFeOrF9ZQp3pDtFUowY@sevenbillion" />
+            android:value="cloudinary://289251737969246:LgXGlEFkNl765nF8VeGrCz45Hdw@ddcreators" />
     </application>
 
 </manifest>
