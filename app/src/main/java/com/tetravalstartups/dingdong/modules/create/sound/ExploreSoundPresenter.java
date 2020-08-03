@@ -41,7 +41,7 @@ public class ExploreSoundPresenter {
                     @Override
                     public void onEvent(@Nullable QuerySnapshot documentSnapshots, @Nullable FirebaseFirestoreException e) {
                         if (documentSnapshots.getDocuments().isEmpty()){
-                            iExploreMusic.musicFetchError("No Sounds");
+                          //  iExploreMusic.musicFetchError("No Sounds");
 
                         } else {
                             soundList.clear();

@@ -42,7 +42,7 @@ public class DDDeleteVideoAlert {
             @Override
             public void onClick(View v) {
                 HashMap hashMap = new HashMap();
-                hashMap.put("video_status", Constants.VIDEO_STATUS_MODERATE);
+                hashMap.put("video_status", Constant.VIDEO_STATUS_MODERATE);
                 db.collection("videos")
                         .document(video_id)
                         .update(hashMap);

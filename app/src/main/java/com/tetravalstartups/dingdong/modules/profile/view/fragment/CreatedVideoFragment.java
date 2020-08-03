@@ -12,7 +12,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
@@ -20,16 +19,14 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.google.firebase.storage.FirebaseStorage;
 import com.tetravalstartups.dingdong.R;
 import com.tetravalstartups.dingdong.auth.Master;
 import com.tetravalstartups.dingdong.modules.profile.model.InProfileCreatedVideo;
 import com.tetravalstartups.dingdong.modules.profile.view.adapter.InProfileCreatedVideoAdapter;
-import com.tetravalstartups.dingdong.utils.Constants;
+import com.tetravalstartups.dingdong.utils.Constant;
 import com.tetravalstartups.dingdong.utils.EqualSpacingItemDecoration;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 public class CreatedVideoFragment extends Fragment {
@@ -77,7 +74,7 @@ public class CreatedVideoFragment extends Fragment {
         recyclerVideos.addItemDecoration(new EqualSpacingItemDecoration(4, EqualSpacingItemDecoration.GRID));
         Query query = db.collection("videos");
         query.whereEqualTo("user_id", id)
-                .whereEqualTo("video_status", Constants.VIDEO_STATUS_PUBLIC)
+                .whereEqualTo("video_status", Constant.VIDEO_STATUS_PUBLIC)
                 .orderBy("timestamp", Query.Direction.DESCENDING)
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override

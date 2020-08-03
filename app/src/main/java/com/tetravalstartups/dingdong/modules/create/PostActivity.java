@@ -33,7 +33,7 @@ import com.tetravalstartups.dingdong.auth.Master;
 import com.tetravalstartups.dingdong.modules.home.video.Video;
 import com.tetravalstartups.dingdong.modules.subscription.SubPlanChooserBottomSheet;
 import com.tetravalstartups.dingdong.modules.subscription.Subscribed;
-import com.tetravalstartups.dingdong.utils.Constants;
+import com.tetravalstartups.dingdong.utils.Constant;
 import com.tetravalstartups.dingdong.utils.DDLoading;
 import com.tetravalstartups.dingdong.utils.DDLoadingProgress;
 import com.tetravalstartups.dingdong.utils.DDVideoPreview;
@@ -67,6 +67,8 @@ public class PostActivity extends AppCompatActivity implements View.OnClickListe
 
     private Master master;
     private FirebaseFirestore db;
+
+    private int val = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -193,7 +195,6 @@ public class PostActivity extends AppCompatActivity implements View.OnClickListe
                 .callback(new UploadCallback() {
                     @Override
                     public void onStart(String requestId) {
-
                     }
 
                     @Override
@@ -205,55 +206,66 @@ public class PostActivity extends AppCompatActivity implements View.OnClickListe
                     @Override
                     public void onSuccess(String requestId, Map resultData) {
 
-                        String media_url = MediaManager.get().url().transformation(new Transformation().quality(50))
-                                .resourceType("video").generate("user_uploaded_videos/" + public_id + ".mp4");
+                        db.collection("videos").get()
+                                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<QuerySnapshot> task1) {
+                                        if (task1.isSuccessful()) {
+                                            val = task1.getResult().getDocuments().size();
 
-                        String thumbnail = MediaManager.get().url().transformation(new Transformation().quality(50))
-                                .resourceType("video").generate("user_uploaded_videos/" + public_id + ".webp");
+                                            String media_url = MediaManager.get().url().transformation(new Transformation().quality(50))
+                                                    .resourceType("video").generate("user_uploaded_videos/" + public_id + ".mp4");
 
-                        Video video = new Video();
-                        video.setId(public_id);
-                        video.setVideo_desc(etVideoDesc.getText().toString());
-                        video.setSound_id(public_id);
+                                            String thumbnail = MediaManager.get().url().transformation(new Transformation().quality(50))
+                                                    .resourceType("video").generate("user_uploaded_videos/" + public_id + ".webp");
 
-                        if (getIntent().getStringExtra("sound_title").equals("Original")) {
-                            video.setSound_title("Original sound by " + master.getHandle());
-                        } else {
-                            video.setSound_title(getIntent().getStringExtra("sound_title"));
-                        }
+                                            Video video = new Video();
+                                            video.setId(public_id);
+                                            video.setVideo_desc(etVideoDesc.getText().toString());
+                                            video.setSound_id(public_id);
 
-                        double randomDouble = Math.random();
-                        randomDouble = randomDouble * 1000 + 1;
-                        int randomInt = (int) randomDouble;
+                                            if (getIntent().getStringExtra("sound_title").equals("Original")) {
+                                                video.setSound_title("Original sound by " + master.getHandle());
+                                            } else {
+                                                video.setSound_title(getIntent().getStringExtra("sound_title"));
+                                            }
 
-                        video.setLikes_count(Constants.INITIAL_VIDEO_LIKES);
-                        video.setShare_count(Constants.INITIAL_VIDEO_SHARES);
-                        video.setComment_count(Constants.INITIAL_VIDEO_COMMENTS);
-                        video.setView_count(Constants.INITIAL_VIDEO_VIEWS);
-                        video.setUser_id(master.getId());
-                        video.setUser_handle(master.getHandle());
-                        video.setUser_name(master.getName());
-                        video.setUser_photo(master.getPhoto());
-                        video.setVideo_thumbnail(thumbnail);
-                        video.setVideo_url(media_url);
-                        video.setVideo_index(randomInt + "");
 
-                        if (video_status) {
-                            video.setVideo_status(Constants.VIDEO_STATUS_PRIVATE);
-                        } else {
-                            video.setVideo_status(Constants.VIDEO_STATUS_PUBLIC);
-                        }
 
-                        db.collection("videos").document(public_id)
-                                .set(video)
-                                .addOnCompleteListener(task -> {
-                                    if (task.isSuccessful()) {
-                                        Intent intent = new Intent(PostActivity.this, MainActivity.class);
-                                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                        startActivity(intent);
-                                        finish();
-                                        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-                                        ddLoadingProgress.hideProgress();
+                                            video.setLikes_count(Constant.INITIAL_VIDEO_LIKES);
+                                            video.setShare_count(Constant.INITIAL_VIDEO_SHARES);
+                                            video.setComment_count(Constant.INITIAL_VIDEO_COMMENTS);
+                                            video.setView_count(Constant.INITIAL_VIDEO_VIEWS);
+                                            video.setUser_id(master.getId());
+                                            video.setUser_handle(master.getHandle());
+                                            video.setUser_name(master.getName());
+                                            video.setUser_photo(master.getPhoto());
+                                            video.setVideo_thumbnail(thumbnail);
+                                            video.setVideo_url(media_url);
+                                            video.setVideo_index(val +"");
+                                            Toast.makeText(PostActivity.this, ""+val, Toast.LENGTH_SHORT).show();
+
+
+                                            if (video_status) {
+                                                video.setVideo_status(Constant.VIDEO_STATUS_PRIVATE);
+                                            } else {
+                                                video.setVideo_status(Constant.VIDEO_STATUS_PUBLIC);
+                                            }
+
+                                            db.collection("videos").document(public_id)
+                                                    .set(video)
+                                                    .addOnCompleteListener(task -> {
+                                                        if (task.isSuccessful()) {
+                                                            Intent intent = new Intent(PostActivity.this, MainActivity.class);
+                                                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                                            startActivity(intent);
+                                                            finish();
+                                                            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                                                            ddLoadingProgress.hideProgress();
+                                                        }
+                                                    });
+
+                                        }
                                     }
                                 });
                     }
@@ -296,84 +308,94 @@ public class PostActivity extends AppCompatActivity implements View.OnClickListe
                     @Override
                     public void onSuccess(String requestId, Map resultData) {
 
-                        String media_url = MediaManager.get().url().transformation(new Transformation().quality(50))
-                                .resourceType("video").generate("user_uploaded_videos/" + public_id + ".mp4");
+                        db.collection("videos").get()
+                                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<QuerySnapshot> task1) {
+                                        if (task1.isSuccessful()) {
+                                            val = task1.getResult().getDocuments().size();
 
-                        String thumbnail = MediaManager.get().url().transformation(new Transformation().quality(50))
-                                .resourceType("video").generate("user_uploaded_videos/" + public_id + ".webp");
+                                            String media_url = MediaManager.get().url().transformation(new Transformation().quality(50))
+                                                    .resourceType("video").generate("user_uploaded_videos/" + public_id + ".mp4");
 
-                        Video video = new Video();
-                        video.setId(public_id);
-                        video.setVideo_desc(etVideoDesc.getText().toString());
-                        video.setSound_id(public_id);
+                                            String thumbnail = MediaManager.get().url().transformation(new Transformation().quality(50))
+                                                    .resourceType("video").generate("user_uploaded_videos/" + public_id + ".webp");
 
-                        if (getIntent().getStringExtra("sound_title").equals("Original")) {
-                            video.setSound_title("Original sound by " + master.getHandle());
-                        } else {
-                            video.setSound_title(getIntent().getStringExtra("sound_title"));
-                        }
+                                            Video video = new Video();
+                                            video.setId(public_id);
+                                            video.setVideo_desc(etVideoDesc.getText().toString());
+                                            video.setSound_id(public_id);
 
-                        double randomDouble = Math.random();
-                        randomDouble = randomDouble * 1000 + 1;
-                        int randomInt = (int) randomDouble;
+                                            if (getIntent().getStringExtra("sound_title").equals("Original")) {
+                                                video.setSound_title("Original sound by " + master.getHandle());
+                                            } else {
+                                                video.setSound_title(getIntent().getStringExtra("sound_title"));
+                                            }
 
-                        video.setLikes_count(Constants.INITIAL_VIDEO_LIKES);
-                        video.setShare_count(Constants.INITIAL_VIDEO_SHARES);
-                        video.setComment_count(Constants.INITIAL_VIDEO_COMMENTS);
-                        video.setView_count(Constants.INITIAL_VIDEO_VIEWS);
-                        video.setUser_id(master.getId());
-                        video.setUser_handle(master.getHandle());
-                        video.setUser_name(master.getName());
-                        video.setUser_photo(master.getPhoto());
-                        video.setVideo_thumbnail(thumbnail);
-                        video.setVideo_url(media_url);
-                        video.setVideo_index(randomInt + "");
+                                            double randomDouble = Math.random();
 
-                        if (video_status) {
-                            video.setVideo_status(Constants.VIDEO_STATUS_PRIVATE);
-                        } else {
-                            video.setVideo_status(Constants.VIDEO_STATUS_PUBLIC);
-                        }
+                                            video.setLikes_count(Constant.INITIAL_VIDEO_LIKES);
+                                            video.setShare_count(Constant.INITIAL_VIDEO_SHARES);
+                                            video.setComment_count(Constant.INITIAL_VIDEO_COMMENTS);
+                                            video.setView_count(Constant.INITIAL_VIDEO_VIEWS);
+                                            video.setUser_id(master.getId());
+                                            video.setUser_handle(master.getHandle());
+                                            video.setUser_name(master.getName());
+                                            video.setUser_photo(master.getPhoto());
+                                            video.setVideo_thumbnail(thumbnail);
+                                            video.setVideo_url(media_url);
+                                            video.setVideo_index(val +"");
 
-                        db.collection("videos").document(public_id)
-                                .set(video)
-                                .addOnCompleteListener(task -> {
-                                    if (task.isSuccessful()) {
+                                            if (video_status) {
+                                                video.setVideo_status(Constant.VIDEO_STATUS_PRIVATE);
+                                            } else {
+                                                video.setVideo_status(Constant.VIDEO_STATUS_PUBLIC);
+                                            }
 
-                                        db.collection("users")
-                                                .document(master.getId())
-                                                .collection("passbook")
-                                                .document("balance")
-                                                .get()
-                                                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                                                    @Override
-                                                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                                                        String video_uploads = task.getResult().getString("subscription");
-                                                        int video_uploads_int = Integer.parseInt(video_uploads);
-                                                        int updated_coins = video_uploads_int + profit_per_day;
-                                                        HashMap hashMap = new HashMap();
-                                                        hashMap.put("subscription", updated_coins + "");
+                                            db.collection("videos").document(public_id)
+                                                    .set(video)
+                                                    .addOnCompleteListener(task -> {
+                                                        if (task.isSuccessful()) {
 
-                                                        db.collection("users")
-                                                                .document(master.getId())
-                                                                .collection("passbook")
-                                                                .document("balance")
-                                                                .update(hashMap)
-                                                                .addOnCompleteListener(new OnCompleteListener() {
-                                                                    @Override
-                                                                    public void onComplete(@NonNull Task task) {
-                                                                        Intent intent = new Intent(PostActivity.this, MainActivity.class);
-                                                                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                                                        startActivity(intent);
-                                                                        finish();
-                                                                        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-                                                                        ddLoadingProgress.hideProgress();
-                                                                    }
-                                                                });
-                                                    }
-                                                });
+                                                            db.collection("users")
+                                                                    .document(master.getId())
+                                                                    .collection("passbook")
+                                                                    .document("balance")
+                                                                    .get()
+                                                                    .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                                                        @Override
+                                                                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                                                            String video_uploads = task.getResult().getString("subscription");
+                                                                            int video_uploads_int = Integer.parseInt(video_uploads);
+                                                                            int updated_coins = video_uploads_int + profit_per_day;
+                                                                            HashMap hashMap = new HashMap();
+                                                                            hashMap.put("subscription", updated_coins + "");
+
+                                                                            db.collection("users")
+                                                                                    .document(master.getId())
+                                                                                    .collection("passbook")
+                                                                                    .document("balance")
+                                                                                    .update(hashMap)
+                                                                                    .addOnCompleteListener(new OnCompleteListener() {
+                                                                                        @Override
+                                                                                        public void onComplete(@NonNull Task task) {
+                                                                                            Intent intent = new Intent(PostActivity.this, MainActivity.class);
+                                                                                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                                                                            startActivity(intent);
+                                                                                            finish();
+                                                                                            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                                                                                            ddLoadingProgress.hideProgress();
+                                                                                        }
+                                                                                    });
+                                                                        }
+                                                                    });
+                                                        }
+                                                    });
+
+                                        }
                                     }
                                 });
+
                     }
 
                     @Override

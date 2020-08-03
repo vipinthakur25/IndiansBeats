@@ -34,6 +34,8 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
 
     private FirebaseAuth auth;
 
+    int index = 0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,27 +57,26 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
         auth = FirebaseAuth.getInstance();
 
 //        FirebaseFirestore db = FirebaseFirestore.getInstance();
-//        db.collection("users")
+//        db.collection("videos")
 //                .get()
 //                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
 //                    @Override
 //                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
 //                        for (DocumentSnapshot snapshot : task.getResult()) {
-//
+//                            index = index + 1;
 //                            HashMap hashMap = new HashMap();
-//                            hashMap.put("subscription", "0");
+//                            hashMap.put("video_index", index+"");
 //
-//                            db.collection("users")
+//                            db.collection("videos")
 //                                    .document(snapshot.getString("id"))
-//                                    .collection("passbook")
-//                                    .document("balance")
 //                                    .update(hashMap);
 //
-//                            Log.e("log_video", snapshot.toString());
+//                            Log.e("log_videos", snapshot.toString());
 //
 //                        }
 //                    }
 //                });
+
     }
 
     @Override

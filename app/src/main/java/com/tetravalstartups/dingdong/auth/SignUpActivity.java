@@ -20,7 +20,7 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.tetravalstartups.dingdong.R;
-import com.tetravalstartups.dingdong.utils.Constants;
+import com.tetravalstartups.dingdong.utils.Constant;
 
 import java.util.HashMap;
 
@@ -129,12 +129,12 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
                     profile.setId(auth.getCurrentUser().getUid());
                     profile.setName(name);
                     profile.setEmail(email);
-                    profile.setPhoto(Constants.DD_IV_PLACEHOLDER);
-                    profile.setBio(Constants.DEFAULT_BIO);
+                    profile.setPhoto(Constant.DD_IV_PLACEHOLDER);
+                    profile.setBio(Constant.DEFAULT_BIO);
                     profile.setHandle(handle[0]);
-                    profile.setLikes(Constants.INITIAL_LIKES);
-                    profile.setFollowers(Constants.INITIAL_FOLLOWER);
-                    profile.setFollowing(Constants.INITIAL_FOLLOWING);
+                    profile.setLikes(Constant.INITIAL_LIKES);
+                    profile.setFollowers(Constant.INITIAL_FOLLOWER);
+                    profile.setFollowing(Constant.INITIAL_FOLLOWING);
 
                     HashMap hashMap = new HashMap();
                     hashMap.put("reserved", "0");

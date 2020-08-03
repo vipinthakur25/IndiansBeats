@@ -27,7 +27,7 @@ import com.tetravalstartups.dingdong.R;
 import com.tetravalstartups.dingdong.auth.Master;
 import com.tetravalstartups.dingdong.modules.home.video.Video;
 import com.tetravalstartups.dingdong.modules.home.video.VideoAdapter;
-import com.tetravalstartups.dingdong.utils.Constants;
+import com.tetravalstartups.dingdong.utils.Constant;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -85,7 +85,7 @@ public class _PlayVideoActivity extends BaseActivity {
         Query query = db.collection("videos");
         List<Video> privateDraftVideosList = new ArrayList<>();
         query.whereEqualTo("user_id", master.getId())
-                .whereEqualTo("video_status", Constants.VIDEO_STATUS_PRIVATE)
+                .whereEqualTo("video_status", Constant.VIDEO_STATUS_PRIVATE)
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
@@ -218,7 +218,7 @@ public class _PlayVideoActivity extends BaseActivity {
 
         Query query = db.collection("videos");
         query.whereEqualTo("user_id", getIntent().getStringExtra("user_id"))
-                .whereEqualTo("video_status", Constants.VIDEO_STATUS_PUBLIC)
+                .whereEqualTo("video_status", Constant.VIDEO_STATUS_PUBLIC)
                 .orderBy("timestamp", Query.Direction.DESCENDING)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {

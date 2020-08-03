@@ -12,7 +12,7 @@ import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.tetravalstartups.dingdong.R;
-import com.tetravalstartups.dingdong.utils.Constants;
+import com.tetravalstartups.dingdong.utils.Constant;
 
 import java.util.List;
 
@@ -36,9 +36,9 @@ public class ReservedCoinsTxnAdapter extends RecyclerView.Adapter<ReservedCoinsT
     @Override
     public void onBindViewHolder(@NonNull ReservedCoinsTxnAdapter.ViewHolder holder, int position) {
         ReservedCoinsTxn reservedCoinsTxn = reservedCoinsTxnList.get(position);
-        if (reservedCoinsTxn.getType() == Constants.TXN_CREDIT){
+        if (reservedCoinsTxn.getType() == Constant.TXN_CREDIT){
             holder.tvAmount.setText("+ "+reservedCoinsTxn.getAmount());
-        } else if (reservedCoinsTxn.getType() == Constants.TXN_DEBIT){
+        } else if (reservedCoinsTxn.getType() == Constant.TXN_DEBIT){
             holder.tvAmount.setText("- "+reservedCoinsTxn.getAmount());
         }
 

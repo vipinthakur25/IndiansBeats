@@ -91,7 +91,6 @@
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -99,7 +98,8 @@
 
         <meta-data
             android:name="CLOUDINARY_URL"
-            android:value="cloudinary://289251737969246:LgXGlEFkNl765nF8VeGrCz45Hdw@ddcreators" />
+            android:value="cloudinary://797981641311225:ILAhO04JbFeOrF9ZQp3pDtFUowY@sevenbillion" />
+
     </application>
 
 </manifest>

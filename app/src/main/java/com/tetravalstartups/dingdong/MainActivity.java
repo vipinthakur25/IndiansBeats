@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
@@ -15,6 +16,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
@@ -54,6 +56,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
     private SharedPreferences preferences;
 
+    private LinearLayout lvMain;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -80,6 +84,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         tvDiscover = findViewById(R.id.tvDiscover);
         tvNotification = findViewById(R.id.tvNotification);
         tvProfile = findViewById(R.id.tvProfile);
+
+        lvMain = findViewById(R.id.lvMain);
 
         lvHome.setOnClickListener(this);
         lvDiscover.setOnClickListener(this);
@@ -238,7 +244,26 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     }
 
     private void renewPlan() {
+    }
 
+    boolean doubleBackToExitPressedOnce = false;
+
+    @Override
+    public void onBackPressed() {
+        if (doubleBackToExitPressedOnce) {
+            super.onBackPressed();
+            return;
+        }
+
+        this.doubleBackToExitPressedOnce = true;
+        Snackbar.make(lvMain, "Please click BACK again to exit", Snackbar.LENGTH_LONG).show();
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                doubleBackToExitPressedOnce=false;
+            }
+        }, 2000);
     }
 
     @Override

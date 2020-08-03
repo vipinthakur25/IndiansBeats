@@ -1,6 +1,6 @@
 package com.tetravalstartups.dingdong.utils;
 
-public class Constants {
+public class Constant {
 
     public static final String VIDEO_LIST = "VIDEO_LIST";
     public static final String VIDEO_URL = "VIDEO_URL";
@@ -52,5 +52,19 @@ public class Constants {
     public static final String VIDEO_STATUS_PUBLIC = "1";
     public static final String VIDEO_STATUS_PRIVATE = "0";
     public static final String VIDEO_STATUS_MODERATE = "-1";
+
+    //payout type
+    public static final String PAYOUT_REQUEST_TYPE_ORGANIC = "1";
+    public static final String PAYOUT_REQUEST_TYPE_SUBS = "2";
+
+    //payout status
+    public static final String PAYOUT_STATUS_PENDING = "0";
+    public static final String PAYOUT_STATUS_QUEUED = "2";
+    public static final String PAYOUT_STATUS_PROCESSING = "3";
+    public static final String PAYOUT_STATUS_PROCESSED = "1";
+    public static final String PAYOUT_STATUS_REVERSED = "-1";
+    public static final String PAYOUT_STATUS_CANCELLED = "-2";
+    public static final String PAYOUT_STATUS_REJECTED = "-3";
+    public static final String PAYOUT_STATUS_FAILED = "-4";
 
 }

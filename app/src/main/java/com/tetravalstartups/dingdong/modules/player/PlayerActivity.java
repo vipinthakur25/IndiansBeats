@@ -1,45 +1,29 @@
 package com.tetravalstartups.dingdong.modules.player;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.paging.PagedList;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.PagerSnapHelper;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.SnapHelper;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import com.firebase.ui.firestore.paging.FirestorePagingAdapter;
-import com.firebase.ui.firestore.paging.FirestorePagingOptions;
-import com.firebase.ui.firestore.paging.LoadingState;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.tetravalstartups.dingdong.R;
 import com.tetravalstartups.dingdong.modules.home.video.Video;
-import com.tetravalstartups.dingdong.utils.Constants;
+import com.tetravalstartups.dingdong.utils.Constant;
 import com.tetravalstartups.dingdong.utils.DDLoading;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
 
 public class PlayerActivity extends AppCompatActivity {
 
@@ -89,7 +73,7 @@ public class PlayerActivity extends AppCompatActivity {
 
         Query query = db.collection("videos")
                 .whereEqualTo("user_id", user_id)
-                .whereEqualTo("video_status", Constants.VIDEO_STATUS_PUBLIC)
+                .whereEqualTo("video_status", Constant.VIDEO_STATUS_PUBLIC)
                 .orderBy("timestamp", Query.Direction.DESCENDING);
         query.get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {

@@ -17,12 +17,6 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
@@ -30,10 +24,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.tetravalstartups.dingdong.R;
-import com.tetravalstartups.dingdong.utils.Constants;
-
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.tetravalstartups.dingdong.utils.Constant;
 
 public class AddBankBottomSheetFragment extends BottomSheetDialogFragment implements View.OnClickListener {
 
@@ -185,7 +176,7 @@ public class AddBankBottomSheetFragment extends BottomSheetDialogFragment implem
         banks.setIfsc(ifsc);
         banks.setBranch(branch);
         banks.setAddress(address);
-        banks.setStatus(Constants.BANK_UNVERIFIED);
+        banks.setStatus(Constant.BANK_UNVERIFIED);
 
         db.collection("users")
                 .document(firebaseAuth.getCurrentUser().getUid())

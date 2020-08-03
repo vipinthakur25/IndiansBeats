@@ -10,7 +10,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.tetravalstartups.dingdong.utils.Constants;
+import com.tetravalstartups.dingdong.utils.Constant;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -32,7 +32,7 @@ public class VideoPresenter {
         List<Video> videoList = new ArrayList<>();
 
         Query query = db.collection("videos");
-        query.whereEqualTo("video_status", Constants.VIDEO_STATUS_PUBLIC)
+        query.whereEqualTo("video_status", Constant.VIDEO_STATUS_PUBLIC)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override

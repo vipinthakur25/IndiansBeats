@@ -31,7 +31,7 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.tetravalstartups.dingdong.R;
 import com.tetravalstartups.dingdong.modules.home.video.Video;
-import com.tetravalstartups.dingdong.utils.Constants;
+import com.tetravalstartups.dingdong.utils.Constant;
 import com.tetravalstartups.dingdong.utils.DDLoading;
 
 import java.util.ArrayList;
@@ -51,7 +51,7 @@ public class PlayerFragment extends Fragment implements View.OnClickListener, Sw
     private DDLoading ddLoading;
 
     // recyclerview configuration
-    private int limit = 15;
+    private int limit = 30;
     private DocumentSnapshot lastVisible;
     private boolean isScrolling = false;
     private boolean isLastItemReached = false;
@@ -102,8 +102,8 @@ public class PlayerFragment extends Fragment implements View.OnClickListener, Sw
     private void setupAdapter() {
 
         CollectionReference videosRef = rootRef.collection("videos");
-        Query query = videosRef.whereEqualTo("video_status", Constants.VIDEO_STATUS_PUBLIC)
-                .whereGreaterThan("video_index", preferences.getString("index", "1")).limit(limit);
+        Query query = videosRef.whereEqualTo("video_status", Constant.VIDEO_STATUS_PUBLIC)
+                .orderBy("timestamp", Query.Direction.DESCENDING).limit(limit);
 
         SnapHelper snapHelper = new PagerSnapHelper();
         recyclerVideos.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -122,7 +122,6 @@ public class PlayerFragment extends Fragment implements View.OnClickListener, Sw
                             Video video = snapshot.toObject(Video.class);
                             videoList.add(video);
                         }
-                        Collections.shuffle(videoList);
                         recyclerVideos.setAdapter(playerAdapter);
                         mSwipeRefreshLayout.setRefreshing(false);
                         playerAdapter.notifyDataSetChanged();
@@ -158,7 +157,8 @@ public class PlayerFragment extends Fragment implements View.OnClickListener, Sw
                 if (isScrolling && (firstVisibleItemPosition + visibleItemCount == totalItemCount) && !isLastItemReached) {
                     isScrolling = false;
                     mSwipeRefreshLayout.setRefreshing(true);
-                    Query nextQuery = videosRef.whereEqualTo("video_status", Constants.VIDEO_STATUS_PUBLIC)
+                    Query nextQuery = videosRef.whereEqualTo("video_status", Constant.VIDEO_STATUS_PUBLIC)
+                            .orderBy("timestamp", Query.Direction.DESCENDING)
                             .startAfter(lastVisible).limit(limit);
                     nextQuery.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                         @Override
@@ -168,7 +168,6 @@ public class PlayerFragment extends Fragment implements View.OnClickListener, Sw
                                     Video video = d.toObject(Video.class);
                                     videoList.add(video);
                                 }
-                                Collections.shuffle(videoList);
                                 playerAdapter.notifyDataSetChanged();
                                 mSwipeRefreshLayout.setRefreshing(false);
                                 lastVisible = t.getResult().getDocuments().get(t.getResult().size() - 1);
@@ -191,7 +190,7 @@ public class PlayerFragment extends Fragment implements View.OnClickListener, Sw
             Intent shareIntent = new Intent();
             shareIntent.setAction(Intent.ACTION_SEND);
             shareIntent.setPackage("com.whatsapp");
-            shareIntent.putExtra(Intent.EXTRA_TEXT, "Hey your friend is using *Ding Dong* which is an *Hybrid video sharing app*. Here is the *download* link:\nhttps://bit.ly/3jJ2kJU\n\n*Create . Share . Earn*");
+            shareIntent.putExtra(Intent.EXTRA_TEXT, "Hey your friend is using *Ding Dong* which is an *Hybrid video sharing app*. Here is the *download* link:\nhttps://bit.ly/33bQke3\n\n*Create . Share . Earn*");
             shareIntent.setType("text/plain");
             startActivity(shareIntent);
         } catch (Exception e) {
@@ -199,7 +198,7 @@ public class PlayerFragment extends Fragment implements View.OnClickListener, Sw
             Intent shareIntent = new Intent();
             shareIntent.setAction(Intent.ACTION_SEND);
             shareIntent.setPackage("com.whatsapp.w4b");
-            shareIntent.putExtra(Intent.EXTRA_TEXT, "Hey your friend is using *Ding Dong* which is an *Hybrid video sharing app*. Here is the *download* link:\nhttps://bit.ly/3jJ2kJU\n\n*Create . Share . Earn*");
+            shareIntent.putExtra(Intent.EXTRA_TEXT, "Hey your friend is using *Ding Dong* which is an *Hybrid video sharing app*. Here is the *download* link:\nhttps://bit.ly/33bQke3\n\n*Create . Share . Earn*");
             shareIntent.setType("text/plain");
             startActivity(shareIntent);
         }

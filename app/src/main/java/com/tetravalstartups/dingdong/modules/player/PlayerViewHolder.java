@@ -456,13 +456,10 @@ public class PlayerViewHolder extends RecyclerView.ViewHolder implements View.On
                 .gravity("north_east").height(50)
                 .overlay(new Layer().publicId("dd_wm_v1")).width(40).x(20).y(20).crop("scale"))
                 .resourceType("video").generate("user_uploaded_videos/"+videoModel.getId()+".mp4");
-        Toast.makeText(context, ""+url, Toast.LENGTH_SHORT).show();
 
-        String message = "Hey your friend is using *Ding Dong* which is an *Hybrid video sharing app*. Here is the *download* link:\nhttps://bit.ly/3jJ2kJU\n\n*Create . Share . Earn*";
+        String message = "Hey your friend is using *Ding Dong* which is an *Hybrid video sharing app*. Here is the *download* link:\nhttps://bit.ly/33bQke3\n\n*Create . Share . Earn*";
 
         ddLoading.showProgress(context, "Loading...", false);
-        Intent share = new Intent(Intent.ACTION_SEND);
-        share.setType("*/*");
         FileLoader.with(context)
                 .load(url,false)
                 .fromDirectory("dingdong/shared", FileLoader.DIR_EXTERNAL_PUBLIC)
@@ -471,12 +468,23 @@ public class PlayerViewHolder extends RecyclerView.ViewHolder implements View.On
                     public void onLoad(FileLoadRequest request, FileResponse<File> response) {
                         ddLoading.hideProgress();
                         File loadedFile = response.getBody();
-                        Intent shareIntent = new Intent();
-                        shareIntent.setAction(Intent.ACTION_SEND);
+
+
+                        Uri imgUri = Uri.parse(loadedFile.getAbsolutePath());
+                        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                        shareIntent.setType("text/plain");
                         shareIntent.putExtra(Intent.EXTRA_TEXT, message);
-                        shareIntent.putExtra(Intent.EXTRA_STREAM, Uri.parse(loadedFile.getPath()));
-                        shareIntent.setType("*/*");
+                        shareIntent.putExtra(Intent.EXTRA_STREAM, imgUri);
+                        shareIntent.setType("video/mp4");
                         shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+                       try {
+                           context.startActivity(Intent.createChooser(shareIntent, "Share Video"));
+                       } catch (Exception e) {
+                           Toast.makeText(context, ""+e, Toast.LENGTH_SHORT).show();
+                       }
+
+
                         HashMap hmFollower = new HashMap();
                         hmFollower.put("id", master.getId());
                         db.collection("videos")
@@ -497,7 +505,7 @@ public class PlayerViewHolder extends RecyclerView.ViewHolder implements View.On
                                         }
                                     }
                                 });
-                        context.startActivity(Intent.createChooser(shareIntent, "Share Video"));
+
                     }
 
                     @Override

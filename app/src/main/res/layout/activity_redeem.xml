@@ -7,7 +7,17 @@
     android:orientation="vertical"
     tools:context=".modules.passbook.RedeemActivity">
 
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/aniView"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:visibility="gone"
+        app:lottie_rawRes="@raw/request_done"/>
+
     <LinearLayout
+        android:id="@+id/lhHeader"
+        android:visibility="visible"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
@@ -36,16 +46,102 @@
                 android:textColor="@color/colorTextTitle"
                 android:textSize="16sp" />
 
+            <ImageView
+                android:id="@+id/ivBanks"
+                android:layout_width="50dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="center_vertical|end"
+                android:padding="14dp"
+                app:srcCompat="@drawable/ic_baseline_account_balance_24" />
+
         </FrameLayout>
 
-        <ProgressBar
-            android:id="@+id/progressBar"
-            style="?android:attr/progressBarStyleHorizontal"
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/lhEarning"
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:layout_marginTop="24dp"
+        android:orientation="horizontal">
+
+
+        <LinearLayout
+            android:id="@+id/lvOrganicEarning"
+
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:visibility="gone"
-            android:indeterminate="true"/>
+            android:layout_marginEnd="8dp"
+            android:layout_weight="1"
+            android:background="@drawable/bg_passbook_v3"
+            android:orientation="vertical"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/montserrat"
+                android:gravity="center"
+                android:text="Organic Earning"
+                android:textSize="12sp"
+                android:textColor="@color/colorPrimaryDarkV2" />
+
+            <TextView
+                android:id="@+id/tvOEarning"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/montserrat_bold"
+                android:gravity="center"
+                android:text="0"
+                android:textColor="@color/colorBrandYellowV2"
+                android:textSize="25sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/lvSubscriptionEarning"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+            android:layout_marginStart="8dp"
+            android:background="@drawable/bg_passbook_v3"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Subscription Earning"
+                android:gravity="center"
+                android:textSize="12sp"
+                android:fontFamily="@font/montserrat"
+                android:textColor="@color/colorPrimaryDarkV2"/>
+
+            <TextView
+                android:id="@+id/tvSEarning"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textColor="@color/colorBrandYellowV2"
+                android:fontFamily="@font/montserrat_bold"
+                android:textSize="25sp"
+                android:text="0"/>
+
+
+        </LinearLayout>
 
     </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerRequest"
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
 
 </LinearLayout>

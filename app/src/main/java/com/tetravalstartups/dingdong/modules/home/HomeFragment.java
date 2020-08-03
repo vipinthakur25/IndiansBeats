@@ -14,18 +14,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import com.cloudinary.Transformation;
-import com.cloudinary.android.MediaManager;
-import com.cloudinary.transformation.Layer;
 import com.google.firebase.auth.FirebaseAuth;
 import com.tetravalstartups.dingdong.MainActivity;
 import com.tetravalstartups.dingdong.R;
 import com.tetravalstartups.dingdong.modules.home.video.Video;
 import com.tetravalstartups.dingdong.modules.home.video.VideoAdapter;
 import com.tetravalstartups.dingdong.modules.home.video.VideoPresenter;
-import com.tetravalstartups.dingdong.utils.Constants;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class HomeFragment extends Fragment implements VideoPresenter.IVideo {

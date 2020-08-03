@@ -158,6 +158,7 @@
                         android:layout_height="wrap_content"
                         android:text="Total Earning"
                         android:gravity="center"
+                        android:textSize="12sp"
                         android:fontFamily="@font/montserrat"
                         android:textColor="@color/colorPrimaryDarkV2"/>
 
@@ -189,6 +190,7 @@
                         android:layout_height="wrap_content"
                         android:text="Total Spending"
                         android:gravity="center"
+                        android:textSize="12sp"
                         android:fontFamily="@font/montserrat"
                         android:textColor="@color/colorPrimaryDarkV2"/>
 
@@ -241,6 +243,7 @@
                         android:layout_height="wrap_content"
                         android:text="Time spent in app"
                         android:gravity="center"
+                        android:textSize="12sp"
                         android:fontFamily="@font/montserrat"
                         android:textColor="@color/colorPrimaryDarkV2"/>
 
@@ -272,6 +275,7 @@
                         android:layout_height="wrap_content"
                         android:text="Daily Check-In"
                         android:gravity="center"
+                        android:textSize="12sp"
                         android:fontFamily="@font/montserrat"
                         android:textColor="@color/colorPrimaryDarkV2"/>
 
@@ -313,6 +317,7 @@
                         android:layout_height="wrap_content"
                         android:text="Video Uploads"
                         android:gravity="center"
+                        android:textSize="12sp"
                         android:fontFamily="@font/montserrat"
                         android:textColor="@color/colorPrimaryDarkV2"/>
 
@@ -344,6 +349,7 @@
                         android:layout_height="wrap_content"
                         android:text="From your fans"
                         android:gravity="center"
+                        android:textSize="12sp"
                         android:fontFamily="@font/montserrat"
                         android:textColor="@color/colorPrimaryDarkV2"/>
 
@@ -379,6 +385,7 @@
                     android:layout_height="wrap_content"
                     android:text="Subscription Earning"
                     android:gravity="center"
+                    android:textSize="12sp"
                     android:fontFamily="@font/montserrat"
                     android:textColor="@color/colorTextTitle"/>
 

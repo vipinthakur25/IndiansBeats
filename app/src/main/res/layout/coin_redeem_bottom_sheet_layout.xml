@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorPrimary"
+    android:focusableInTouchMode="true"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Redemption Information"
+        android:textColor="@color/colorTextTitle"
+        android:fontFamily="@font/montserrat_bold"
+        android:gravity="center"
+        android:textSize="16sp"
+        android:padding="16dp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Balance (In Coins) :"
+            android:layout_weight="1"
+            android:textColor="@color/colorTextTitle"
+            android:fontFamily="@font/montserrat"
+            android:textSize="16sp"/>
+
+        <TextView
+            android:id="@+id/tvBalanceInCoins"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="..."
+            android:textColor="@color/colorTextTitle"
+            android:fontFamily="@font/montserrat"
+            android:textSize="16sp"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Conversion Rate (Per Coin) :"
+            android:layout_weight="1"
+            android:textColor="@color/colorTextTitle"
+            android:fontFamily="@font/montserrat"
+            android:textSize="16sp"/>
+
+        <TextView
+            android:id="@+id/tvConversionRate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/montserrat"
+            android:text="..."
+            android:textColor="@color/colorTextTitle"
+            android:textSize="16sp" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Balance (In ₹) :"
+            android:layout_weight="1"
+            android:textColor="@color/colorTextTitle"
+            android:fontFamily="@font/montserrat"
+            android:textSize="16sp"/>
+
+        <TextView
+            android:id="@+id/tvBalanceInRs"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="..."
+            android:textColor="@color/colorTextTitle"
+            android:fontFamily="@font/montserrat"
+            android:textSize="16sp"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Redeemable Balance (In ₹):"
+            android:layout_weight="1"
+            android:textColor="@color/colorTextTitle"
+            android:fontFamily="@font/montserrat"
+            android:textSize="16sp"/>
+
+        <TextView
+            android:id="@+id/tvRedeemableBalance"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="..."
+            android:textColor="@color/colorTextTitle"
+            android:fontFamily="@font/montserrat"
+            android:textSize="16sp"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Processing Fees:"
+            android:layout_weight="1"
+            android:textColor="@color/colorTextTitle"
+            android:fontFamily="@font/montserrat"
+            android:textSize="16sp"/>
+
+        <TextView
+            android:id="@+id/tvProcessingFee"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="..."
+            android:textColor="@color/colorTextTitle"
+            android:fontFamily="@font/montserrat"
+            android:textSize="16sp"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Cash In Hand (In ₹):"
+            android:layout_weight="1"
+            android:textColor="@color/colorTextTitle"
+            android:fontFamily="@font/montserrat"
+            android:textSize="16sp"/>
+
+        <TextView
+            android:id="@+id/tvInHand"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="..."
+            android:textColor="@color/colorTextTitle"
+            android:fontFamily="@font/montserrat"
+            android:textSize="16sp"/>
+
+    </LinearLayout>
+
+    <EditText
+        android:id="@+id/etAmountToWithdraw"
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:background="@drawable/bg_edittext"
+        android:fontFamily="@font/montserrat_bold"
+        android:hint="Amount to withdraw (In ₹)"
+        android:textSize="16sp"
+        android:inputType="number"
+        android:gravity="center_vertical"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"/>
+
+    <TextView
+        android:id="@+id/tvRequest"
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:background="@drawable/bg_button_gradient"
+        android:fontFamily="@font/montserrat_bold"
+        android:text="Request redemption"
+        android:textColor="@color/colorAccentV1"
+        android:textSize="18dp"
+        android:gravity="center"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginBottom="24dp"
+        android:layout_marginEnd="16dp"/>
+
+</LinearLayout>

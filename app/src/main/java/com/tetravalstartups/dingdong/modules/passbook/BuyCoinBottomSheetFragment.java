@@ -18,13 +18,12 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.tetravalstartups.dingdong.R;
 import com.tetravalstartups.dingdong.modules.subscription.SubscriptionActivity;
-import com.tetravalstartups.dingdong.utils.Constants;
+import com.tetravalstartups.dingdong.utils.Constant;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -146,11 +145,11 @@ public class BuyCoinBottomSheetFragment extends BottomSheetDialogFragment implem
                                                 String id = documentReference.getId();
                                                 UnreservedCoinTxn unreservedCoinTxn = new UnreservedCoinTxn();
                                                 unreservedCoinTxn.setId(id);
-                                                unreservedCoinTxn.setType(Constants.TXN_CREDIT);
+                                                unreservedCoinTxn.setType(Constant.TXN_CREDIT);
                                                 unreservedCoinTxn.setAmount(up_ur_coin);
                                                 unreservedCoinTxn.setTime(txnTime);
                                                 unreservedCoinTxn.setDate(txnDate);
-                                                unreservedCoinTxn.setRemark(Constants.TXN_REMARK_COIN_PURCHASE);
+                                                unreservedCoinTxn.setRemark(Constant.TXN_REMARK_COIN_PURCHASE);
                                                 unreservedCoinTxn.setStatus(2);
                                                 db.collection("users")
                                                         .document(firebaseAuth.getCurrentUser().getUid())

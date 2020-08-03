@@ -25,7 +25,7 @@ import com.nabinbhandari.android.permissions.PermissionHandler;
 import com.nabinbhandari.android.permissions.Permissions;
 import com.tetravalstartups.dingdong.MainActivity;
 import com.tetravalstartups.dingdong.R;
-import com.tetravalstartups.dingdong.utils.Constants;
+import com.tetravalstartups.dingdong.utils.Constant;
 import com.tetravalstartups.dingdong.utils.ProfilePhotoBottomSheet;
 
 import java.util.HashMap;
@@ -179,12 +179,12 @@ public class SetupProfileActivity extends AppCompatActivity implements ProfilePh
         profile.setId(firebaseAuth.getCurrentUser().getUid());
         profile.setName(name);
         profile.setEmail(email);
-        profile.setPhoto(Constants.DD_IV_PLACEHOLDER);
+        profile.setPhoto(Constant.DD_IV_PLACEHOLDER);
         profile.setBio(bio);
         profile.setHandle(handle);
-        profile.setLikes(Constants.INITIAL_LIKES);
-        profile.setFollowers(Constants.INITIAL_FOLLOWER);
-        profile.setFollowing(Constants.INITIAL_FOLLOWING);
+        profile.setLikes(Constant.INITIAL_LIKES);
+        profile.setFollowers(Constant.INITIAL_FOLLOWER);
+        profile.setFollowing(Constant.INITIAL_FOLLOWING);
 
         HashMap hashMap = new HashMap();
         hashMap.put("reserved", "0");

@@ -8,16 +8,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
-import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.tetravalstartups.dingdong.R;
-import com.tetravalstartups.dingdong.utils.Constants;
+import com.tetravalstartups.dingdong.utils.Constant;
 
 import java.util.List;
 
@@ -49,9 +46,9 @@ public class UnreservedCoinTxnAdapter extends RecyclerView.Adapter<UnreservedCoi
     public void onBindViewHolder(@NonNull UnreservedCoinTxnAdapter.ViewHolder holder, int position) {
         UnreservedCoinTxn unreservedCoinTxn = unreservedCoinTxnList.get(position);
 
-        if (unreservedCoinTxn.getType() == Constants.TXN_CREDIT){
+        if (unreservedCoinTxn.getType() == Constant.TXN_CREDIT){
             holder.tvAmount.setText("+ "+unreservedCoinTxn.getAmount());
-        } else if (unreservedCoinTxn.getType() == Constants.TXN_DEBIT){
+        } else if (unreservedCoinTxn.getType() == Constant.TXN_DEBIT){
             holder.tvAmount.setText("- "+unreservedCoinTxn.getAmount());
         }
 

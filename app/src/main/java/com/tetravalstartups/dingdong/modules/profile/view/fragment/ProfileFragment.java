@@ -9,7 +9,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -21,6 +20,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
@@ -34,7 +34,7 @@ import com.tetravalstartups.dingdong.modules.profile.view.activity.FollowersActi
 import com.tetravalstartups.dingdong.modules.profile.view.activity.FollowingActivity;
 import com.tetravalstartups.dingdong.modules.profile.view.activity.SettingsActivity;
 import com.tetravalstartups.dingdong.modules.profile.view.adapter.VideoTabPagerAdapter;
-import com.tetravalstartups.dingdong.utils.Constants;
+import com.tetravalstartups.dingdong.utils.Constant;
 import com.tetravalstartups.dingdong.utils.LightBox;
 
 import java.util.HashMap;
@@ -61,6 +61,8 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     private Master master;
     private FirebaseAuth auth;
     private FirebaseFirestore db;
+
+    int count = 0;
 
     public ProfileFragment() {
     }
@@ -130,12 +132,6 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                 new LightBox(getContext()).showLightBox(master.getPhoto());
             }
         });
-
-        if (master.getLikes() != null) {
-            tvLikeCount.setText(master.getLikes());
-        } else {
-            tvLikeCount.setText("0");
-        }
 
         if (master.getFollowers() != null) {
             tvFollowerCount.setText(master.getFollowers());
@@ -263,7 +259,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     }
 
     private void fetchVideosCount() {
-        Query query = db.collection("videos").whereEqualTo("user_id", master.getId()).whereEqualTo("video_status", Constants.VIDEO_STATUS_PUBLIC);
+        Query query = db.collection("videos").whereEqualTo("user_id", master.getId()).whereEqualTo("video_status", Constant.VIDEO_STATUS_PUBLIC);
         query.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
@@ -276,6 +272,46 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                 }
             }
         });
+
+        fetchLikesCount();
+
+    }
+
+    private void fetchLikesCount() {
+
+        Query query = db.collection("videos")
+                .whereEqualTo("user_id", master.getId())
+                .whereEqualTo("video_status", Constant.VIDEO_STATUS_PUBLIC);
+
+        query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (DocumentSnapshot snapshot : task.getResult()) {
+                                String id = snapshot.getString("id");
+                                db.collection("videos")
+                                        .document(id)
+                                        .collection("liked_by")
+                                        .get()
+                                        .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                                if (task.isSuccessful()) {
+                                                    if (task.getResult().getDocuments().isEmpty()) {
+                                                        tvLikeCount.setText("0");
+                                                    } else {
+                                                        count = count + task.getResult().getDocuments().size();
+                                                    }
+                                                }
+                                            }
+                                        });
+                            }
+
+                            tvLikeCount.setText(count+"");
+
+                        }
+                    }
+                });
     }
 
 }

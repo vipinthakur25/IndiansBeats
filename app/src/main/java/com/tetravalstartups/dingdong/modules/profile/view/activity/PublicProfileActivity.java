@@ -24,15 +24,12 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.tetravalstartups.dingdong.BaseActivity;
-import com.tetravalstartups.dingdong.MainActivity;
 import com.tetravalstartups.dingdong.R;
 import com.tetravalstartups.dingdong.auth.LoginActivity;
 import com.tetravalstartups.dingdong.auth.Master;
 import com.tetravalstartups.dingdong.auth.Profile;
 import com.tetravalstartups.dingdong.modules.profile.view.adapter.PublicProfilePagerAdapter;
-import com.tetravalstartups.dingdong.modules.profile.view.adapter.VideoTabPagerAdapter;
-import com.tetravalstartups.dingdong.utils.Constants;
+import com.tetravalstartups.dingdong.utils.Constant;
 import com.tetravalstartups.dingdong.utils.DDLoading;
 import com.tetravalstartups.dingdong.utils.LightBox;
 
@@ -410,7 +407,7 @@ public class PublicProfileActivity extends AppCompatActivity implements View.OnC
 
     private void fetchVideosCount(String id) {
         Query query = db.collection("videos").whereEqualTo("user_id", id)
-                .whereEqualTo("video_status", Constants.VIDEO_STATUS_PUBLIC);
+                .whereEqualTo("video_status", Constant.VIDEO_STATUS_PUBLIC);
         query.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {

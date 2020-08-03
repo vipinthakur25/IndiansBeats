@@ -20,11 +20,9 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.tetravalstartups.dingdong.R;
 import com.tetravalstartups.dingdong.auth.Master;
-import com.tetravalstartups.dingdong.modules.profile.model.LikedVideos;
 import com.tetravalstartups.dingdong.modules.profile.model.PrivateDraftVideos;
-import com.tetravalstartups.dingdong.modules.profile.view.adapter.LikedVideoAdapter;
 import com.tetravalstartups.dingdong.modules.profile.view.adapter.PrivateDraftVideoAdapter;
-import com.tetravalstartups.dingdong.utils.Constants;
+import com.tetravalstartups.dingdong.utils.Constant;
 import com.tetravalstartups.dingdong.utils.EqualSpacingItemDecoration;
 
 import java.util.ArrayList;
@@ -64,7 +62,7 @@ public class PrivateDraftFragment extends Fragment {
         recyclerVideos.addItemDecoration(new EqualSpacingItemDecoration(4, EqualSpacingItemDecoration.GRID));
         Query query = db.collection("videos");
         query.whereEqualTo("user_id", master.getId())
-                .whereEqualTo("video_status", Constants.VIDEO_STATUS_PRIVATE)
+                .whereEqualTo("video_status", Constant.VIDEO_STATUS_PRIVATE)
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
