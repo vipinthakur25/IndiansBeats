@@ -62,8 +62,6 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     private FirebaseAuth auth;
     private FirebaseFirestore db;
 
-    int count = 0;
-
     public ProfileFragment() {
     }
 
@@ -132,6 +130,12 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                 new LightBox(getContext()).showLightBox(master.getPhoto());
             }
         });
+
+        if (master.getLikes() != null) {
+            tvLikeCount.setText(master.getLikes());
+        } else {
+            tvLikeCount.setText("0");
+        }
 
         if (master.getFollowers() != null) {
             tvFollowerCount.setText(master.getFollowers());
@@ -272,46 +276,8 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                 }
             }
         });
-
-        fetchLikesCount();
-
     }
 
-    private void fetchLikesCount() {
 
-        Query query = db.collection("videos")
-                .whereEqualTo("user_id", master.getId())
-                .whereEqualTo("video_status", Constant.VIDEO_STATUS_PUBLIC);
-
-        query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            for (DocumentSnapshot snapshot : task.getResult()) {
-                                String id = snapshot.getString("id");
-                                db.collection("videos")
-                                        .document(id)
-                                        .collection("liked_by")
-                                        .get()
-                                        .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                                            @Override
-                                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                                if (task.isSuccessful()) {
-                                                    if (task.getResult().getDocuments().isEmpty()) {
-                                                        tvLikeCount.setText("0");
-                                                    } else {
-                                                        count = count + task.getResult().getDocuments().size();
-                                                    }
-                                                }
-                                            }
-                                        });
-                            }
-
-                            tvLikeCount.setText(count+"");
-
-                        }
-                    }
-                });
-    }
 
 }

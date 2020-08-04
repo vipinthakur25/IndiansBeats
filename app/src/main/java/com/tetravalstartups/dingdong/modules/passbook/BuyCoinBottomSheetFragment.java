@@ -145,12 +145,12 @@ public class BuyCoinBottomSheetFragment extends BottomSheetDialogFragment implem
                                                 String id = documentReference.getId();
                                                 UnreservedCoinTxn unreservedCoinTxn = new UnreservedCoinTxn();
                                                 unreservedCoinTxn.setId(id);
-                                                unreservedCoinTxn.setType(Constant.TXN_CREDIT);
-                                                unreservedCoinTxn.setAmount(up_ur_coin);
+                                                unreservedCoinTxn.setType(String.valueOf(Constant.TXN_CREDIT));
+                                                unreservedCoinTxn.setAmount(String.valueOf(up_ur_coin));
                                                 unreservedCoinTxn.setTime(txnTime);
                                                 unreservedCoinTxn.setDate(txnDate);
                                                 unreservedCoinTxn.setRemark(Constant.TXN_REMARK_COIN_PURCHASE);
-                                                unreservedCoinTxn.setStatus(2);
+                                                unreservedCoinTxn.setStatus(String.valueOf(2));
                                                 db.collection("users")
                                                         .document(firebaseAuth.getCurrentUser().getUid())
                                                         .collection("unreserved_coins_txn")

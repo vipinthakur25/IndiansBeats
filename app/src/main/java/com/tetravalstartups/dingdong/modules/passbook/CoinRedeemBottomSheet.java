@@ -16,6 +16,7 @@ import androidx.annotation.Nullable;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.tetravalstartups.dingdong.R;
@@ -23,6 +24,9 @@ import com.tetravalstartups.dingdong.auth.Master;
 import com.tetravalstartups.dingdong.utils.Constant;
 import com.tetravalstartups.dingdong.utils.DDLoading;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.HashMap;
 
 public class CoinRedeemBottomSheet extends BottomSheetDialogFragment implements View.OnClickListener {
@@ -152,8 +156,18 @@ public class CoinRedeemBottomSheet extends BottomSheetDialogFragment implements 
             double in_inr = amount * conversion;
             double redeemable = (in_inr * percent) / 100;
 
-            DocumentReference documentReference = db.collection("payouts").document();
+            CollectionReference collectionReference = db.collection("payouts");
+            DocumentReference documentReference = collectionReference.document();
             String request_id = documentReference.getId();
+
+            DateFormat df = new SimpleDateFormat("h:mm a ~ d MMM yyyy");
+            String date = df.format(Calendar.getInstance().getTime());
+
+            DateFormat dfTime = new SimpleDateFormat("h:mm a");
+            String txnTime = dfTime.format(Calendar.getInstance().getTime());
+
+            DateFormat dfDate = new SimpleDateFormat("d MMM yyyy");
+            String txnDate = dfDate.format(Calendar.getInstance().getTime());
 
             PayoutRequest payoutRequest = new PayoutRequest();
             payoutRequest.setId(request_id);
@@ -178,11 +192,13 @@ public class CoinRedeemBottomSheet extends BottomSheetDialogFragment implements 
             payoutRequest.setProcessing_fee_amount_at_request(processing + "");
             payoutRequest.setIn_hand_balance_at_request(in_hand + "");
             payoutRequest.setTo_withdraw_balance_at_request(w_draw + "");
-            payoutRequest.setStatus(Constant.PAYOUT_STATUS_PENDING);
+            payoutRequest.setStatus(String.valueOf(Constant.TXN_STATUS_PENDING));
+            payoutRequest.setTxn_date(txnDate);
+            payoutRequest.setTxn_time(txnTime);
 
 
             db.collection("payouts")
-                    .document(master.getId())
+                    .document(request_id)
                     .set(payoutRequest)
                     .addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override

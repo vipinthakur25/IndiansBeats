@@ -9,21 +9,21 @@ import com.google.firebase.firestore.ServerTimestamp;
 import java.util.Date;
 
 @IgnoreExtraProperties
-public class UnreservedCoinTxn implements Parcelable {
+public class UnreservedCoinTxn {
     @ServerTimestamp
     private Date timestamp;
     private String id;
-    private int type;
-    private int amount;
+    private String type;
+    private String amount;
     private String time;
     private String date;
     private String remark;
-    private int status;
+    private String status;
 
     public UnreservedCoinTxn() {
     }
 
-    public UnreservedCoinTxn(Date timestamp, String id, int type, int amount, String time, String date, String remark, int status) {
+    public UnreservedCoinTxn(Date timestamp, String id, String type, String amount, String time, String date, String remark, String status) {
         this.timestamp = timestamp;
         this.id = id;
         this.type = type;
@@ -33,28 +33,6 @@ public class UnreservedCoinTxn implements Parcelable {
         this.remark = remark;
         this.status = status;
     }
-
-    protected UnreservedCoinTxn(Parcel in) {
-        id = in.readString();
-        type = in.readInt();
-        amount = in.readInt();
-        time = in.readString();
-        date = in.readString();
-        remark = in.readString();
-        status = in.readInt();
-    }
-
-    public static final Creator<UnreservedCoinTxn> CREATOR = new Creator<UnreservedCoinTxn>() {
-        @Override
-        public UnreservedCoinTxn createFromParcel(Parcel in) {
-            return new UnreservedCoinTxn(in);
-        }
-
-        @Override
-        public UnreservedCoinTxn[] newArray(int size) {
-            return new UnreservedCoinTxn[size];
-        }
-    };
 
     public Date getTimestamp() {
         return timestamp;
@@ -72,19 +50,19 @@ public class UnreservedCoinTxn implements Parcelable {
         this.id = id;
     }
 
-    public int getType() {
+    public String getType() {
         return type;
     }
 
-    public void setType(int type) {
+    public void setType(String type) {
         this.type = type;
     }
 
-    public int getAmount() {
+    public String getAmount() {
         return amount;
     }
 
-    public void setAmount(int amount) {
+    public void setAmount(String amount) {
         this.amount = amount;
     }
 
@@ -112,27 +90,11 @@ public class UnreservedCoinTxn implements Parcelable {
         this.remark = remark;
     }
 
-    public int getStatus() {
+    public String getStatus() {
         return status;
     }
 
-    public void setStatus(int status) {
+    public void setStatus(String status) {
         this.status = status;
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(id);
-        dest.writeInt(type);
-        dest.writeInt(amount);
-        dest.writeString(time);
-        dest.writeString(date);
-        dest.writeString(remark);
-        dest.writeInt(status);
     }
 }

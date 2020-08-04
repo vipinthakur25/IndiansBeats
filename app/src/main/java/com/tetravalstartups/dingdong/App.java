@@ -80,6 +80,8 @@ public class App extends Application {
                                             HashMap hashMap = new HashMap();
                                             hashMap.put("avl_uploads", total);
 
+
+
                                             db.collection("users")
                                                     .document(firebaseAuth.getCurrentUser().getUid())
                                                     .collection("subscription")

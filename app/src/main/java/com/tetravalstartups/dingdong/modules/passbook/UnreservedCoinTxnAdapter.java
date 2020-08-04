@@ -46,29 +46,25 @@ public class UnreservedCoinTxnAdapter extends RecyclerView.Adapter<UnreservedCoi
     public void onBindViewHolder(@NonNull UnreservedCoinTxnAdapter.ViewHolder holder, int position) {
         UnreservedCoinTxn unreservedCoinTxn = unreservedCoinTxnList.get(position);
 
-        if (unreservedCoinTxn.getType() == Constant.TXN_CREDIT){
-            holder.tvAmount.setText("+ "+unreservedCoinTxn.getAmount());
-        } else if (unreservedCoinTxn.getType() == Constant.TXN_DEBIT){
-            holder.tvAmount.setText("- "+unreservedCoinTxn.getAmount());
-        }
-
         holder.tvTimeDate.setText(unreservedCoinTxn.getTime()+" ~ "+unreservedCoinTxn.getDate());
 
         holder.tvRemark.setText(unreservedCoinTxn.getRemark());
 
-        if (unreservedCoinTxn.getStatus() == 0){
+        holder.tvAmount.setText(unreservedCoinTxn.getAmount());
+
+        if (unreservedCoinTxn.getStatus() == "0"){
             holder.ivPending.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_dd_check_mark_white));
             holder.ivProcessing.setImageDrawable(null);
             holder.ivDone.setImageDrawable(null);
 
         }
-        if (unreservedCoinTxn.getStatus() == 1){
+        if (unreservedCoinTxn.getStatus() == "1"){
             holder.ivPending.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_dd_check_mark_white));
             holder.ivProcessing.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_dd_check_mark_white));
             holder.ivDone.setImageDrawable(null);
 
         }
-        if (unreservedCoinTxn.getStatus() == 2){
+        if (unreservedCoinTxn.getStatus() == "2"){
             holder.ivPending.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_dd_check_mark_white));
             holder.ivProcessing.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_dd_check_mark_white));
             holder.ivDone.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_dd_check_mark_white));
@@ -80,12 +76,11 @@ public class UnreservedCoinTxnAdapter extends RecyclerView.Adapter<UnreservedCoi
                 SharedPreferences preferences = context.getSharedPreferences("unreserved", 0);
                 Editor editor = preferences.edit();
                 editor.putString("id", unreservedCoinTxn.getId());
-                editor.putInt("type", unreservedCoinTxn.getType());
-                editor.putInt("amount", unreservedCoinTxn.getAmount());
+                editor.putInt("amount", Integer.parseInt(unreservedCoinTxn.getAmount()));
                 editor.putString("time", unreservedCoinTxn.getTime());
                 editor.putString("date", unreservedCoinTxn.getDate());
                 editor.putString("remark", unreservedCoinTxn.getRemark());
-                editor.putInt("status", unreservedCoinTxn.getStatus());
+                editor.putInt("status", Integer.parseInt(unreservedCoinTxn.getStatus()));
                 editor.apply();
                 txnDetailsBottomSheetFragment.show(((PassbookActivity)context).getSupportFragmentManager(),
                         "profilePhotoBottomSheet");

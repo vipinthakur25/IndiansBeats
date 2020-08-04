@@ -9,8 +9,10 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.tetravalstartups.dingdong.R;
 import com.tetravalstartups.dingdong.utils.EqualSpacingItemDecoration;
@@ -25,6 +27,10 @@ public class BanksActivity extends AppCompatActivity implements View.OnClickList
     private RecyclerView recyclerBanks;
     private FirebaseAuth firebaseAuth;
     private TextView tvNoData;
+    private LinearLayout lvMain;
+    private int bank_acc_count = 0;
+
+    private BanksPresenter banksPresenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +44,9 @@ public class BanksActivity extends AppCompatActivity implements View.OnClickList
         ivAddBank = findViewById(R.id.ivAddBank);
         recyclerBanks = findViewById(R.id.recyclerBanks);
         tvNoData = findViewById(R.id.tvNoData);
+
+        lvMain = findViewById(R.id.lvMain);
+
         ivGoBack.setOnClickListener(this);
         ivAddBank.setOnClickListener(this);
 
@@ -55,7 +64,7 @@ public class BanksActivity extends AppCompatActivity implements View.OnClickList
         recyclerBanks.addItemDecoration(new EqualSpacingItemDecoration(16,
                 EqualSpacingItemDecoration.VERTICAL));
 
-        BanksPresenter banksPresenter =
+        banksPresenter =
                 new BanksPresenter(BanksActivity.this,
                 BanksActivity.this);
 
@@ -71,11 +80,15 @@ public class BanksActivity extends AppCompatActivity implements View.OnClickList
             overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
         }
         if (v == ivAddBank){
-            if (getSupportFragmentManager().findFragmentByTag("addBanks") == null){
-                addBankBottomSheetFragment.setStyle(DialogFragment.STYLE_NORMAL, R.style.DialogStyle);
-                addBankBottomSheetFragment.show(getSupportFragmentManager(), "addBanks");
+            banksPresenter.fetchBanks(firebaseAuth.getCurrentUser().getUid());
+            if (bank_acc_count == 0) {
+                if (getSupportFragmentManager().findFragmentByTag("addBanks") == null){
+                    addBankBottomSheetFragment.setStyle(DialogFragment.STYLE_NORMAL, R.style.DialogStyle);
+                    addBankBottomSheetFragment.show(getSupportFragmentManager(), "addBanks");
+                }
+            } else if (bank_acc_count == 1) {
+                Snackbar.make(lvMain, "You can only one bank", Snackbar.LENGTH_LONG).show();
             }
-            //ivAddBank.setEnabled(false);
         }
     }
 
@@ -101,6 +114,7 @@ public class BanksActivity extends AppCompatActivity implements View.OnClickList
                         banksList);
         banksAdapter.notifyDataSetChanged();
         recyclerBanks.setAdapter(banksAdapter);
+        bank_acc_count = banksList.size();
     }
 
     @Override

@@ -26,12 +26,14 @@ public class PayoutRequest {
     private String processing_fee_amount_at_request;
     private String in_hand_balance_at_request;
     private String to_withdraw_balance_at_request;
+    private String txn_date;
+    private String txn_time;
     private String status;
 
     public PayoutRequest() {
     }
 
-    public PayoutRequest(Date timestamp, String id, String user_id, String user_name, String user_handle, String user_email, String user_photo, String request_type, String coin_balance_at_request, String inr_balance_at_request, String conversion_rate_at_request, String redeemable_percent_at_request, String redeemable_balance_at_request, String processing_fee_percent_at_request, String processing_fee_amount_at_request, String in_hand_balance_at_request, String to_withdraw_balance_at_request, String status) {
+    public PayoutRequest(Date timestamp, String id, String user_id, String user_name, String user_handle, String user_email, String user_photo, String request_type, String coin_balance_at_request, String inr_balance_at_request, String conversion_rate_at_request, String redeemable_percent_at_request, String redeemable_balance_at_request, String processing_fee_percent_at_request, String processing_fee_amount_at_request, String in_hand_balance_at_request, String to_withdraw_balance_at_request, String txn_date, String txn_time, String status) {
         this.timestamp = timestamp;
         this.id = id;
         this.user_id = user_id;
@@ -49,6 +51,8 @@ public class PayoutRequest {
         this.processing_fee_amount_at_request = processing_fee_amount_at_request;
         this.in_hand_balance_at_request = in_hand_balance_at_request;
         this.to_withdraw_balance_at_request = to_withdraw_balance_at_request;
+        this.txn_date = txn_date;
+        this.txn_time = txn_time;
         this.status = status;
     }
 
@@ -186,6 +190,22 @@ public class PayoutRequest {
 
     public void setTo_withdraw_balance_at_request(String to_withdraw_balance_at_request) {
         this.to_withdraw_balance_at_request = to_withdraw_balance_at_request;
+    }
+
+    public String getTxn_date() {
+        return txn_date;
+    }
+
+    public void setTxn_date(String txn_date) {
+        this.txn_date = txn_date;
+    }
+
+    public String getTxn_time() {
+        return txn_time;
+    }
+
+    public void setTxn_time(String txn_time) {
+        this.txn_time = txn_time;
     }
 
     public String getStatus() {

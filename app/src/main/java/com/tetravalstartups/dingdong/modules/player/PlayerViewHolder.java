@@ -60,6 +60,7 @@ import com.tetravalstartups.dingdong.MainActivity;
 import com.tetravalstartups.dingdong.R;
 import com.tetravalstartups.dingdong.auth.LoginActivity;
 import com.tetravalstartups.dingdong.auth.Master;
+import com.tetravalstartups.dingdong.auth.PhoneActivity;
 import com.tetravalstartups.dingdong.modules.comment.InVideoCommentBottomSheet;
 import com.tetravalstartups.dingdong.modules.create.SoundDetailActivity;
 import com.tetravalstartups.dingdong.modules.home.video.Video;
@@ -167,7 +168,7 @@ public class PlayerViewHolder extends RecyclerView.ViewHolder implements View.On
                     doLikeVideo();
                 } else {
                     likeButton.setLiked(false);
-                    context.startActivity(new Intent(context, LoginActivity.class));
+                    context.startActivity(new Intent(context, PhoneActivity.class));
                 }
             }
 
@@ -177,7 +178,7 @@ public class PlayerViewHolder extends RecyclerView.ViewHolder implements View.On
                     doUnLikeVideo();
                 } else {
                     likeButton.setLiked(true);
-                    context.startActivity(new Intent(context, LoginActivity.class));
+                    context.startActivity(new Intent(context, PhoneActivity.class));
                 }
             }
         });
@@ -389,7 +390,7 @@ public class PlayerViewHolder extends RecyclerView.ViewHolder implements View.On
         editor.putString("video_id", videoModel.getId());
         editor.apply();
         inVideoCommentBottomSheet.setStyle(DialogFragment.STYLE_NORMAL, R.style.DialogStyle);
-        inVideoCommentBottomSheet.show(((MainActivity)context).getSupportFragmentManager(), "comments");
+        inVideoCommentBottomSheet.show(((MainActivity)context.getApplicationContext()).getSupportFragmentManager(), "comments");
     }
 
     private void fetchLatestComments() {
@@ -432,6 +433,27 @@ public class PlayerViewHolder extends RecyclerView.ViewHolder implements View.On
                 .collection("liked_by")
                 .document(firebaseAuth.getCurrentUser().getUid())
                 .set(hmVideo);
+
+        db.collection("users")
+                .document(videoModel.getUser_id())
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        String likes = task.getResult().getString("likes");
+                        int like = Integer.parseInt(likes);
+                        int update_likes = like + 1;
+
+                        HashMap hmUser = new HashMap();
+                        hmUser.put("likes", update_likes+"");
+
+                        db.collection("users")
+                                .document(videoModel.getUser_id())
+                                .update(hmUser);
+
+                    }
+                });
+
     }
 
     private void doUnLikeVideo() {
@@ -447,6 +469,26 @@ public class PlayerViewHolder extends RecyclerView.ViewHolder implements View.On
                 .collection("liked_videos")
                 .document(videoModel.getId())
                 .delete();
+
+        db.collection("users")
+                .document(videoModel.getUser_id())
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        String likes = task.getResult().getString("likes");
+                        int like = Integer.parseInt(likes);
+                        int update_likes = like - 1;
+
+                        HashMap hmUser = new HashMap();
+                        hmUser.put("likes", update_likes+"");
+
+                        db.collection("users")
+                                .document(videoModel.getUser_id())
+                                .update(hmUser);
+
+                    }
+                });
     }
 
     private void doShareVideos() {
@@ -556,7 +598,7 @@ public class PlayerViewHolder extends RecyclerView.ViewHolder implements View.On
 
 
             } else {
-                context.startActivity(new Intent(context, LoginActivity.class));
+                context.startActivity(new Intent(context, PhoneActivity.class));
             }
         }
 
@@ -564,7 +606,7 @@ public class PlayerViewHolder extends RecyclerView.ViewHolder implements View.On
             if (firebaseAuth.getCurrentUser() != null) {
                 doShowComments();
             } else {
-                context.startActivity(new Intent(context, LoginActivity.class));
+                context.startActivity(new Intent(context, PhoneActivity.class));
             }
         }
 
