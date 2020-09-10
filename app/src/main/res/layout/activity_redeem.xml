@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:id="@+id/lvMain"
-    tools:context=".modules.passbook.RedeemActivity">
+    tools:context=".modules.passbook.redeem.view.RedeemActivity">
 
     <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/aniView"
@@ -73,7 +73,6 @@
 
         <LinearLayout
             android:id="@+id/lvOrganicEarning"
-
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
@@ -141,7 +140,7 @@
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerRequest"
-        android:visibility="gone"
+        android:visibility="visible"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 

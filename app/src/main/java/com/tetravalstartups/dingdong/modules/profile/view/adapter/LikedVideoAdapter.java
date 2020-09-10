@@ -13,21 +13,20 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.cloudinary.android.MediaManager;
 import com.tetravalstartups.dingdong.R;
+import com.tetravalstartups.dingdong.auth.Master;
 import com.tetravalstartups.dingdong.modules.player.PlayerActivity;
-import com.tetravalstartups.dingdong.modules.profile.model.InProfileCreatedVideo;
-import com.tetravalstartups.dingdong.modules.profile.model.LikedVideos;
-import com.tetravalstartups.dingdong.modules.profile.view.activity.PlayVideoActivity;
+import com.tetravalstartups.dingdong.modules.profile.videos.VideoResponseDatum;
 
 import java.util.List;
 
 public class LikedVideoAdapter extends RecyclerView.Adapter<LikedVideoAdapter.ViewHolder> {
 
     Context context;
-    List<LikedVideos> likedVideosList;
+    List<VideoResponseDatum> likedVideosList;
+    private Master master;
 
-    public LikedVideoAdapter(Context context, List<LikedVideos> likedVideosList) {
+    public LikedVideoAdapter(Context context, List<VideoResponseDatum> likedVideosList) {
         this.context = context;
         this.likedVideosList = likedVideosList;
     }
@@ -36,22 +35,23 @@ public class LikedVideoAdapter extends RecyclerView.Adapter<LikedVideoAdapter.Vi
     @Override
     public LikedVideoAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.liked_video_list_item, parent, false);
+        master = new Master(context);
         return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull LikedVideoAdapter.ViewHolder holder, int position) {
-        LikedVideos video = likedVideosList.get(position);
-        holder.tvViews.setText(video.getViews());
-        String url = MediaManager.get().url().resourceType("video").generate("user_uploaded_videos/"+video.getId()+".webp");
-        Glide.with(context).load(url).into(holder.ivThumbnail);
+        VideoResponseDatum video = likedVideosList.get(position);
+        holder.tvViews.setText(video.getLikesCount()+"");
+        Glide.with(context).load(video.getVideoUrl()).placeholder(R.drawable.dd_logo_placeholder).timeout(60000).into(holder.ivThumbnail);
+
         holder.frameVideo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(context, PlayerActivity.class);
                 intent.putExtra("video_type", "liked");
                 intent.putExtra("pos", position+"");
-                intent.putExtra("user_id", video.getUser_id());
+                intent.putExtra("user_id", master.getId());
                 context.startActivity(intent);
             }
         });

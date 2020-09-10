@@ -1,22 +1,19 @@
 package com.tetravalstartups.dingdong.modules.profile.view.activity;
 
+import android.os.Bundle;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.os.Bundle;
-import android.view.View;
-import android.widget.ImageView;
-import android.widget.ProgressBar;
-import android.widget.TextView;
-
 import com.tetravalstartups.dingdong.R;
-import com.tetravalstartups.dingdong.auth.Master;
-import com.tetravalstartups.dingdong.modules.profile.model.Followings;
-import com.tetravalstartups.dingdong.modules.profile.presenter.FollowerPresenter;
+import com.tetravalstartups.dingdong.modules.profile.model.following.FollowingResponse;
 import com.tetravalstartups.dingdong.modules.profile.presenter.FollowingPresenter;
-import com.tetravalstartups.dingdong.modules.profile.view.adapter.FollowerAdapter;
 import com.tetravalstartups.dingdong.modules.profile.view.adapter.FollowingAdapter;
+import com.tetravalstartups.dingdong.utils.DDLoading;
 import com.tetravalstartups.dingdong.utils.EqualSpacingItemDecoration;
 
 import java.util.List;
@@ -24,11 +21,9 @@ import java.util.List;
 public class FollowingActivity extends AppCompatActivity implements View.OnClickListener, FollowingPresenter.IFollowing {
 
     private RecyclerView recyclerFollowing;
-    private ImageView ivGoBack, ivSettings;
+    private ImageView ivGoBack;
     private TextView tvNoFollowers;
-    private ProgressBar progressBar;
-    private Master master;
-    private String profile_type;
+    private DDLoading ddLoading;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,25 +35,21 @@ public class FollowingActivity extends AppCompatActivity implements View.OnClick
     private void initView() {
         ivGoBack = findViewById(R.id.ivGoBack);
         ivGoBack.setOnClickListener(this);
-        ivSettings = findViewById(R.id.ivSettings);
-        progressBar = findViewById(R.id.progressBar);
+
         recyclerFollowing = findViewById(R.id.recyclerFollowing);
         recyclerFollowing.setLayoutManager(new LinearLayoutManager(FollowingActivity.this));
         recyclerFollowing.addItemDecoration(new EqualSpacingItemDecoration(0, EqualSpacingItemDecoration.VERTICAL));
+
         tvNoFollowers = findViewById(R.id.tvNoFollowers);
-        master = new Master(FollowingActivity.this);
+
+        ddLoading = DDLoading.getInstance();
         fetchFollowing();
     }
 
-    private void fetchFollowing() {
+    public void fetchFollowing() {
+        ddLoading.showProgress(FollowingActivity.this, "Hold On...", false);
         FollowingPresenter followingPresenter = new FollowingPresenter(FollowingActivity.this, FollowingActivity.this);
-        if (getIntent().hasExtra("user_id")) {
-            profile_type = "public";
-            followingPresenter.fetchFollowing(getIntent().getStringExtra("user_id"));
-        } else {
-            profile_type = "private";
-            followingPresenter.fetchFollowing(master.getId());
-        }
+        followingPresenter.fetchFollowing(getIntent().getStringExtra("user_id"));
     }
 
     @Override
@@ -71,22 +62,20 @@ public class FollowingActivity extends AppCompatActivity implements View.OnClick
     }
 
     @Override
-    public void followingFetchSuccess(List<Followings> followingsList) {
-        FollowingAdapter followingAdapter = new
-                FollowingAdapter(FollowingActivity.this,
-                followingsList, profile_type);
+    public void followingFetchSuccess(List<FollowingResponse> followingsList) {
+        FollowingAdapter followingAdapter = new FollowingAdapter(FollowingActivity.this, followingsList);
         followingAdapter.notifyDataSetChanged();
         recyclerFollowing.setAdapter(followingAdapter);
         recyclerFollowing.setVisibility(View.VISIBLE);
-        progressBar.setVisibility(View.INVISIBLE);
         tvNoFollowers.setVisibility(View.GONE);
+        ddLoading.hideProgress();
     }
 
     @Override
     public void followingFetchError(String error) {
         recyclerFollowing.setVisibility(View.GONE);
-        progressBar.setVisibility(View.INVISIBLE);
         tvNoFollowers.setVisibility(View.VISIBLE);
+        ddLoading.hideProgress();
     }
 
     @Override

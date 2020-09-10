@@ -6,6 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:id="@+id/lvProfile"
     tools:context=".auth.SetupProfileActivity">
 
     <LinearLayout
@@ -51,32 +52,6 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <FrameLayout
-                android:layout_width="100dp"
-                android:layout_height="100dp"
-                android:layout_marginTop="16dp"
-                android:layout_gravity="center">
-
-                <de.hdodenhof.circleimageview.CircleImageView
-                    android:id="@+id/ivPhoto"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    app:civ_border_width="2dp"
-                    android:src="@drawable/dd_logo_placeholder"
-                    app:civ_border_color="@color/colorAccentV1"/>
-
-                <ImageView
-                    android:id="@+id/imageView5"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="end|bottom"
-                    android:layout_margin="5dp"
-                    android:background="@drawable/bg_circular_gradient"
-                    app:srcCompat="@drawable/ic_dd_add_white" />
-
-
-            </FrameLayout>
-
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -87,7 +62,37 @@
                 android:paddingStart="16dp"
                 android:fontFamily="@font/montserrat_bold"
                 android:textColor="@color/colorTextTitle"
-                android:text="Full Name" />
+                android:text="Phone Number" />
+
+            <EditText
+                android:id="@+id/etPhone"
+                android:layout_width="match_parent"
+                android:layout_height="45dp"
+                android:background="@drawable/bg_button_disabled"
+                android:fontFamily="@font/montserrat_bold"
+                android:hint="Phone Number"
+                android:enabled="false"
+                android:textSize="16sp"
+                android:autofillHints="password"
+                android:inputType="textPersonName|none"
+                android:gravity="center_vertical"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"/>
+
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="4dp"
+                android:fontFamily="@font/montserrat_bold"
+                android:paddingStart="16dp"
+                android:text="Full Name"
+                android:textColor="@color/colorTextTitle" />
 
             <EditText
                 android:id="@+id/etName"
@@ -116,7 +121,7 @@
                 android:paddingStart="16dp"
                 android:fontFamily="@font/montserrat_bold"
                 android:textColor="@color/colorTextTitle"
-                android:text="Email Id" />
+                android:text="Email" />
 
             <EditText
                 android:id="@+id/etEmail"
@@ -124,7 +129,7 @@
                 android:layout_height="45dp"
                 android:background="@drawable/bg_edittext"
                 android:fontFamily="@font/montserrat_bold"
-                android:hint="Email Id"
+                android:hint="Email"
                 android:textSize="16sp"
                 android:autofillHints="password"
                 android:inputType="textPersonName|none"
@@ -132,35 +137,6 @@
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp"
 
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="16dp"/>
-
-            <TextView
-                android:id="@+id/textView4"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="16dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="4dp"
-                android:paddingStart="16dp"
-                android:fontFamily="@font/montserrat_bold"
-                android:textColor="@color/colorTextTitle"
-                android:text="Handle" />
-
-            <EditText
-                android:id="@+id/etHandle"
-                android:layout_width="match_parent"
-                android:layout_height="45dp"
-                android:background="@drawable/bg_edittext"
-                android:fontFamily="@font/montserrat_bold"
-                android:hint="Handle"
-                android:textSize="16sp"
-                android:autofillHints="password"
-                android:inputType="text|none"
-                android:gravity="center_vertical"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
                 android:layout_marginStart="16dp"
                 android:layout_marginEnd="16dp"/>
 

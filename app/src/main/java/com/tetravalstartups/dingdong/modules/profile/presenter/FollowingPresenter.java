@@ -1,24 +1,27 @@
 package com.tetravalstartups.dingdong.modules.profile.presenter;
 
 import android.content.Context;
-import android.widget.Toast;
+import android.util.Log;
 
-import androidx.annotation.Nullable;
-
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.QuerySnapshot;
-import com.tetravalstartups.dingdong.modules.profile.model.Followings;
+import com.tetravalstartups.dingdong.api.APIClient;
+import com.tetravalstartups.dingdong.api.RequestInterface;
+import com.tetravalstartups.dingdong.modules.profile.model.following.Following;
+import com.tetravalstartups.dingdong.modules.profile.model.following.FollowingResponse;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class FollowingPresenter {
     Context context;
     IFollowing iFollowing;
     private FirebaseFirestore db;
+    private RequestInterface requestInterface;
+    private static final String TAG = "FollowingPresenter";
 
     public FollowingPresenter(Context context, IFollowing iFollowing) {
         this.context = context;
@@ -26,35 +29,33 @@ public class FollowingPresenter {
     }
 
     public interface IFollowing {
-        void followingFetchSuccess(List<Followings> followingsList);
+        void followingFetchSuccess(List<FollowingResponse> followingsList);
 
         void followingFetchError(String error);
     }
 
     public void fetchFollowing(String user_id) {
-        db = FirebaseFirestore.getInstance();
-        List<Followings> followingsList = new ArrayList<>();
+        requestInterface = APIClient.getRetrofitInstance().create(RequestInterface.class);
+        Call<Following> call = requestInterface.getUserFollowing(user_id);
+        call.enqueue(new Callback<Following>() {
+            @Override
+            public void onResponse(Call<Following> call, Response<Following> response) {
+                if (response.code() == 200) {
+                    Following following = response.body();
+                    List<FollowingResponse> followingList = new ArrayList<>(following.getData());
+                    iFollowing.followingFetchSuccess(followingList);
+                } else {
+                    iFollowing.followingFetchError("No Followings");
+                }
 
-        db.collection("users")
-                .document(user_id)
-                .collection("following")
-                .addSnapshotListener(new EventListener<QuerySnapshot>() {
-                    @Override
-                    public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
-                        if (queryDocumentSnapshots.getDocuments().isEmpty()) {
-                            iFollowing.followingFetchError("No Followers");
-                        } else {
-                            followingsList.clear();
-                            for (DocumentSnapshot snapshot : queryDocumentSnapshots.getDocuments()) {
-                                Followings followings = snapshot.toObject(Followings.class);
-                                followingsList.add(followings);
-                            }
+            }
 
-                            iFollowing.followingFetchSuccess(followingsList);
-
-                        }
-                    }
-                });
+            @Override
+            public void onFailure(Call<Following> call, Throwable t) {
+                Log.e(TAG, t.getMessage());
+                iFollowing.followingFetchError(t.getMessage());
+            }
+        });
     }
 
 }

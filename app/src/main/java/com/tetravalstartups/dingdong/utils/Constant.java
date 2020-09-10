@@ -32,9 +32,9 @@ public class Constant {
     public static final int TXN_DEBIT = -1;
     public static final int TXN_CREDIT = 1;
 
-    public static final int TXN_STATUS_PENDING = 0;
-    public static final int TXN_STATUS_PROCESSING = 1;
-    public static final int TXN_STATUS_DONE = 2;
+    public static final String TXN_STATUS_PENDING = "-1";
+    public static final String TXN_STATUS_PROCESSING = "0";
+    public static final String TXN_STATUS_DONE = "1";
 
     public static final String TXN_REMARK_COIN_PURCHASE = "Coin Purchase";
 
@@ -42,16 +42,16 @@ public class Constant {
     public static final int BANK_VERIFIED = 1;
 
     //initial video
-    public static final String INITIAL_VIDEO_LIKES = "0";
-    public static final String INITIAL_VIDEO_SHARES = "0";
-    public static final String INITIAL_VIDEO_COMMENTS = "0";
-    public static final String INITIAL_VIDEO_STATUS = "0";
-    public static final String INITIAL_VIDEO_VIEWS = "0";
+    public static final int INITIAL_VIDEO_LIKES = 0;
+    public static final int INITIAL_VIDEO_SHARES = 0;
+    public static final int INITIAL_VIDEO_COMMENTS = 0;
+    public static final int INITIAL_VIDEO_STATUS = 0;
+    public static final int INITIAL_VIDEO_VIEWS = 0;
 
     // video status
-    public static final String VIDEO_STATUS_PUBLIC = "1";
-    public static final String VIDEO_STATUS_PRIVATE = "0";
-    public static final String VIDEO_STATUS_MODERATE = "-1";
+    public static final int VIDEO_STATUS_PUBLIC = 1;
+    public static final int VIDEO_STATUS_PRIVATE = 0;
+    public static final int VIDEO_STATUS_MODERATE = -1;
 
     //payout type
     public static final String PAYOUT_REQUEST_TYPE_ORGANIC = "1";
@@ -66,5 +66,19 @@ public class Constant {
     public static final String PAYOUT_STATUS_CANCELLED = "-2";
     public static final String PAYOUT_STATUS_REJECTED = "-3";
     public static final String PAYOUT_STATUS_FAILED = "-4";
+
+    //publish status
+    public static final int UPLOAD_WITHOUT_PLAN = 0;
+    public static final int UPLOAD_SKIP_PLAN = 0;
+    public static final int UPLOAD_WITH_PLAN = 1;
+
+    // auth status
+    public static final String AUTH_SENDING_CODE = "Sending code...";
+    public static final String AUTH_RESENDING_CODE = "Resending code...";
+    public static final String AUTH_AUTO_VERIFY = "Waiting for auto verification...";
+
+    public static final String SUBS_PURCHASE_REMARK = "Subscription Purchase [IA]";
+
+
 
 }

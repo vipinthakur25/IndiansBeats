@@ -3,36 +3,45 @@ package com.tetravalstartups.dingdong.auth;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
-import android.text.Editable;
 import android.text.TextUtils;
-import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QuerySnapshot;
-import com.nabinbhandari.android.permissions.PermissionHandler;
-import com.nabinbhandari.android.permissions.Permissions;
+import com.tetravalstartups.dingdong.api.APIClient;
 import com.tetravalstartups.dingdong.MainActivity;
 import com.tetravalstartups.dingdong.R;
+import com.tetravalstartups.dingdong.api.AuthInterface;
+import com.tetravalstartups.dingdong.api.RequestInterface;
+import com.tetravalstartups.dingdong.modules.passbook.model.GeneratePassbook;
+import com.tetravalstartups.dingdong.modules.profile.external.PublicProfileResponse;
 import com.tetravalstartups.dingdong.utils.Constant;
+import com.tetravalstartups.dingdong.utils.DDLoading;
 import com.tetravalstartups.dingdong.utils.ProfilePhotoBottomSheet;
 
 import java.util.HashMap;
 
-public class SetupProfileActivity extends AppCompatActivity implements ProfilePhotoBottomSheet.BottomSheetListener, View.OnClickListener {
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
-    private ImageView ivPhoto;
+public class SetupProfileActivity extends AppCompatActivity implements View.OnClickListener {
+
+    private EditText etPhone;
     private EditText etName;
     private EditText etEmail;
     private EditText etHandle;
@@ -40,14 +49,17 @@ public class SetupProfileActivity extends AppCompatActivity implements ProfilePh
     private TextView tvUpdate;
     private ImageView ivGoBack;
 
-    private String selected_photo;
+    private LinearLayout lvProfile;
 
-    private Master master;
-
-    private FirebaseFirestore db;
     private FirebaseAuth firebaseAuth;
+    private FirebaseFirestore db;
 
     private ProfilePhotoBottomSheet bottomSheet;
+    private RequestInterface requestInterface;
+    private AuthInterface authInterface;
+    private DDLoading ddLoading;
+
+    private static final String TAG = "SetupProfileActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,65 +69,30 @@ public class SetupProfileActivity extends AppCompatActivity implements ProfilePh
     }
 
     private void initView() {
-        ivPhoto = findViewById(R.id.ivPhoto);
+        etPhone = findViewById(R.id.etPhone);
         etName = findViewById(R.id.etName);
         etEmail = findViewById(R.id.etEmail);
         etHandle = findViewById(R.id.etHandle);
         etBio = findViewById(R.id.etBio);
         ivGoBack = findViewById(R.id.ivGoBack);
+        lvProfile = findViewById(R.id.lvProfile);
         ivGoBack.setOnClickListener(this);
 
         tvUpdate = findViewById(R.id.tvUpdate);
-
-        ivPhoto.setOnClickListener(this);
         tvUpdate.setOnClickListener(this);
 
         bottomSheet = new ProfilePhotoBottomSheet();
-
-        db = FirebaseFirestore.getInstance();
         firebaseAuth = FirebaseAuth.getInstance();
+        db = FirebaseFirestore.getInstance();
 
-        etHandle.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+        ddLoading = DDLoading.getInstance();
 
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                String handle = etHandle.getText().toString();
-                Query query = db.collection("users");
-                query.whereEqualTo("handle", handle)
-                        .get()
-                        .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                            @Override
-                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                if (task.getResult().getDocuments().isEmpty()) {
-                                    etHandle.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, R.drawable.ic_dd_user_handle_available, 0);
-                                    tvUpdate.setVisibility(View.VISIBLE);
-                                } else
-                                if (handle.isEmpty()) {
-                                    tvUpdate.setVisibility(View.GONE);
-                                    etHandle.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, 0, 0);
-                                } else  {
-                                    etHandle.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, R.drawable.ic_dd_user_handle_unavailable, 0);
-                                    tvUpdate.setVisibility(View.GONE);
-                                }
-                            }
-                        });
-            }
-        });
-    }
-
-    @Override
-    public void onButtonClicked(String text) {
+        etPhone.setText(firebaseAuth.getCurrentUser().getPhoneNumber());
+        requestInterface = APIClient.getRetrofitInstance().create(RequestInterface.class);
+        authInterface = APIClient.getRetrofitInstance().create(AuthInterface.class);
 
     }
+
 
     @Override
     public void onBackPressed() {
@@ -130,23 +107,9 @@ public class SetupProfileActivity extends AppCompatActivity implements ProfilePh
             onBackPressed();
         }
 
-        if (view == ivPhoto) {
-            String[] permissions = {Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                    Manifest.permission.READ_EXTERNAL_STORAGE};
-            Permissions.check(this/*context*/, permissions,
-                    null/*rationale*/, null/*options*/,
-                    new PermissionHandler() {
-                        @Override
-                        public void onGranted() {
-                            bottomSheet.show(getSupportFragmentManager(), "profilePhotoBottomSheet");
-                        }
-                    });
-        }
-
         if (view == tvUpdate) {
             String name = etName.getText().toString();
             String email = etEmail.getText().toString();
-            String handle = etHandle.getText().toString();
             String bio = etBio.getText().toString();
 
             if (TextUtils.isEmpty(name)) {
@@ -159,49 +122,50 @@ public class SetupProfileActivity extends AppCompatActivity implements ProfilePh
                 return;
             }
 
-            if (TextUtils.isEmpty(handle)) {
-                Toast.makeText(this, "Handle required", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
             if (TextUtils.isEmpty(bio)) {
                 Toast.makeText(this, "Bio required", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            setProfileData(name, email, handle, bio);
+            String[] handle = email.split("@");
 
+            if (!isConnected()) {
+                Snackbar.make(lvProfile, "Please make sure that you are connect to internet.", Snackbar.LENGTH_LONG).show();
+            } else {
+                ddLoading.showProgress(SetupProfileActivity.this, "Hold On...", false);
+                setProfileData(name, email, handle[0], bio);
+            }
         }
     }
 
     private void setProfileData(String name, String email, String handle, String bio) {
-        Profile profile = new Profile();
+        PublicProfileResponse profile = new PublicProfileResponse();
         profile.setId(firebaseAuth.getCurrentUser().getUid());
         profile.setName(name);
         profile.setEmail(email);
         profile.setPhoto(Constant.DD_IV_PLACEHOLDER);
         profile.setBio(bio);
         profile.setHandle(handle);
-        profile.setLikes(Constant.INITIAL_LIKES);
-        profile.setFollowers(Constant.INITIAL_FOLLOWER);
-        profile.setFollowing(Constant.INITIAL_FOLLOWING);
+        profile.setLikes(0);
+        profile.setFollowers(0);
+        profile.setFollowing(0);
 
         HashMap hashMap = new HashMap();
-        hashMap.put("reserved", "0");
-        hashMap.put("unreserved", "0");
-        hashMap.put("cashback", "0");
-        hashMap.put("video", "0");
+        hashMap.put("daily_rewards", "0");
+        hashMap.put("time_spent", "0");
+        hashMap.put("video_uploads", "0");
+        hashMap.put("fans_donation", "0");
         hashMap.put("subscription", "0");
 
 
-        db.collection("users")
+        db.collection("customers")
                 .document(firebaseAuth.getCurrentUser().getUid())
                 .set(profile)
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()){
-                            db.collection("users")
+                            db.collection("customers")
                                     .document(firebaseAuth.getCurrentUser().getUid())
                                     .collection("passbook")
                                     .document("balance")
@@ -209,19 +173,76 @@ public class SetupProfileActivity extends AppCompatActivity implements ProfilePh
                                     .addOnCompleteListener(new OnCompleteListener<Void>() {
                                         @Override
                                         public void onComplete(@NonNull Task<Void> task) {
-                                            Intent intent = new Intent(SetupProfileActivity.this, MainActivity.class);
-                                            startActivity(intent);
-                                            finish();
-                                            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                                            String id = firebaseAuth.getCurrentUser().getUid();
+                                            String authPhone = firebaseAuth.getCurrentUser().getPhoneNumber();
+                                            authPhone = authPhone.replace("+91", "");
+                                            signUpUser(id, handle, name, email, authPhone);
                                         }
                                     });
                         }
                     }
                 });
+
     }
 
-    public void closeSheet(){
-        bottomSheet.dismiss();
+    private void signUpUser(String id, String handle, String name, String email, String authPhone) {
+        Call<SignUp> call = requestInterface.signUpUser(id, handle, name, email, authPhone);
+        call.enqueue(new Callback<SignUp>() {
+            @Override
+            public void onResponse(Call<SignUp> call, Response<SignUp> response) {
+                if (response.code() == 200) {
+                    Log.e(TAG, "onResponse: "+response.message());
+                    generatePassbook(id);
+                } else {
+                    ddLoading.hideProgress();
+                    Log.e(TAG, "onResponse: "+response.message());
+                    Snackbar.make(lvProfile, "Something went wrong...", Snackbar.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<SignUp> call, Throwable t) {
+                Log.e(TAG, "onFailure: "+t.getMessage() );
+            }
+        });
+    }
+
+        private void generatePassbook(String user_id) {
+        Call<GeneratePassbook> call = authInterface.generatePassbook(user_id, user_id);
+        call.enqueue(new Callback<GeneratePassbook>() {
+            @Override
+            public void onResponse(Call<GeneratePassbook> call, Response<GeneratePassbook> response) {
+                ddLoading.hideProgress();
+                if (response.code() == 200) {
+                    goToHome();
+                    Log.e(TAG, "onResponse: for user: "+user_id+" "+response.message());
+                } else if (response.code() == 400){
+                    Log.e(TAG, "onResponse: for user: "+user_id+" "+response.message());
+                } else {
+                    Log.e(TAG, "onResponse: Something went wrong...");
+                }
+
+            }
+
+            @Override
+            public void onFailure(Call<GeneratePassbook> call, Throwable t) {
+                Log.e(TAG, "onFailure: "+t.getMessage());
+            }
+        });
+    }
+
+
+    private void goToHome() {
+        Intent intent = new Intent(SetupProfileActivity.this, MainActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK| Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+    }
+
+    public boolean isConnected() {
+        ConnectivityManager cm =
+                (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo netInfo = cm.getActiveNetworkInfo();
+        return netInfo != null && netInfo.isConnectedOrConnecting();
     }
 
 }

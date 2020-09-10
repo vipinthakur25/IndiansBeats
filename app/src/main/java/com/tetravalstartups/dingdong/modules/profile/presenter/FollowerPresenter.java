@@ -2,23 +2,22 @@ package com.tetravalstartups.dingdong.modules.profile.presenter;
 
 import android.content.Context;
 
-import androidx.annotation.Nullable;
-
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.QuerySnapshot;
-import com.tetravalstartups.dingdong.modules.profile.model.Followers;
+import com.tetravalstartups.dingdong.api.APIClient;
+import com.tetravalstartups.dingdong.api.RequestInterface;
+import com.tetravalstartups.dingdong.modules.profile.model.followers.Followers;
+import com.tetravalstartups.dingdong.modules.profile.model.followers.FollowersResponse;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 public class FollowerPresenter {
     Context context;
     IFollower iFollower;
-
-    FirebaseFirestore db;
+    private RequestInterface requestInterface;
 
     public FollowerPresenter(Context context, IFollower iFollower) {
         this.context = context;
@@ -26,33 +25,31 @@ public class FollowerPresenter {
     }
 
     public interface IFollower {
-        void followerFetchSuccess(List<Followers> followersList);
+        void followerFetchSuccess(List<FollowersResponse> followersList);
 
         void followerFetchError(String error);
     }
 
     public void fetchFollowers(String user_id){
-        db = FirebaseFirestore.getInstance();
-        final List<Followers> followersList = new ArrayList<>();
-        db.collection("users")
-                .document(user_id)
-                .collection("followers")
-                .addSnapshotListener(new EventListener<QuerySnapshot>() {
-                    @Override
-                    public void onEvent(@Nullable QuerySnapshot documentSnapshots, @Nullable FirebaseFirestoreException e) {
-                        if (documentSnapshots.getDocuments().isEmpty()){
-                            iFollower.followerFetchError("No Followers...");
-                        } else {
-                            followersList.clear();
-                            for (DocumentSnapshot snapshot : documentSnapshots.getDocuments()){
-                                Followers followers = snapshot.toObject(Followers.class);
-                                followersList.add(followers);
-                            }
-                            iFollower.followerFetchSuccess(followersList);
-                        }
-                    }
-                });
+        requestInterface = APIClient.getRetrofitInstance().create(RequestInterface.class);
+        Call<Followers> call = requestInterface.getUserFollowers(user_id);
+        call.enqueue(new Callback<Followers>() {
+            @Override
+            public void onResponse(Call<Followers> call, Response<Followers> response) {
+                if (response.code() == 200) {
+                    Followers followers = response.body();
+                    List<FollowersResponse> followersResponseList = new ArrayList<>(followers.getData());
+                    iFollower.followerFetchSuccess(followersResponseList);
+                } else {
+                    iFollower.followerFetchError("No Followers...");
+                }
+            }
 
+            @Override
+            public void onFailure(Call<Followers> call, Throwable t) {
+                iFollower.followerFetchError(t.getMessage());
+            }
+        });
     }
 
 }

@@ -4,8 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/colorBlack"
     tools:context=".modules.player.PlayerFragment">
-
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipeRefreshLayout"
@@ -47,7 +47,7 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/montserrat_bold"
                 android:text="Following"
-                android:textColor="@color/colorTextTitle"
+                android:textColor="@color/colorDisable"
                 android:textSize="16sp" />
 
             <View
@@ -55,7 +55,7 @@
                 android:layout_height="8dp"
                 android:layout_marginStart="8dp"
                 android:layout_marginEnd="8dp"
-                android:background="@color/colorTextTitle" />
+                android:background="@color/colorDisableText" />
 
             <TextView
                 android:id="@+id/tvTrending"
@@ -63,20 +63,11 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/montserrat_bold"
                 android:text="Trending"
-                android:textColor="@color/colorBrandYellow"
+                android:textColor="@color/colorGradientStart"
                 android:textSize="16sp" />
 
         </LinearLayout>
 
     </LinearLayout>
-
-    <ImageView
-        android:id="@+id/ivWhatsapp"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_gravity="end"
-        android:layout_marginTop="36dp"
-        android:layout_marginEnd="16dp"
-        android:src="@drawable/ic_whatsapp"/>
 
 </FrameLayout>

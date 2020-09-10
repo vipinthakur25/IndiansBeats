@@ -2,15 +2,15 @@ package com.tetravalstartups.dingdong.modules.player;
 
 import android.Manifest;
 import android.animation.Animator;
-import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.MediaPlayer;
 import android.net.Uri;
-import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -29,46 +29,52 @@ import androidx.fragment.app.DialogFragment;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.airbnb.lottie.LottieAnimationView;
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.bumptech.glide.Glide;
-import com.cloudinary.Transformation;
-import com.cloudinary.android.MediaManager;
-import com.cloudinary.transformation.Layer;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.ui.PlayerView;
 import com.google.android.exoplayer2.upstream.cache.CacheDataSourceFactory;
 import com.google.android.exoplayer2.upstream.cache.SimpleCache;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.EventListener;
-import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.krishna.fileloader.FileLoader;
-import com.krishna.fileloader.listener.FileRequestListener;
-import com.krishna.fileloader.pojo.FileResponse;
-import com.krishna.fileloader.request.FileLoadRequest;
+import com.google.firebase.storage.FileDownloadTask;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 import com.like.LikeButton;
 import com.like.OnLikeListener;
 import com.nabinbhandari.android.permissions.PermissionHandler;
 import com.nabinbhandari.android.permissions.Permissions;
-import com.tetravalstartups.dingdong.MainActivity;
+import com.tetravalstartups.dingdong.api.APIClient;
+import com.tetravalstartups.dingdong.BaseActivity;
 import com.tetravalstartups.dingdong.R;
-import com.tetravalstartups.dingdong.auth.LoginActivity;
+import com.tetravalstartups.dingdong.api.RequestInterface;
 import com.tetravalstartups.dingdong.auth.Master;
 import com.tetravalstartups.dingdong.auth.PhoneActivity;
 import com.tetravalstartups.dingdong.modules.comment.InVideoCommentBottomSheet;
-import com.tetravalstartups.dingdong.modules.create.SoundDetailActivity;
-import com.tetravalstartups.dingdong.modules.home.video.Video;
+import com.tetravalstartups.dingdong.modules.profile.model.Follow;
+import com.tetravalstartups.dingdong.modules.profile.videos.VideoResponseDatum;
 import com.tetravalstartups.dingdong.modules.profile.view.activity.PublicProfileActivity;
 import com.tetravalstartups.dingdong.utils.DDLoading;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.Map;
+
+import retrofit2.Call;
+import retrofit2.Callback;
 
 public class PlayerViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, Player.EventListener {
 
@@ -92,7 +98,7 @@ public class PlayerViewHolder extends RecyclerView.ViewHolder implements View.On
     private FirebaseFirestore db;
     private FirebaseAuth firebaseAuth;
     private Master master;
-    private Video videoModel;
+    private VideoResponseDatum videoModel;
     private InVideoCommentBottomSheet inVideoCommentBottomSheet;
 
     private SimpleCache simpleCache;
@@ -102,6 +108,10 @@ public class PlayerViewHolder extends RecyclerView.ViewHolder implements View.On
     private SimpleExoPlayer player;
 
     private LottieAnimationView aniLike;
+    private DDLoading ddLoading;
+
+    private RequestInterface requestInterface;
+    private static final String TAG = "PlayerViewHolder";
 
     PlayerViewHolder(@NonNull View itemView) {
         super(itemView);
@@ -123,7 +133,6 @@ public class PlayerViewHolder extends RecyclerView.ViewHolder implements View.On
         ivPlay = itemView.findViewById(R.id.ivPlay);
         ivPause = itemView.findViewById(R.id.ivPause);
         aniLike = itemView.findViewById(R.id.aniLike);
-//        playerView = itemView.findViewById(R.id.player_view);
 
         ivFollowUser.setOnClickListener(this);
         lvComment.setOnClickListener(this);
@@ -134,9 +143,11 @@ public class PlayerViewHolder extends RecyclerView.ViewHolder implements View.On
 
         db = FirebaseFirestore.getInstance();
         firebaseAuth = FirebaseAuth.getInstance();
+        requestInterface = APIClient.getRetrofitInstance().create(RequestInterface.class);
 
         master = new Master(context);
         inVideoCommentBottomSheet = new InVideoCommentBottomSheet();
+        ddLoading = DDLoading.getInstance();
 
         likeVideo.setOnLikeListener(new OnLikeListener() {
             @Override
@@ -152,7 +163,7 @@ public class PlayerViewHolder extends RecyclerView.ViewHolder implements View.On
 
                         @Override
                         public void onAnimationEnd(Animator animator) {
-                            aniLike.setVisibility(View.INVISIBLE);
+                            aniLike.setVisibility(View.GONE);
                         }
 
                         @Override
@@ -211,10 +222,10 @@ public class PlayerViewHolder extends RecyclerView.ViewHolder implements View.On
 
     }
 
-    public void playVideo(Video model) {
-        if (model.getVideo_url() != null) {
+    public void playVideo(VideoResponseDatum model) {
+        if (model.getVideoUrl() != null) {
             videoView.requestFocus();
-            Uri uri = Uri.parse(model.getVideo_url());
+            Uri uri = Uri.parse(model.getVideoUrl());
             videoView.setVideoURI(uri);
             videoView.setOnPreparedListener(mp -> {
                 videoView.start();
@@ -242,13 +253,26 @@ public class PlayerViewHolder extends RecyclerView.ViewHolder implements View.On
                 }
 
                 if (mp.isPlaying()) {
-                    int current_views = Integer.parseInt(model.getView_count());
-                    int updated_view = current_views + 1;
-                    HashMap hmView = new HashMap();
-                    hmView.put("view_count", updated_view + "");
-                    db.collection("videos")
-                            .document(videoModel.getId())
-                            .update(hmView);
+                    FirebaseFirestore db = FirebaseFirestore.getInstance();
+                    DocumentReference documentReference = db.collection("views").document();
+                    String referenceId = documentReference.getId();
+                    Call<Seen> call;
+                    if (firebaseAuth == null) {
+                        call = requestInterface.markVideoSeen(referenceId, videoModel.getId(), "");
+                    } else {
+                        call = requestInterface.markVideoSeen(referenceId, videoModel.getId(), master.getId());
+                    }
+                    call.enqueue(new Callback<Seen>() {
+                        @Override
+                        public void onResponse(Call<Seen> call, retrofit2.Response<Seen> response) {
+                            Log.e("PlayerViewHolder", "onResponse: "+response.message() );
+                        }
+
+                        @Override
+                        public void onFailure(Call<Seen> call, Throwable t) {
+                            Log.e("PlayerViewHolder", t.getMessage());
+                        }
+                    });
                 }
 
                 mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
@@ -270,37 +294,10 @@ public class PlayerViewHolder extends RecyclerView.ViewHolder implements View.On
             db.collection("videos")
                     .document(model.getId())
                     .update(hashMap);
-
         }
-
-//        if (player != null) {
-//            player.stop();
-//            player.release();
-//            player = null;
-//        }
-//
-//            if (context != null) {
-//
-//                player = new SimpleExoPlayer.Builder(context).build();
-//                simpleCache = App.simpleCache;
-//                cacheDataSourceFactory = new CacheDataSourceFactory(simpleCache, new DefaultHttpDataSourceFactory(Util.getUserAgent(context, "dingdong"))
-//                        , CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR);
-//                ProgressiveMediaSource progressiveMediaSource = new ProgressiveMediaSource.Factory(cacheDataSourceFactory).createMediaSource(Uri.parse(model.getVideo_url()));
-//                playerView.setPlayer(player);
-//                player.setPlayWhenReady(true);
-//                player.seekTo(0, 0);
-//                player.setRepeatMode(Player.REPEAT_MODE_ALL);
-//                player.addListener(this);
-//                playerView.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FIXED_WIDTH);
-//                player.prepare(progressiveMediaSource, true, false);
-//            }
 
         videoModel = model;
         setVideoData(model);
-    }
-
-    public void releasePlayer() {
-
     }
 
     public void cdSpinAnimation() {
@@ -314,74 +311,36 @@ public class PlayerViewHolder extends RecyclerView.ViewHolder implements View.On
         ivSoundCD.startAnimation(rotate);
     }
 
-    private void setVideoData(Video video) {
+    private void setVideoData(VideoResponseDatum video) {
         tvSoundName.setSelected(true);
-        tvSoundName.setText(video.getSound_title());
-        tvUserHandle.setText("@"+video.getUser_handle());
-        tvCommentCount.setText(video.getComment_count());
-        tvShareCount.setText(video.getShare_count());
-        tvVideoDesc.setText(video.getVideo_desc());
+        tvSoundName.setText(video.getSoundTitle());
+        tvUserHandle.setText("@"+video.getUserHandle());
+        tvCommentCount.setText(video.getCommentCount()+"");
+        tvShareCount.setText(video.getShareCount()+"");
+        tvVideoDesc.setText(video.getVideoDesc());
+        tvLikeCount.setText(video.getLikesCount()+"");
 
-        Glide.with(context).load(video.getUser_photo())
+        Glide.with(context).load(video.getUserPhoto())
                 .placeholder(R.drawable.dd_logo_placeholder).into(ivPhoto);
 
         if (firebaseAuth.getCurrentUser() != null) {
+            fetchLatestComments();
             checkForFollowing();
             checkForLike();
         }
 
-        if (videoModel.getVideo_desc().isEmpty()){
+        if (videoModel.getVideoDesc().isEmpty()){
             tvVideoDesc.setVisibility(View.GONE);
         }
 
-        db.collection("videos").document(video.getId())
-                .collection("liked_by")
-                .addSnapshotListener(new EventListener<QuerySnapshot>() {
-                    @Override
-                    public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
-                        String likes_count = String.valueOf(queryDocumentSnapshots.getDocuments().size());
-                        tvLikeCount.setText(likes_count);
-                    }
-                });
-
-        fetchLatestComments();
-
-    }
-
-    private void checkForFollowing() {
-        Query followingQuery = db.collection("users").document(firebaseAuth.getCurrentUser().getUid())
-                .collection("following").whereEqualTo("id", videoModel.getUser_id());
-        followingQuery.addSnapshotListener(new EventListener<QuerySnapshot>() {
-            @Override
-            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
-                if (videoModel.getUser_id().equals(master.getId())) {
-                   ivFollowUser.setVisibility(View.GONE);
-                } else if (queryDocumentSnapshots.getDocuments().isEmpty()) {
-                    ivFollowUser.setVisibility(View.VISIBLE);
-                } else {
-                    ivFollowUser.setVisibility(View.GONE);
-                }
-            }
-        });
     }
 
     private void checkForLike() {
-        Query likesQuery = db.collection("users").document(firebaseAuth.getCurrentUser().getUid())
-                .collection("liked_videos");
-        likesQuery.whereEqualTo("id", videoModel.getId())
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            if (task.getResult().getDocuments().isEmpty()) {
-                                likeVideo.setLiked(false);
-                            } else {
-                                likeVideo.setLiked(true);
-                            }
-                        }
-                    }
-                });
+        if (videoModel.getMylike() == 0) {
+            likeVideo.setLiked(false);
+        } else if (videoModel.getMylike() == 1) {
+            likeVideo.setLiked(true);
+        }
     }
 
     private void doShowComments() {
@@ -390,7 +349,7 @@ public class PlayerViewHolder extends RecyclerView.ViewHolder implements View.On
         editor.putString("video_id", videoModel.getId());
         editor.apply();
         inVideoCommentBottomSheet.setStyle(DialogFragment.STYLE_NORMAL, R.style.DialogStyle);
-        inVideoCommentBottomSheet.show(((MainActivity)context.getApplicationContext()).getSupportFragmentManager(), "comments");
+        inVideoCommentBottomSheet.show(((BaseActivity)context).getSupportFragmentManager(), "comments");
     }
 
     private void fetchLatestComments() {
@@ -412,194 +371,133 @@ public class PlayerViewHolder extends RecyclerView.ViewHolder implements View.On
 
 
     private void doLikeVideo() {
-
-        HashMap hmVideo = new HashMap();
-        hmVideo.put("id", firebaseAuth.getCurrentUser().getUid());
-        hmVideo.put("timestamp", FieldValue.serverTimestamp());
-        hmVideo.put("handle", master.getHandle());
-
-        HashMap hmUser = new HashMap();
-        hmUser.put("id", videoModel.getId());
-        hmUser.put("timestamp", FieldValue.serverTimestamp());
-
-        db.collection("users")
-                .document(firebaseAuth.getCurrentUser().getUid())
-                .collection("liked_videos")
-                .document(videoModel.getId())
-                .set(hmUser);
-
-        db.collection("videos")
-                .document(videoModel.getId())
-                .collection("liked_by")
-                .document(firebaseAuth.getCurrentUser().getUid())
-                .set(hmVideo);
-
-        db.collection("users")
-                .document(videoModel.getUser_id())
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+        final String url = "http://35.228.105.69/dingdong/Socialmedia/LikeUnlike/";
+        RequestQueue queue = Volley.newRequestQueue(context);
+        StringRequest postRequest = new StringRequest(Request.Method.POST, url,
+                new Response.Listener<String>() {
                     @Override
-                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                        String likes = task.getResult().getString("likes");
-                        int like = Integer.parseInt(likes);
-                        int update_likes = like + 1;
-
-                        HashMap hmUser = new HashMap();
-                        hmUser.put("likes", update_likes+"");
-
-                        db.collection("users")
-                                .document(videoModel.getUser_id())
-                                .update(hmUser);
-
+                    public void onResponse(String response) {
+                        Toast.makeText(context, videoModel.getLikesCount()+"", Toast.LENGTH_SHORT).show();
+                        int current_like = Integer.parseInt(tvLikeCount.getText().toString());
+                        int update = current_like + 1;
+                        tvLikeCount.setText(update+"");
                     }
-                });
-
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Toast.makeText(context, ""+error.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                }) {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String>  params = new HashMap<String, String>();
+                params.put("id", videoModel.getId());
+                params.put("video_id", videoModel.getId());
+                params.put("user_id", master.getId());
+                return params;
+            }
+        };
+        queue.add(postRequest);
     }
 
     private void doUnLikeVideo() {
-
-        db.collection("videos")
-                .document(videoModel.getId())
-                .collection("liked_by")
-                .document(firebaseAuth.getCurrentUser().getUid())
-                .delete();
-
-        db.collection("users")
-                .document(firebaseAuth.getCurrentUser().getUid())
-                .collection("liked_videos")
-                .document(videoModel.getId())
-                .delete();
-
-        db.collection("users")
-                .document(videoModel.getUser_id())
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+        final String url = "http://35.228.105.69/dingdong/Socialmedia/LikeUnlike/";
+        RequestQueue queue = Volley.newRequestQueue(context);
+        StringRequest postRequest = new StringRequest(Request.Method.POST, url,
+                new Response.Listener<String>() {
                     @Override
-                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                        String likes = task.getResult().getString("likes");
-                        int like = Integer.parseInt(likes);
-                        int update_likes = like - 1;
-
-                        HashMap hmUser = new HashMap();
-                        hmUser.put("likes", update_likes+"");
-
-                        db.collection("users")
-                                .document(videoModel.getUser_id())
-                                .update(hmUser);
-
+                    public void onResponse(String response) {
+                        Toast.makeText(context, videoModel.getLikesCount()+"", Toast.LENGTH_SHORT).show();
+                        int current_like = Integer.parseInt(tvLikeCount.getText().toString());
+                        int update = current_like - 1;
+                        tvLikeCount.setText(update+"");
                     }
-                });
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Toast.makeText(context, ""+error.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                }) {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String>  params = new HashMap<String, String>();
+                params.put("id", videoModel.getId());
+                params.put("video_id", videoModel.getId());
+                params.put("user_id", master.getId());
+                return params;
+            }
+        };
+        queue.add(postRequest);
     }
 
-    private void doShareVideos() {
-        DDLoading ddLoading = DDLoading.getInstance();
-
-        String url = MediaManager.get().url().transformation(new Transformation()
-                .gravity("north_east").height(50)
-                .overlay(new Layer().publicId("dd_wm_v1")).width(40).x(20).y(20).crop("scale"))
-                .resourceType("video").generate("user_uploaded_videos/"+videoModel.getId()+".mp4");
-
-        String message = "Hey your friend is using *Ding Dong* which is an *Hybrid video sharing app*. Here is the *download* link:\nhttps://bit.ly/33bQke3\n\n*Create . Share . Earn*";
-
+    private void doDownloadVideo() {
         ddLoading.showProgress(context, "Loading...", false);
-        FileLoader.with(context)
-                .load(url,false)
-                .fromDirectory("dingdong/shared", FileLoader.DIR_EXTERNAL_PUBLIC)
-                .asFile(new FileRequestListener<File>() {
-                    @Override
-                    public void onLoad(FileLoadRequest request, FileResponse<File> response) {
-                        ddLoading.hideProgress();
-                        File loadedFile = response.getBody();
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+        StorageReference storageRef = storage.getReferenceFromUrl(videoModel.getVideoUrl());
+        final File rootPath = new File(Environment.getExternalStorageDirectory(), "DD Shared");
+        if (!rootPath.exists()) {
+            rootPath.mkdirs();
+        }
+        final File localFile = new File(rootPath, videoModel.getId()+".mp4");
+        storageRef.getFile(localFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
+                if (localFile.canRead()){
+                    doShareVideos(localFile.getPath());
+                }
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
 
+            }
+        });
+    }
 
-                        Uri imgUri = Uri.parse(loadedFile.getAbsolutePath());
-                        Intent shareIntent = new Intent(Intent.ACTION_SEND);
-                        shareIntent.setType("text/plain");
-                        shareIntent.putExtra(Intent.EXTRA_TEXT, message);
-                        shareIntent.putExtra(Intent.EXTRA_STREAM, imgUri);
-                        shareIntent.setType("video/mp4");
-                        shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+    private void doShareVideos(String path) {
+        String message = "Hey your friend is using *Ding Dong* which is an *Hybrid video sharing app*. Here is the *download* link:\nhttps://bit.ly/33bQke3\n\n*Create . Share . Earn*";
+        Uri imgUri = Uri.parse(path);
+        Intent shareIntent = new Intent();
+        shareIntent.setAction(Intent.ACTION_SEND);
+        shareIntent.putExtra(Intent.EXTRA_STREAM, imgUri);
+        shareIntent.putExtra(Intent.EXTRA_TEXT, message);
+        shareIntent.setType("*/*");
 
-                       try {
-                           context.startActivity(Intent.createChooser(shareIntent, "Share Video"));
-                       } catch (Exception e) {
-                           Toast.makeText(context, ""+e, Toast.LENGTH_SHORT).show();
-                       }
+        try {
+            ddLoading.hideProgress();
+            context.startActivity(Intent.createChooser(shareIntent, "Share Video"));
+            Call<Share> call = requestInterface.shareVideoCount(videoModel.getId());
+            call.enqueue(new Callback<Share>() {
+                @Override
+                public void onResponse(Call<Share> call, retrofit2.Response<Share> response) {
+                }
+                @Override
+                public void onFailure(Call<Share> call, Throwable t) {
+                    Log.e(TAG, "onFailure: "+t.getMessage() );
+                }
+            });
+        } catch (Exception e) {
+            Toast.makeText(context, ""+e, Toast.LENGTH_SHORT).show();
+        }
 
+    }
 
-                        HashMap hmFollower = new HashMap();
-                        hmFollower.put("id", master.getId());
-                        db.collection("videos")
-                                .document(videoModel.getId())
-                                .get()
-                                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                                        if (task.isSuccessful()){
-                                            String current_share_count = task.getResult().getString("share_count");
-                                            int current_sc = Integer.parseInt(current_share_count);
-                                            int updated_sc = current_sc + 1;
-                                            HashMap hashMap = new HashMap();
-                                            hashMap.put("share_count", updated_sc+"");
-                                            db.collection("videos")
-                                                    .document(videoModel.getId())
-                                                    .update(hashMap);
-                                        }
-                                    }
-                                });
-
-                    }
-
-                    @Override
-                    public void onError(FileLoadRequest request, Throwable t) {
-                        ddLoading.hideProgress();
-                    }
-                });
-
-
+    private void checkForFollowing() {
+        if (videoModel.getUserId().equals(master.getId())) {
+            ivFollowUser.setVisibility(View.GONE);
+        } else if (videoModel.getMylike().equals("following")) {
+            ivFollowUser.setVisibility(View.GONE);
+        } else {
+            ivFollowUser.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override
     public void onClick(View v) {
         if (v == ivFollowUser) {
-            if (firebaseAuth.getCurrentUser() != null) {
-
-                ivFollowUser.setImageDrawable(context.getResources().getDrawable(R.drawable.dd_followed_link));
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        ivFollowUser.setVisibility(View.GONE);
-                    }
-                }, 1500);
-
-                HashMap<String, String> hmFollowing = new HashMap<String, String>();
-                hmFollowing.put("id", videoModel.getUser_id());
-                hmFollowing.put("handle", videoModel.getUser_handle());
-                hmFollowing.put("photo", videoModel.getUser_photo());
-                hmFollowing.put("name", videoModel.getUser_name());
-
-                HashMap<String, String> hmFollower = new HashMap<String, String>();
-                hmFollower.put("id", master.getId());
-                hmFollower.put("handle", master.getHandle());
-                hmFollower.put("photo", master.getPhoto());
-                hmFollower.put("name", master.getName());
-
-                db.collection("users")
-                        .document(master.getId())
-                        .collection("following")
-                        .document(videoModel.getUser_id())
-                        .set(hmFollowing);
-
-                db.collection("users")
-                        .document(videoModel.getUser_id())
-                        .collection("followers")
-                        .document(videoModel.getUser_id())
-                        .set(hmFollower);
-
-
-            } else {
-                context.startActivity(new Intent(context, PhoneActivity.class));
-            }
+            doFollowUser();
         }
 
         if (v == lvComment) {
@@ -611,6 +509,7 @@ public class PlayerViewHolder extends RecyclerView.ViewHolder implements View.On
         }
 
         if (v == lvShare) {
+            //Toast.makeText(context, "Coming Soon", Toast.LENGTH_SHORT).show();
             String[] permissions = {Manifest.permission.WRITE_EXTERNAL_STORAGE,
                     Manifest.permission.READ_EXTERNAL_STORAGE};
             Permissions.check(context/*context*/, permissions,
@@ -618,37 +517,67 @@ public class PlayerViewHolder extends RecyclerView.ViewHolder implements View.On
                     new PermissionHandler() {
                         @Override
                         public void onGranted() {
-                            doShareVideos();
+                            doDownloadVideo();
                         }
                     });
         }
 
         if (v == ivPhoto) {
             Intent intent = new Intent(context, PublicProfileActivity.class);
-            intent.putExtra("user_id", videoModel.getUser_id());
+            intent.putExtra("user_id", videoModel.getUserId());
             context.startActivity(intent);
         }
 
         if (v == tvUserHandle) {
             Intent intent = new Intent(context, PublicProfileActivity.class);
-            intent.putExtra("user_id", videoModel.getUser_id());
+            intent.putExtra("user_id", videoModel.getUserId());
             context.startActivity(intent);
         }
 
         if (v == ivSoundCD) {
-            Intent intent = new Intent(context, SoundDetailActivity.class);
-            Bundle bundle = new Bundle();
-            bundle.putString("sound_id", videoModel.getSound_id());
-            bundle.putString("sound_title", videoModel.getSound_title());
-            bundle.putString("user_photo", videoModel.getUser_photo());
-            bundle.putString("user_handle", videoModel.getUser_handle());
-            bundle.putString("user_id", videoModel.getUser_id());
-            intent.putExtras(bundle);
-            context.startActivity(intent);
+            Toast.makeText(context, "Coming Soon...", Toast.LENGTH_SHORT).show();
+//            Intent intent = new Intent(context, SoundDetailActivity.class);
+//            Bundle bundle = new Bundle();
+//            bundle.putString("sound_id", videoModel.getSoundId());
+//            bundle.putString("sound_title", videoModel.getSoundTitle());
+//            bundle.putString("user_photo", videoModel.getUserPhoto());
+//            bundle.putString("user_handle", videoModel.getUserHandle());
+//            bundle.putString("user_id", videoModel.getUserId());
+//            intent.putExtras(bundle);
+//            context.startActivity(intent);
         }
 
     }
 
+    private void doFollowUser() {
+        if (firebaseAuth.getCurrentUser() != null) {
+            ddLoading.showProgress(context, "Following...", false);
+            ivFollowUser.setImageDrawable(context.getResources().getDrawable(R.drawable.dd_followed_link));
+            Call<Follow> call = requestInterface.doFollowUser(master.getId(), videoModel.getUserId());
+            call.enqueue(new Callback<Follow>() {
+                @Override
+                public void onResponse(Call<Follow> call, retrofit2.Response<Follow> response) {
+                    Log.e("PlayerViewHolderFollow", "onResponse: "+response.message());
+                    ddLoading.hideProgress();
+                }
+
+                @Override
+                public void onFailure(Call<Follow> call, Throwable t) {
+                    ddLoading.hideProgress();
+                    Log.e("PlayerViewHolder", t.getMessage());
+                }
+            });
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    ivFollowUser.setVisibility(View.GONE);
+                }
+            }, 1500);
+
+        } else {
+            context.startActivity(new Intent(context, PhoneActivity.class));
+        }
+    }
 
     @Override
     public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
@@ -658,5 +587,4 @@ public class PlayerViewHolder extends RecyclerView.ViewHolder implements View.On
 
         }
     }
-
 }

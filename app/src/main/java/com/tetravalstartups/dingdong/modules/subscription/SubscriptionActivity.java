@@ -5,6 +5,7 @@ import android.os.Handler;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -16,6 +17,8 @@ import androidx.viewpager.widget.ViewPager;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.tetravalstartups.dingdong.R;
+import com.tetravalstartups.dingdong.modules.subscription.model.MySubscriptions;
+import com.tetravalstartups.dingdong.modules.subscription.model.Plans;
 import com.tetravalstartups.dingdong.utils.EqualSpacingItemDecoration;
 
 import java.util.ArrayList;
@@ -34,6 +37,7 @@ public class SubscriptionActivity extends AppCompatActivity implements Subscript
     private TabLayout indicator;
     private List<CustomerRating> customerRatingList;
     private ImageView ivGoBack;
+    private TextView tvNoSubs;
 
 
     @Override
@@ -57,13 +61,15 @@ public class SubscriptionActivity extends AppCompatActivity implements Subscript
         ivGoBack = findViewById(R.id.ivGoBack);
         ivGoBack.setOnClickListener(this);
 
+        tvNoSubs = findViewById(R.id.tvNoSubs);
+
         customerRatingList = new ArrayList<>();
 
         setupRecyclerSubs();
 
         setupRatingPager();
 
-        setupRecyclerSubscribed(uid);
+        setupRecyclerSubscribed();
     }
 
     private void setupRatingPager() {
@@ -134,7 +140,6 @@ public class SubscriptionActivity extends AppCompatActivity implements Subscript
 
     private void setupRecyclerSubs() {
         recyclerSubs.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
-        recyclerSubs.addItemDecoration(new EqualSpacingItemDecoration(24, EqualSpacingItemDecoration.VERTICAL));
 
         SubscriptionPresenter subscriptionPresenter = new
                 SubscriptionPresenter(SubscriptionActivity.this,
@@ -143,23 +148,21 @@ public class SubscriptionActivity extends AppCompatActivity implements Subscript
         subscriptionPresenter.fetchSubs();
     }
 
-    private void setupRecyclerSubscribed(String uid) {
+    public void setupRecyclerSubscribed() {
         recyclerSubscribed.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
-        recyclerSubscribed.addItemDecoration(new EqualSpacingItemDecoration(24, EqualSpacingItemDecoration.VERTICAL));
 
         SubscribedPresenter subscribedPresenter = new
                 SubscribedPresenter(SubscriptionActivity.this,
                 SubscriptionActivity.this);
 
-        subscribedPresenter.fetchSubscribe(uid);
-
+        subscribedPresenter.fetchSubscribe();
     }
 
     @Override
-    public void subsFetchSuccess(List<Subscription> subscriptionList) {
+    public void subsFetchSuccess(Plans plans) {
         SubscriptionAdapter subscriptionAdapter = new
                 SubscriptionAdapter(SubscriptionActivity.this,
-                subscriptionList);
+                plans.getPlanResponseList());
         subscriptionAdapter.notifyDataSetChanged();
         recyclerSubs.setAdapter(subscriptionAdapter);
         progressBar.setVisibility(View.INVISIBLE);
@@ -172,16 +175,20 @@ public class SubscriptionActivity extends AppCompatActivity implements Subscript
     }
 
     @Override
-    public void subscribeFetchSuccess(List<Subscribed> subscribedList) {
+    public void subscribeFetchSuccess(MySubscriptions mySubscriptions) {
         SubscribedAdapter subscribedAdapter =
                 new SubscribedAdapter(SubscriptionActivity.this,
-                        subscribedList);
+                        mySubscriptions.getData());
         subscribedAdapter.notifyDataSetChanged();
         recyclerSubscribed.setAdapter(subscribedAdapter);
+        recyclerSubscribed.setVisibility(View.VISIBLE);
+        tvNoSubs.setVisibility(View.GONE);
     }
 
     @Override
     public void subscribeFetchError(String error) {
+        recyclerSubscribed.setVisibility(View.GONE);
+        tvNoSubs.setVisibility(View.VISIBLE);
     }
 
     @Override

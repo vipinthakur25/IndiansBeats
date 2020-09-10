@@ -32,7 +32,7 @@ public class LightBox {
         ImageView ivLightBox = dialog.findViewById(R.id.ivLightBox);
             Glide.with(context)
                     .load(photo)
-                    .placeholder(R.drawable.dingdong_placeholder)
+                    .placeholder(R.drawable.dd_logo_placeholder)
                     .into(ivLightBox);
 
         dialog.show();

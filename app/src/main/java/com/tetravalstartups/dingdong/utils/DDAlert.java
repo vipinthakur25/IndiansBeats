@@ -28,22 +28,12 @@ public class DDAlert {
 
     public void showAlert(Context context, String title, String message, boolean cancelable) {
         mDialog = new Dialog(context, R.style.DDAlert);
-//        mDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-//        mDialog.getWindow().
-//                setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
-        mDialog.setContentView(R.layout.dd_alert_layout);
+        mDialog.setContentView(R.layout.dialog_video_upload_success);
 
-        TextView tvDDTitle = mDialog.findViewById(R.id.tvDDTitle);
-        TextView tvDDMessage = mDialog.findViewById(R.id.tvDDMessage);
-        TextView tvDDAction = mDialog.findViewById(R.id.tvDDAction);
-
-        tvDDTitle.setText(title);
-        tvDDMessage.setText(message);
-
-        tvDDAction.setOnClickListener(new View.OnClickListener() {
+        TextView tvOk = mDialog.findViewById(R.id.tvOk);
+        tvOk.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                context.startActivity(new Intent(context, SoundActivity.class));
                 mDialog.dismiss();
             }
         });

@@ -14,7 +14,8 @@ import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.tetravalstartups.dingdong.R;
-import com.tetravalstartups.dingdong.utils.Constant;
+import com.tetravalstartups.dingdong.modules.passbook.redeem.model.PayoutHistoryResponse;
+import com.tetravalstartups.dingdong.modules.passbook.redeem.view.RedeemActivity;
 
 import java.util.List;
 
@@ -22,12 +23,12 @@ public class UnreservedCoinTxnAdapter extends RecyclerView.Adapter<UnreservedCoi
         implements TxnDetailsBottomSheetFragment.TxnDetailsListener {
 
     Context context;
-    List<UnreservedCoinTxn> unreservedCoinTxnList;
+    List<PayoutHistoryResponse> unreservedCoinTxnList;
 
     private TxnDetailsBottomSheetFragment txnDetailsBottomSheetFragment;
 
 
-    public UnreservedCoinTxnAdapter(Context context, List<UnreservedCoinTxn> unreservedCoinTxnList) {
+    public UnreservedCoinTxnAdapter(Context context, List<PayoutHistoryResponse> unreservedCoinTxnList) {
         this.context = context;
         this.unreservedCoinTxnList = unreservedCoinTxnList;
     }
@@ -44,30 +45,44 @@ public class UnreservedCoinTxnAdapter extends RecyclerView.Adapter<UnreservedCoi
 
     @Override
     public void onBindViewHolder(@NonNull UnreservedCoinTxnAdapter.ViewHolder holder, int position) {
-        UnreservedCoinTxn unreservedCoinTxn = unreservedCoinTxnList.get(position);
+        PayoutHistoryResponse unreservedCoinTxn = unreservedCoinTxnList.get(position);
 
-        holder.tvTimeDate.setText(unreservedCoinTxn.getTime()+" ~ "+unreservedCoinTxn.getDate());
+        String[] dateTime = unreservedCoinTxn.getCreatedDate().split("\\s");
 
-        holder.tvRemark.setText(unreservedCoinTxn.getRemark());
+        holder.tvTimeDate.setText(dateTime[1]+" ~ "+dateTime[0]);
+        holder.tvRemark.setText("Payout Request");
+        holder.tvAmount.setText(unreservedCoinTxn.getAmount()+"");
 
-        holder.tvAmount.setText(unreservedCoinTxn.getAmount());
-
-        if (unreservedCoinTxn.getStatus() == "0"){
+        if (unreservedCoinTxn.getStatus() == 0){
             holder.ivPending.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_dd_check_mark_white));
             holder.ivProcessing.setImageDrawable(null);
             holder.ivDone.setImageDrawable(null);
 
         }
-        if (unreservedCoinTxn.getStatus() == "1"){
+
+        if (unreservedCoinTxn.getStatus() == 1){
             holder.ivPending.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_dd_check_mark_white));
             holder.ivProcessing.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_dd_check_mark_white));
             holder.ivDone.setImageDrawable(null);
 
         }
-        if (unreservedCoinTxn.getStatus() == "2"){
+
+        if (unreservedCoinTxn.getStatus() == 2){
             holder.ivPending.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_dd_check_mark_white));
             holder.ivProcessing.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_dd_check_mark_white));
             holder.ivDone.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_dd_check_mark_white));
+        }
+
+        if (unreservedCoinTxn.getStatus() == 3){
+            holder.ivPending.setImageDrawable(null);
+            holder.ivProcessing.setImageDrawable(null);
+            holder.ivDone.setImageDrawable(null);
+        }
+
+        if (unreservedCoinTxn.getStatus() == 4){
+            holder.ivPending.setImageDrawable(null);
+            holder.ivProcessing.setImageDrawable(null);
+            holder.ivDone.setImageDrawable(null);
         }
 
         holder.cardTransaction.setOnClickListener(new View.OnClickListener() {
@@ -76,13 +91,18 @@ public class UnreservedCoinTxnAdapter extends RecyclerView.Adapter<UnreservedCoi
                 SharedPreferences preferences = context.getSharedPreferences("unreserved", 0);
                 Editor editor = preferences.edit();
                 editor.putString("id", unreservedCoinTxn.getId());
-                editor.putInt("amount", Integer.parseInt(unreservedCoinTxn.getAmount()));
-                editor.putString("time", unreservedCoinTxn.getTime());
-                editor.putString("date", unreservedCoinTxn.getDate());
-                editor.putString("remark", unreservedCoinTxn.getRemark());
-                editor.putInt("status", Integer.parseInt(unreservedCoinTxn.getStatus()));
+                editor.putInt("amount", unreservedCoinTxn.getAmount());
+                String[] dateTime = unreservedCoinTxn.getCreatedDate().split("\\s");
+                editor.putString("time",dateTime[1]);
+                editor.putString("date", dateTime[0]);
+                if (unreservedCoinTxn.getDescription().isEmpty()) {
+                    editor.putString("remark", "Payout Request");
+                } else {
+                    editor.putString("remark", unreservedCoinTxn.getDescription());
+                }
+                editor.putInt("status", unreservedCoinTxn.getStatus());
                 editor.apply();
-                txnDetailsBottomSheetFragment.show(((PassbookActivity)context).getSupportFragmentManager(),
+                txnDetailsBottomSheetFragment.show(((RedeemActivity)context).getSupportFragmentManager(),
                         "profilePhotoBottomSheet");
             }
         });

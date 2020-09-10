@@ -13,16 +13,17 @@ import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.tetravalstartups.dingdong.R;
+import com.tetravalstartups.dingdong.modules.subscription.model.MySubscriptionResponse;
 
 import java.util.List;
 
 public class SubPlanAdapter extends RecyclerView.Adapter<SubPlanAdapter.ViewHolder> {
 
     Context context;
-    List<SubPlan> subPlanList;
+    List<MySubscriptionResponse> subPlanList;
     int row_index = -1;
 
-    public SubPlanAdapter(Context context, List<SubPlan> subPlanList) {
+    public SubPlanAdapter(Context context, List<MySubscriptionResponse> subPlanList) {
         this.context = context;
         this.subPlanList = subPlanList;
     }
@@ -36,10 +37,10 @@ public class SubPlanAdapter extends RecyclerView.Adapter<SubPlanAdapter.ViewHold
 
     @Override
     public void onBindViewHolder(@NonNull SubPlanAdapter.ViewHolder holder, int position) {
-        SubPlan subPlan = subPlanList.get(position);
+        MySubscriptionResponse subPlan = subPlanList.get(position);
         holder.tvName.setText("#" + subPlan.getName());
-        holder.tvUploads.setText(subPlan.getAvl_uploads() + "/" + subPlan.getTotal_uploads());
-        holder.tvValidity.setText(subPlan.getStart_date() + " ~ " + subPlan.getEnd_date());
+        holder.tvUploads.setText(subPlan.getAvlUploads() + "/" + subPlan.getTotalUploads());
+        holder.tvValidity.setText(subPlan.getStartDate() + " ~ " + subPlan.getEndDate());
 
         holder.lhSubs.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -54,6 +55,9 @@ public class SubPlanAdapter extends RecyclerView.Adapter<SubPlanAdapter.ViewHold
             SharedPreferences preferences = context.getSharedPreferences("sub_plan", 0);
             SharedPreferences.Editor editor = preferences.edit();
             editor.putString("id", subPlan.getId());
+            editor.putInt("plan_id", subPlan.getPlanId());
+            editor.putInt("monthly_profit", subPlan.getMonthlyProfit());
+            editor.putInt("total_uploads", subPlan.getTotalUploads());
             editor.apply();
         } else {
             holder.lhSubs.setBackground(context.getResources().getDrawable(R.drawable.bg_button_v3));

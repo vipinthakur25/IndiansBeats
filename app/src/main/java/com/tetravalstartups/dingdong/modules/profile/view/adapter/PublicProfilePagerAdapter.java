@@ -1,5 +1,7 @@
 package com.tetravalstartups.dingdong.modules.profile.view.adapter;
 
+import android.os.Bundle;
+
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -11,8 +13,11 @@ import com.tetravalstartups.dingdong.modules.profile.view.fragment.PrivateDraftF
 
 public class PublicProfilePagerAdapter extends FragmentPagerAdapter {
 
-    public PublicProfilePagerAdapter(@NonNull FragmentManager fm) {
+    private String id;
+
+    public PublicProfilePagerAdapter(@NonNull FragmentManager fm, String user_id) {
         super(fm);
+        id = user_id;
     }
 
     @NonNull
@@ -20,7 +25,11 @@ public class PublicProfilePagerAdapter extends FragmentPagerAdapter {
     public Fragment getItem(int position) {
         switch (position){
             case 0:
-                return new CreatedVideoFragment();
+                Bundle bundle = new Bundle();
+                bundle.putString("user_id", id);
+                CreatedVideoFragment createdVideoFragment = new CreatedVideoFragment();
+                createdVideoFragment.setArguments(bundle);
+                return createdVideoFragment;
             default:
                 return null;
         }

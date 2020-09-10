@@ -1,26 +1,34 @@
 package com.tetravalstartups.dingdong;
 
-import androidx.annotation.NonNull;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 
 import com.bumptech.glide.Glide;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.tetravalstartups.dingdong.api.APIClient;
+import com.tetravalstartups.dingdong.api.RequestInterface;
+import com.tetravalstartups.dingdong.auth.CheckUserResponse;
 import com.tetravalstartups.dingdong.auth.SetupProfileActivity;
+
+import retrofit2.Call;
+import retrofit2.Callback;
 
 public class SplashActivity extends BaseActivity {
 
     private ImageView ivSplash;
     private FirebaseFirestore db;
     private FirebaseAuth firebaseAuth;
+    private RequestInterface requestInterface;
+    private static final String TAG = "SplashActivity";
+
+    private FrameLayout frameSplash;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,36 +41,21 @@ public class SplashActivity extends BaseActivity {
 
     private void initView() {
 
+        frameSplash = findViewById(R.id.frameSplash);
         ivSplash = findViewById(R.id.ivSplash);
-        Glide.with(this).load(R.drawable.dd_gif_splash).into(ivSplash);
 
+        Glide.with(this).load(R.drawable.dd_logo_amin).into(ivSplash);
         db = FirebaseFirestore.getInstance();
         firebaseAuth = FirebaseAuth.getInstance();
+        requestInterface = APIClient.getRetrofitInstance().create(RequestInterface.class);
 
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
                 if (firebaseAuth.getCurrentUser() != null) {
-                    String uid = firebaseAuth.getCurrentUser().getUid();
-                    DocumentReference profileRef = db.collection("users").document(uid);
-                    profileRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                        @Override
-                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                            if (task.isSuccessful()){
-                                DocumentSnapshot document = task.getResult();
-                                if (document.exists()){
-                                    // progressDialog.dismiss();
-                                    startActivity(new Intent(getApplicationContext(), MainActivity.class));
-                                }else {
-                                    startActivity(new Intent(getApplicationContext(), SetupProfileActivity.class));
-                                }
-                                finish();
-                            } else {
-                                //   progressDialog.dismiss();
-                                //   Toast.makeText(OTPActivity.this, "database error (otp->profile)", Toast.LENGTH_SHORT).show();
-                            }
-                        }
-                    });
+                    String authPhone = firebaseAuth.getCurrentUser().getPhoneNumber();
+                    authPhone = authPhone.replace("+91", "");
+                    checkUser(authPhone);
                 } else {
                     Intent splashIntent = new Intent(SplashActivity.this, MainActivity.class);
                     startActivity(splashIntent);
@@ -81,6 +74,35 @@ public class SplashActivity extends BaseActivity {
             return;
         }
         super.onWindowFocusChanged(hasFocus);
+    }
+
+    private void checkUser(String phone) {
+        Call<CheckUserResponse> call = requestInterface.checkUser(phone);
+        call.enqueue(new Callback<CheckUserResponse>() {
+            @Override
+            public void onResponse(Call<CheckUserResponse> call, retrofit2.Response<CheckUserResponse> response) {
+                if (response.code() == 200) {
+                    Intent intent = new Intent(SplashActivity.this, MainActivity.class);
+                    startActivity(intent);
+                    finish();
+                    overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                } else if (response.code() == 400){
+                    Intent intent = new Intent(SplashActivity.this, SetupProfileActivity.class);
+                    startActivity(intent);
+                    finish();
+                    overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                } else if (response.code() == 500){
+                    Snackbar.make(frameSplash, "Something went wrong...", Snackbar.LENGTH_LONG).show();
+                } else if (response.code() == 403) {
+                    Snackbar.make(frameSplash, "Scheduled maintenance going on...", Snackbar.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<CheckUserResponse> call, Throwable t) {
+                Log.e(TAG, "onFailure: " + t.getMessage());
+            }
+        });
     }
 
 }

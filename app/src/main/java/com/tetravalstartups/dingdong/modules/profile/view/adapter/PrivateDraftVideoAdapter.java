@@ -1,7 +1,6 @@
 package com.tetravalstartups.dingdong.modules.profile.view.adapter;
 
 import android.content.Context;
-import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,9 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.cloudinary.android.MediaManager;
 import com.tetravalstartups.dingdong.R;
-import com.tetravalstartups.dingdong.modules.profile.model.LikedVideos;
 import com.tetravalstartups.dingdong.modules.profile.model.PrivateDraftVideos;
-import com.tetravalstartups.dingdong.modules.profile.view.activity.PlayVideoActivity;
 import com.tetravalstartups.dingdong.utils.DDDeletePublishVideoAlert;
 
 import java.util.List;

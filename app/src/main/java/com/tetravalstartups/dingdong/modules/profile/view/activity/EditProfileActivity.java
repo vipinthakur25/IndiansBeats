@@ -1,13 +1,13 @@
 package com.tetravalstartups.dingdong.modules.profile.view.activity;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.Manifest;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -17,26 +17,24 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.android.material.bottomsheet.BottomSheetBehavior;
-import com.google.android.material.snackbar.Snackbar;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.google.firebase.firestore.auth.User;
 import com.nabinbhandari.android.permissions.PermissionHandler;
 import com.nabinbhandari.android.permissions.Permissions;
-import com.tetravalstartups.dingdong.MainActivity;
+import com.tetravalstartups.dingdong.api.APIClient;
 import com.tetravalstartups.dingdong.R;
+import com.tetravalstartups.dingdong.api.RequestInterface;
 import com.tetravalstartups.dingdong.auth.Master;
 import com.tetravalstartups.dingdong.auth.Profile;
-import com.tetravalstartups.dingdong.utils.LightBox;
+import com.tetravalstartups.dingdong.modules.profile.external.PublicProfile;
 import com.tetravalstartups.dingdong.utils.ProfilePhotoBottomSheet;
 
 import java.util.HashMap;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class EditProfileActivity extends AppCompatActivity implements ProfilePhotoBottomSheet.BottomSheetListener, View.OnClickListener {
 
@@ -54,6 +52,9 @@ public class EditProfileActivity extends AppCompatActivity implements ProfilePho
     private FirebaseFirestore db;
 
     private ProfilePhotoBottomSheet bottomSheet;
+    private RequestInterface requestInterface;
+    private Profile userProfile;
+    private static final String TAG = "EditProfileActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +62,7 @@ public class EditProfileActivity extends AppCompatActivity implements ProfilePho
         setContentView(R.layout.activity_edit_profile);
 
         db = FirebaseFirestore.getInstance();
+        master = new Master(EditProfileActivity.this);
 
         initView();
     }
@@ -79,6 +81,7 @@ public class EditProfileActivity extends AppCompatActivity implements ProfilePho
         tvUpdate.setOnClickListener(this);
 
         bottomSheet = new ProfilePhotoBottomSheet();
+        requestInterface = APIClient.getRetrofitInstance().create(RequestInterface.class);
 
         getProfileData();
 
@@ -118,7 +121,7 @@ public class EditProfileActivity extends AppCompatActivity implements ProfilePho
             @Override
             public void afterTextChanged(Editable s) {
                 String handle = etHandle.getText().toString();
-                Query query = db.collection("users");
+                Query query = db.collection("customers");
                 query.whereEqualTo("handle", handle)
                         .get()
                         .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -210,9 +213,19 @@ public class EditProfileActivity extends AppCompatActivity implements ProfilePho
             profile.put("handle", handle);
             profile.put("bio", bio);
 
-            db.collection("users")
-                    .document(master.getId())
-                    .update(profile);
+            Call<PublicProfile> call = requestInterface.editUserProfile(master.getId(), name, master.getEmail(), bio);
+            call.enqueue(new Callback<PublicProfile>() {
+                @Override
+                public void onResponse(Call<PublicProfile> call, Response<PublicProfile> response) {
+                    new Master(EditProfileActivity.this).setUser(response.body().getPublicProfileResponse());
+                    setupProfile();
+                }
+
+                @Override
+                public void onFailure(Call<PublicProfile> call, Throwable t) {
+                    Log.e(TAG, "onFailure: "+t.getMessage() );
+                }
+            });
 
             Toast.makeText(this, "Profile Updated!", Toast.LENGTH_SHORT).show();
         }
@@ -226,24 +239,28 @@ public class EditProfileActivity extends AppCompatActivity implements ProfilePho
     }
 
     public void getProfileData(){
-        FirebaseAuth auth = FirebaseAuth.getInstance();
-        String id  = auth.getCurrentUser().getUid();
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("users")
-                .document(id)
-                .addSnapshotListener(new EventListener<DocumentSnapshot>() {
-                    @Override
-                    public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
-                        Profile profile = documentSnapshot.toObject(Profile.class);
-                        new Master(EditProfileActivity.this).setUser(profile);
-                        master = new Master(EditProfileActivity.this);
-                        setupProfile();
-                    }
-                });
+        Call<PublicProfile> call = requestInterface.getUserData(master.getId(), master.getId());
+        call.enqueue(new Callback<PublicProfile>() {
+            @Override
+            public void onResponse(Call<PublicProfile> call, Response<PublicProfile> response) {
+                new Master(EditProfileActivity.this).setUser(response.body().getPublicProfileResponse());
+                setupProfile();
+            }
+
+            @Override
+            public void onFailure(Call<PublicProfile> call, Throwable t) {
+                Log.e(TAG, "onFailure: "+t.getMessage() );
+            }
+        });
     }
 
     public void closeSheet(){
         bottomSheet.dismiss();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        setupProfile();
+    }
 }

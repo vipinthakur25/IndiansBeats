@@ -211,7 +211,7 @@ public class AddBankBottomSheetFragment extends BottomSheetDialogFragment implem
 
     private void doAddBank(String name, String account, String ifsc, String branch, String address) {
 
-        DocumentReference documentReference = db.collection("users").document();
+        DocumentReference documentReference = db.collection("customers").document();
         String id = documentReference.getId();
 
         Banks banks = new Banks();
@@ -223,7 +223,7 @@ public class AddBankBottomSheetFragment extends BottomSheetDialogFragment implem
         banks.setAddress(address);
         banks.setStatus(Constant.BANK_UNVERIFIED);
 
-        db.collection("users")
+        db.collection("customers")
                 .document(firebaseAuth.getCurrentUser().getUid())
                 .collection("banks")
                 .document(id)

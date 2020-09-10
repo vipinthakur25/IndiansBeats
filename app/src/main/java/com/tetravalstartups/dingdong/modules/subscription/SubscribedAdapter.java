@@ -13,15 +13,17 @@ import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.tetravalstartups.dingdong.R;
+import com.tetravalstartups.dingdong.modules.subscription.model.MySubscriptionResponse;
+import com.tetravalstartups.dingdong.modules.subscription.model.MySubscriptions;
 
 import java.util.List;
 
 public class SubscribedAdapter extends RecyclerView.Adapter<SubscribedAdapter.ViewHolder> {
 
     Context context;
-    List<Subscribed> subscribedList;
+    List<MySubscriptionResponse> subscribedList;
 
-    public SubscribedAdapter(Context context, List<Subscribed> subscribedList) {
+    public SubscribedAdapter(Context context, List<MySubscriptionResponse> subscribedList) {
         this.context = context;
         this.subscribedList = subscribedList;
     }
@@ -35,10 +37,10 @@ public class SubscribedAdapter extends RecyclerView.Adapter<SubscribedAdapter.Vi
 
     @Override
     public void onBindViewHolder(@NonNull SubscribedAdapter.ViewHolder holder, int position) {
-        Subscribed subscribed = subscribedList.get(position);
+        MySubscriptionResponse subscribed = subscribedList.get(position);
         holder.tvName.setText("#"+subscribed.getName());
-        holder.tvUploads.setText(subscribed.getAvl_uploads()+"/"+subscribed.getTotal_uploads());
-        holder.tvValidity.setText(subscribed.getStart_date()+" ~ "+subscribed.getEnd_date());
+        holder.tvUploads.setText(subscribed.getAvlUploads()+"/"+subscribed.getTotalUploads());
+        holder.tvValidity.setText(subscribed.getStartDate()+" ~ "+subscribed.getEndDate());
     }
 
     @Override

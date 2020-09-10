@@ -18,7 +18,6 @@ import android.view.animation.RotateAnimation;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 import android.widget.VideoView;
 
 import androidx.annotation.NonNull;
@@ -47,16 +46,14 @@ import com.krishna.fileloader.pojo.FileResponse;
 import com.krishna.fileloader.request.FileLoadRequest;
 import com.like.LikeButton;
 import com.like.OnLikeListener;
-import com.tetravalstartups.dingdong.MainActivity;
 import com.tetravalstartups.dingdong.R;
 import com.tetravalstartups.dingdong.auth.LoginActivity;
 import com.tetravalstartups.dingdong.auth.Master;
 import com.tetravalstartups.dingdong.modules.comment.InVideoCommentBottomSheet;
 import com.tetravalstartups.dingdong.modules.create.SoundDetailActivity;
-import com.tetravalstartups.dingdong.modules.profile.view.activity.PlayVideoActivity;
+import com.tetravalstartups.dingdong.modules.player.PlayerActivity;
 import com.tetravalstartups.dingdong.modules.profile.view.activity.PublicProfileActivity;
 import com.tetravalstartups.dingdong.utils.DDLoading;
-import com.vincan.medialoader.MediaLoader;
 
 import java.io.File;
 import java.util.HashMap;
@@ -131,7 +128,7 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.VideoViewHol
                     editor.putString("video_id", video.getId());
                     editor.apply();
                     inVideoCommentBottomSheet.setStyle(DialogFragment.STYLE_NORMAL, R.style.DialogStyle);
-                    inVideoCommentBottomSheet.show(((PlayVideoActivity)context).getSupportFragmentManager(), "addBanks");
+                    inVideoCommentBottomSheet.show(((PlayerActivity)context).getSupportFragmentManager(), "addBanks");
                 } else {
                     context.startActivity(new Intent(context, LoginActivity.class));
                 }
@@ -272,7 +269,7 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.VideoViewHol
 
                 if (mp.isPlaying()) {
                     holder.ivThumbnail.setVisibility(View.INVISIBLE);
-                    int current_views = Integer.parseInt(video.getView_count());
+                    int current_views = video.getView_count();
                     int updated_view = current_views + 1;
                     HashMap hmView = new HashMap();
                     hmView.put("view_count", updated_view + "");

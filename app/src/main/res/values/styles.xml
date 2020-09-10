@@ -11,6 +11,7 @@
         <item name="android:statusBarColor">@android:color/transparent</item>
     </style>
 
+
     <style name="DingDongTabLayout" parent="TextAppearance.Design.Tab">
         <item name="textAllCaps">false</item>
         <item name="android:textAllCaps">false</item>

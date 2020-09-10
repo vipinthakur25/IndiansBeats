@@ -80,32 +80,30 @@ public class TxnDetailsBottomSheetFragment extends BottomSheetDialogFragment imp
         int status = preferences.getInt("status",-1);
 
         tvRemark.setText(remark);
-        if (type == -1){
-            tvAmount.setText("- "+amount);
-        } else if (type == 1){
-            tvAmount.setText("+ "+amount);
-        }
+        tvAmount.setText(amount+"");
         tvTimeDate.setText(time+" ~ "+date);
         tvId.setText(id);
 
         if (status == 0){
-
             ivStatus.setBackground(getResources().getDrawable(R.drawable.bg_red_circle));
             ivStatus.setImageDrawable(getResources().getDrawable(R.drawable.ic_dd_check_mark_white));
             tvStatus.setText("Pending");
-
         } else if (status == 1){
-
             ivStatus.setBackground(getResources().getDrawable(R.drawable.bg_yellow_circle));
             ivStatus.setImageDrawable(getResources().getDrawable(R.drawable.ic_dd_check_mark_white));
             tvStatus.setText("Processing");
-
         } else if (status == 2){
-
             ivStatus.setBackground(getResources().getDrawable(R.drawable.bg_green_circle));
             ivStatus.setImageDrawable(getResources().getDrawable(R.drawable.ic_dd_check_mark_white));
             tvStatus.setText("Successful");
-
+        } else if (status == 3){
+            ivStatus.setBackground(getResources().getDrawable(R.drawable.bg_red_circle));
+            ivStatus.setImageDrawable(null);
+            tvStatus.setText("Rejected");
+        } else if (status == 4){
+            ivStatus.setBackground(getResources().getDrawable(R.drawable.bg_red_circle));
+            ivStatus.setImageDrawable(null);
+            tvStatus.setText("Hold");
         }
 
         ivShare.setOnClickListener(this);
@@ -148,7 +146,7 @@ public class TxnDetailsBottomSheetFragment extends BottomSheetDialogFragment imp
     private void shareIt() {
         Uri imageUri = FileProvider.getUriForFile(
                 getContext(),
-                "com.example.homefolder.example.provider",
+                "com.tetravalstartups.dingdong.modules.passbook.provider",
                 imagePath);
         Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
         sharingIntent.setType("image/*");

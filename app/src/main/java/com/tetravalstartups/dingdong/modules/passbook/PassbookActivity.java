@@ -1,22 +1,26 @@
 package com.tetravalstartups.dingdong.modules.passbook;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.DialogFragment;
 
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.tetravalstartups.dingdong.R;
+import com.tetravalstartups.dingdong.api.APIClient;
+import com.tetravalstartups.dingdong.api.UserInterface;
 import com.tetravalstartups.dingdong.auth.Master;
+import com.tetravalstartups.dingdong.modules.passbook.redeem.model.PassbookBalance;
+import com.tetravalstartups.dingdong.modules.passbook.redeem.model.PassbookBalanceResponse;
+import com.tetravalstartups.dingdong.modules.passbook.redeem.view.RedeemActivity;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class PassbookActivity extends AppCompatActivity implements View.OnClickListener, BuyCoinBottomSheetFragment.BuyCoinListener {
 
@@ -31,10 +35,15 @@ public class PassbookActivity extends AppCompatActivity implements View.OnClickL
     private TextView tvFromYourFans;
     private TextView tvRedeemCoin;
     private TextView tvSubscriptionCoin;
+    private TextView tvTransactions;
     private FirebaseFirestore db;
 
     private Master master;
     private BuyCoinBottomSheetFragment bottomSheetFragment;
+
+    private static final String TAG = "PassbookActivity";
+
+    private UserInterface userInterface;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,7 +58,7 @@ public class PassbookActivity extends AppCompatActivity implements View.OnClickL
         tvTotalEarning = findViewById(R.id.tvTotalEarning);
         tvAvailableCoins = findViewById(R.id.tvAvailableCoins);
         tvTotalSpending = findViewById(R.id.tvTotalSpending);
-        tvBuyCoin = findViewById(R.id.tvBuyCoin);
+        tvTransactions = findViewById(R.id.tvTransactions);
         tvTimeSpend = findViewById(R.id.tvTimeSpend);
         tvDailyCheckIn = findViewById(R.id.tvDailyCheckIn);
         tvFromYourFans = findViewById(R.id.tvFromYourFans);
@@ -57,7 +66,7 @@ public class PassbookActivity extends AppCompatActivity implements View.OnClickL
         tvRedeemCoin = findViewById(R.id.tvRedeemCoin);
 
         ivGoBack.setOnClickListener(this);
-        tvBuyCoin.setOnClickListener(this);
+        tvTransactions.setOnClickListener(this);
         tvRedeemCoin.setOnClickListener(this);
 
         db = FirebaseFirestore.getInstance();
@@ -65,8 +74,9 @@ public class PassbookActivity extends AppCompatActivity implements View.OnClickL
 
         bottomSheetFragment = new BuyCoinBottomSheetFragment();
 
-        fetchBalances();
+        userInterface = APIClient.getRetrofitInstance().create(UserInterface.class);
 
+        fetchBalances();
     }
 
 
@@ -85,9 +95,10 @@ public class PassbookActivity extends AppCompatActivity implements View.OnClickL
             overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
         }
 
-        if (v == tvBuyCoin) {
-            bottomSheetFragment.setStyle(DialogFragment.STYLE_NORMAL, R.style.DialogStyle);
-            bottomSheetFragment.show(getSupportFragmentManager(), "addCoin");
+        if (v == tvTransactions) {
+            Intent intent = new Intent(PassbookActivity.this, TransactionActivity.class);
+            startActivity(intent);
+            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
         }
 
         if (v == tvRedeemCoin) {
@@ -99,29 +110,35 @@ public class PassbookActivity extends AppCompatActivity implements View.OnClickL
     }
 
     private void fetchBalances() {
-        db.collection("users")
-                .document(master.getId())
-                .collection("passbook")
-                .document("balance")
-                .addSnapshotListener(new EventListener<DocumentSnapshot>() {
-                    @Override
-                    public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
-                        assert documentSnapshot != null;
-                        String subscription_balance = documentSnapshot.getString("subscription");
-                        tvSubscriptionCoin.setText(subscription_balance);
-                    }
-                });
-    }
+        Call<PassbookBalance> call = userInterface.fetchPassbookDetails(master.getId());
+        call.enqueue(new Callback<PassbookBalance>() {
+            @Override
+            public void onResponse(Call<PassbookBalance> call, Response<PassbookBalance> response) {
+                if (response.code() == 200) {
+                    PassbookBalanceResponse passbookBalanceResponse = response.body().getData();
+                    tvSubscriptionCoin.setText(passbookBalanceResponse.getSubscription()+"");
+                    tvVideoUploads.setText(passbookBalanceResponse.getVideoUploads()+"");
+                    tvDailyCheckIn.setText(passbookBalanceResponse.getDailyRewards()+"");
+                    tvTimeSpend.setText(passbookBalanceResponse.getTimeSpent()+"");
+                    tvFromYourFans.setText(passbookBalanceResponse.getFansDonation()+"");
 
-    private void dailyCheckInStatus() {
-        String current_date = "01/01/2020";
-        String date2 = "02/01/2020";
-        SharedPreferences preferences = getSharedPreferences("check_in", 0);
-        if (preferences.getString("checked_in", "0").equals(current_date)) {
+                    int available = passbookBalanceResponse.getDailyRewards()
+                            +passbookBalanceResponse.getFansDonation()
+                            +passbookBalanceResponse.getTimeSpent()
+                            +passbookBalanceResponse.getVideoUploads();
 
-        }
-        SharedPreferences.Editor editor = preferences.edit();
+                    tvAvailableCoins.setText(available+"");
 
+                } else {
+                    Log.e(TAG, "onResponse: "+response.message());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<PassbookBalance> call, Throwable t) {
+                Log.e(TAG, "onFailure: "+t.getMessage() );
+            }
+        });
     }
 
     @Override

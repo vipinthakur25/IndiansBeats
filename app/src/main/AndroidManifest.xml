@@ -11,6 +11,7 @@
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FLASHLIGHT" />
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
 
     <application
         android:name=".App"
@@ -22,13 +23,14 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".modules.passbook.RedeemActivity"></activity>
+        <activity android:name=".modules.profile.view.activity.TAndCActivity"/>
+        <activity android:name=".modules.passbook.TransactionActivity" />
+        <activity android:name=".modules.passbook.redeem.view.RedeemActivity" />
         <activity android:name=".auth.SetupProfileActivity" />
         <activity android:name=".modules.profile.view.activity.FollowingActivity" />
         <activity android:name=".modules.player.PlayerActivity" />
         <activity android:name=".modules.profile.view.activity.PublicProfileActivity" />
         <activity android:name=".BaseActivity" />
-        <activity android:name=".modules.profile.view.activity.PlayVideoActivity" />
         <activity
             android:name=".modules.record.RecordActivity"
             android:screenOrientation="portrait" />
@@ -38,11 +40,19 @@
         <activity
             android:name=".modules.create.SoundDetailActivity"
             android:screenOrientation="portrait" />
+
         <activity
             android:name=".modules.record.PreviewActivity"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait">
+        <intent-filter>
+            <action android:name="android.intent.action.SEND" />
+            <category android:name="android.intent.category.DEFAULT" />
+            <data android:mimeType="video/mp4" />
+        </intent-filter>
+        </activity>
+
         <activity
-            android:name=".modules.create.PostActivity"
+            android:name=".modules.publish.PostActivity"
             android:screenOrientation="portrait" />
         <activity
             android:name=".ComingSoonActivity"
@@ -91,15 +101,17 @@
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity android:name=".MainActivity" />
 
+        <service android:name=".service.PublishService" />
+
         <meta-data
             android:name="CLOUDINARY_URL"
             android:value="cloudinary://797981641311225:ILAhO04JbFeOrF9ZQp3pDtFUowY@sevenbillion" />
-
     </application>
 
 </manifest>

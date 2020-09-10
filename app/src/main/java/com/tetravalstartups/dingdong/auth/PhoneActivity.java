@@ -21,7 +21,6 @@ public class PhoneActivity extends AppCompatActivity implements View.OnClickList
     private TextView tvSendOtp;
     private LinearLayout lvPhone;
     private ImageView ivGoBack;
-    private LinearLayout lhEmail;
 
 
     @Override
@@ -35,11 +34,9 @@ public class PhoneActivity extends AppCompatActivity implements View.OnClickList
         etPhoneNumber = findViewById(R.id.etPhoneNumber);
         lvPhone = findViewById(R.id.lvPhone);
         ivGoBack = findViewById(R.id.ivGoBack);
-        lhEmail = findViewById(R.id.lhEmail);
 
         tvSendOtp = findViewById(R.id.tvSendOtp);
         tvSendOtp.setOnClickListener(this);
-        lhEmail.setOnClickListener(this);
     }
 
     @Override
@@ -57,11 +54,6 @@ public class PhoneActivity extends AppCompatActivity implements View.OnClickList
 
         if (v == ivGoBack) {
             onBackPressed();
-        }
-
-        if (v == lhEmail) {
-            startActivity(new Intent(PhoneActivity.this, LoginActivity.class));
-            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
         }
     }
 

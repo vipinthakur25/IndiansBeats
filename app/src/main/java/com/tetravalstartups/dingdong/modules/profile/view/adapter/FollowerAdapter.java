@@ -2,6 +2,7 @@ package com.tetravalstartups.dingdong.modules.profile.view.adapter;
 
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,40 +11,40 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QuerySnapshot;
+import com.tetravalstartups.dingdong.api.APIClient;
 import com.tetravalstartups.dingdong.R;
-import com.tetravalstartups.dingdong.auth.LoginActivity;
+import com.tetravalstartups.dingdong.api.RequestInterface;
 import com.tetravalstartups.dingdong.auth.Master;
-import com.tetravalstartups.dingdong.modules.profile.model.Followers;
+import com.tetravalstartups.dingdong.auth.PhoneActivity;
+import com.tetravalstartups.dingdong.modules.profile.model.Follow;
+import com.tetravalstartups.dingdong.modules.profile.model.followers.FollowersResponse;
+import com.tetravalstartups.dingdong.modules.profile.view.activity.FollowersActivity;
 import com.tetravalstartups.dingdong.modules.profile.view.activity.PublicProfileActivity;
 
-import java.util.HashMap;
 import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class FollowerAdapter extends RecyclerView.Adapter<FollowerAdapter.ViewHolder> {
 
+    private static final String TAG = "FollowerAdapter";
     Context context;
-    List<Followers> followersList;
+    List<FollowersResponse> followersList;
     Master master;
     FirebaseFirestore db;
     FirebaseAuth firebaseAuth;
-    private String profile_type;
+    private RequestInterface requestInterface;
 
-    public FollowerAdapter(Context context, List<Followers> followersList, String profile_type) {
+    public FollowerAdapter(Context context, List<FollowersResponse> followersList) {
         this.context = context;
         this.followersList = followersList;
-        this.profile_type = profile_type;
     }
 
     @NonNull
@@ -53,124 +54,54 @@ public class FollowerAdapter extends RecyclerView.Adapter<FollowerAdapter.ViewHo
         master = new Master(context);
         db = FirebaseFirestore.getInstance();
         firebaseAuth = FirebaseAuth.getInstance();
+        requestInterface = APIClient.getRetrofitInstance().create(RequestInterface.class);
         return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull FollowerAdapter.ViewHolder holder, int position) {
-        Followers followers = followersList.get(position);
+        FollowersResponse followers = followersList.get(position);
 
-        if (followers.getPhoto().isEmpty()) {
-            holder.ivPhoto.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_dd_profile_inactive));
-        } else {
-            Glide.with(context).load(followers.getPhoto()).placeholder(R.drawable.dd_logo_placeholder).into(holder.ivPhoto);
-        }
+        Glide.with(context).load(followers.getPhoto()).placeholder(R.drawable.dd_logo_placeholder).into(holder.ivPhoto);
         holder.tvName.setText(followers.getName());
-        holder.tvHandle.setText("@" + followers.getHandle());
+        holder.tvHandle.setText(String.format("@%s", followers.getHandle()));
+
+        if (firebaseAuth.getCurrentUser() == null) {
+            holder.tvFollow.setVisibility(View.VISIBLE);
+            holder.tvFollow.setText(R.string.follow);
+            holder.tvFollow.setBackground(context.getResources().getDrawable(R.drawable.bg_button_gradient));
+            holder.tvFollow.setTextColor(context.getResources().getColor(R.color.colorTextTitle));
+
+        } else {
+
+            if (followers.getId().equals(master.getId())) {
+                holder.tvFollow.setVisibility(View.GONE);
+
+            } else if (followers.getMyfollow().equals("followBack")) {
+                holder.tvFollow.setVisibility(View.VISIBLE);
+                holder.tvFollow.setText(R.string.follow_back);
+                holder.tvFollow.setBackground(context.getResources().getDrawable(R.drawable.bg_button_gradient));
+                holder.tvFollow.setTextColor(context.getResources().getColor(R.color.colorTextTitle));
+
+            } else if (followers.getMyfollow().equals("following")) {
+                holder.tvFollow.setVisibility(View.VISIBLE);
+                holder.tvFollow.setText(R.string.unfollow);
+                holder.tvFollow.setBackground(context.getResources().getDrawable(R.drawable.bg_button_disabled));
+                holder.tvFollow.setTextColor(context.getResources().getColor(R.color.colorPrimary));
+            }
+        }
 
         holder.tvFollow.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                if (firebaseAuth.getCurrentUser() != null) {
-
-                    Query followingQuery = db.collection("users").document(master.getId())
-                            .collection("following").whereEqualTo("id", followers.getId());
-                    followingQuery.get()
-                            .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                                @Override
-                                public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                    if (followers.getId().equals(master.getId())) {
-                                        holder.tvFollow.setVisibility(View.GONE);
-                                    } else if (task.getResult().getDocuments().isEmpty()) {
-                                        holder.tvFollow.setVisibility(View.VISIBLE);
-                                        holder.tvFollow.setText("Follow");
-                                        holder.tvFollow.setBackground(context.getResources().getDrawable(R.drawable.bg_button_gradient));
-                                        holder.tvFollow.setTextColor(context.getResources().getColor(R.color.colorTextTitle));
-
-                                        HashMap hmFollowing = new HashMap();
-                                        hmFollowing.put("id", followers.getId());
-                                        hmFollowing.put("handle", followers.getHandle());
-                                        hmFollowing.put("photo", followers.getPhoto());
-                                        hmFollowing.put("name", followers.getName());
-
-
-                                        HashMap hmFollower = new HashMap();
-                                        hmFollower.put("id", master.getId());
-                                        hmFollower.put("handle", master.getHandle());
-                                        hmFollower.put("photo", master.getPhoto());
-                                        hmFollower.put("name", master.getName());
-
-                                        db.collection("users")
-                                                .document(master.getId())
-                                                .collection("following")
-                                                .document(followers.getId())
-                                                .set(hmFollowing);
-
-                                        db.collection("users")
-                                                .document(followers.getId())
-                                                .collection("followers")
-                                                .document(followers.getId())
-                                                .set(hmFollower);
-
-                                    } else {
-                                        holder.tvFollow.setVisibility(View.VISIBLE);
-                                        holder.tvFollow.setText("Unfollow");
-                                        holder.tvFollow.setBackground(context.getResources().getDrawable(R.drawable.bg_button_white));
-                                        holder.tvFollow.setTextColor(context.getResources().getColor(R.color.colorPrimary));
-
-                                        db.collection("users")
-                                                .document(master.getId())
-                                                .collection("following")
-                                                .document(followers.getId())
-                                                .delete();
-
-                                        db.collection("users")
-                                                .document(followers.getId())
-                                                .collection("followers")
-                                                .document(followers.getId())
-                                                .delete();
-
-                                    }
-                                }
-                            });
-
+                if (firebaseAuth.getCurrentUser() == null) {
+                    context.startActivity(new Intent(context, PhoneActivity.class));
                 } else {
-                    context.startActivity(new Intent(context, LoginActivity.class));
+                    doFollow(followers);
                 }
-
             }
         });
 
-        if (firebaseAuth.getCurrentUser() != null) {
-
-            Query followingQuery = db.collection("users").document(master.getId())
-                    .collection("following").whereEqualTo("id", followers.getId());
-            followingQuery.addSnapshotListener(new EventListener<QuerySnapshot>() {
-                @Override
-                public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
-                    if (followers.getId().equals(master.getId())) {
-                        holder.tvFollow.setVisibility(View.GONE);
-                    } else if (queryDocumentSnapshots.getDocuments().isEmpty()) {
-                        holder.tvFollow.setVisibility(View.VISIBLE);
-                        holder.tvFollow.setText("Follow");
-                        holder.tvFollow.setBackground(context.getResources().getDrawable(R.drawable.bg_button_gradient));
-                        holder.tvFollow.setTextColor(context.getResources().getColor(R.color.colorTextTitle));
-                    } else {
-                        holder.tvFollow.setVisibility(View.VISIBLE);
-                        holder.tvFollow.setText("Unfollow");
-                        holder.tvFollow.setBackground(context.getResources().getDrawable(R.drawable.bg_button_white));
-                        holder.tvFollow.setTextColor(context.getResources().getColor(R.color.colorPrimary));
-                    }
-                }
-            });
-
-        } else {
-            holder.tvFollow.setVisibility(View.VISIBLE);
-            holder.tvFollow.setText("Follow");
-            holder.tvFollow.setBackground(context.getResources().getDrawable(R.drawable.bg_button_gradient));
-            holder.tvFollow.setTextColor(context.getResources().getColor(R.color.colorTextTitle));
-        }
 
         holder.lhFollower.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -181,7 +112,26 @@ public class FollowerAdapter extends RecyclerView.Adapter<FollowerAdapter.ViewHo
             }
         });
 
+    }
 
+    private void doFollow(FollowersResponse followers) {
+        Call<Follow> call = requestInterface.doFollowUser(master.getId(), followers.getId());
+        call.enqueue(new Callback<Follow>() {
+            @Override
+            public void onResponse(Call<Follow> call, Response<Follow> response) {
+                if (response.code() == 200) {
+                    notifyDataSetChanged();
+                    ((FollowersActivity) context).fetchFollowers();
+                } else {
+                    Log.e(TAG, "onResponse: " + response.message());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Follow> call, Throwable t) {
+                Log.e(TAG, "onFailure: " + t.getMessage());
+            }
+        });
     }
 
     @Override

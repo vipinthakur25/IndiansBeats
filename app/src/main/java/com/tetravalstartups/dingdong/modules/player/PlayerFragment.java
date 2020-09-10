@@ -6,37 +6,32 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.PagerSnapHelper;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.SnapHelper;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import com.daimajia.androidanimations.library.Techniques;
-import com.daimajia.androidanimations.library.YoYo;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QuerySnapshot;
+import com.tetravalstartups.dingdong.api.APIClient;
 import com.tetravalstartups.dingdong.R;
-import com.tetravalstartups.dingdong.modules.home.video.Video;
-import com.tetravalstartups.dingdong.utils.Constant;
+import com.tetravalstartups.dingdong.api.RequestInterface;
+import com.tetravalstartups.dingdong.auth.Master;
+import com.tetravalstartups.dingdong.modules.profile.videos.VideoResponseDatum;
+import com.tetravalstartups.dingdong.modules.profile.videos.created.CreatedVideo;
 import com.tetravalstartups.dingdong.utils.DDLoading;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class PlayerFragment extends Fragment implements View.OnClickListener, SwipeRefreshLayout.OnRefreshListener {
 
@@ -44,21 +39,14 @@ public class PlayerFragment extends Fragment implements View.OnClickListener, Sw
     private View view;
     private RecyclerView recyclerVideos;
     private SwipeRefreshLayout mSwipeRefreshLayout;
-    private List<Video> videoList = new ArrayList<>();
-    PlayerAdapter playerAdapter;
+    private List<VideoResponseDatum> videoList = new ArrayList<>();
+    ___PlayerAdapter playerAdapter;
     private TextView tvTrending, tvFollowing;
-    private ImageView ivWhatsapp;
     private DDLoading ddLoading;
-
-    // recyclerview configuration
-    private int limit = 30;
-    private DocumentSnapshot lastVisible;
-    private boolean isScrolling = false;
-    private boolean isLastItemReached = false;
-
     private SharedPreferences preferences;
+    private Master master;
 
-    private FirebaseFirestore rootRef = FirebaseFirestore.getInstance();
+    private RequestInterface requestInterface;
 
 
     public PlayerFragment() {
@@ -72,6 +60,7 @@ public class PlayerFragment extends Fragment implements View.OnClickListener, Sw
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_player, container, false);
+        requestInterface = APIClient.getRetrofitInstance().create(RequestInterface.class);
         initView();
         return view;
     }
@@ -84,15 +73,9 @@ public class PlayerFragment extends Fragment implements View.OnClickListener, Sw
         tvFollowing = view.findViewById(R.id.tvFollowing);
         tvTrending = view.findViewById(R.id.tvTrending);
 
-        ivWhatsapp = view.findViewById(R.id.ivWhatsapp);
-        ivWhatsapp.setOnClickListener(this);
-
         preferences = getContext().getSharedPreferences("video_index", 0);
 
-        YoYo.with(Techniques.Pulse)
-                .duration(2500)
-                .repeat(YoYo.INFINITE)
-                .playOn(ivWhatsapp);
+        master = new Master(getContext());
 
         ddLoading = DDLoading.getInstance();
         mSwipeRefreshLayout.setRefreshing(true);
@@ -100,116 +83,38 @@ public class PlayerFragment extends Fragment implements View.OnClickListener, Sw
     }
 
     private void setupAdapter() {
-
-        CollectionReference videosRef = rootRef.collection("videos");
-        Query query = videosRef.whereEqualTo("video_status", Constant.VIDEO_STATUS_PUBLIC)
-                .orderBy("timestamp", Query.Direction.DESCENDING).limit(limit);
-
-        SnapHelper snapHelper = new PagerSnapHelper();
         recyclerVideos.setLayoutManager(new LinearLayoutManager(getContext()));
+        SnapHelper snapHelper = new PagerSnapHelper();
         if (recyclerVideos.getOnFlingListener() == null)
             snapHelper.attachToRecyclerView(recyclerVideos);
-        playerAdapter = new PlayerAdapter(getContext(), videoList);
-
-        query.get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
-                    if (queryDocumentSnapshots.getDocuments().isEmpty()) {
-                        Toast.makeText(getContext(), "No Videos", Toast.LENGTH_SHORT).show();
-                        mSwipeRefreshLayout.setRefreshing(false);
-                    } else {
-                        videoList.clear();
-                        for (DocumentSnapshot snapshot : queryDocumentSnapshots.getDocuments()) {
-                            Video video = snapshot.toObject(Video.class);
-                            videoList.add(video);
-                        }
-                        recyclerVideos.setAdapter(playerAdapter);
-                        mSwipeRefreshLayout.setRefreshing(false);
-                        playerAdapter.notifyDataSetChanged();
-                        lastVisible = queryDocumentSnapshots.getDocuments().get(queryDocumentSnapshots.size() - 1);
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(getContext(), "" + e.getMessage(), Toast.LENGTH_SHORT).show();
-                        mSwipeRefreshLayout.setRefreshing(false);
-                    }
-                });
-
-        recyclerVideos.addOnScrollListener(new RecyclerView.OnScrollListener() {
+        Call<CreatedVideo> call = requestInterface.getAllVideos(master.getId(), 250);
+        call.enqueue(new Callback<CreatedVideo>() {
             @Override
-            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
-                super.onScrollStateChanged(recyclerView, newState);
-                if (newState == AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL) {
-                    isScrolling = true;
+            public void onResponse(Call<CreatedVideo> call, Response<CreatedVideo> response) {
+                if (response.code() == 200) {
+                    CreatedVideo createdVideo = response.body();
+                    List<VideoResponseDatum> createdVideosArrayList = new ArrayList<>(createdVideo.getData());
+                    playerAdapter = new ___PlayerAdapter(getContext(), createdVideosArrayList);
+                    playerAdapter.notifyDataSetChanged();
+                    recyclerVideos.setAdapter(playerAdapter);
+                    mSwipeRefreshLayout.setRefreshing(false);
+                } else {
+                    Toast.makeText(getContext(), "No Videos", Toast.LENGTH_SHORT).show();
                 }
+
             }
 
             @Override
-            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-
-                LinearLayoutManager linearLayoutManager = ((LinearLayoutManager) recyclerView.getLayoutManager());
-                int firstVisibleItemPosition = linearLayoutManager.findFirstVisibleItemPosition();
-                int visibleItemCount = linearLayoutManager.getChildCount();
-                int totalItemCount = linearLayoutManager.getItemCount();
-
-                if (isScrolling && (firstVisibleItemPosition + visibleItemCount == totalItemCount) && !isLastItemReached) {
-                    isScrolling = false;
-                    mSwipeRefreshLayout.setRefreshing(true);
-                    Query nextQuery = videosRef.whereEqualTo("video_status", Constant.VIDEO_STATUS_PUBLIC)
-                            .orderBy("timestamp", Query.Direction.DESCENDING)
-                            .startAfter(lastVisible).limit(limit);
-                    nextQuery.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                        @Override
-                        public void onComplete(@NonNull Task<QuerySnapshot> t) {
-                            if (t.isSuccessful()) {
-                                for (DocumentSnapshot d : t.getResult()) {
-                                    Video video = d.toObject(Video.class);
-                                    videoList.add(video);
-                                }
-                                playerAdapter.notifyDataSetChanged();
-                                mSwipeRefreshLayout.setRefreshing(false);
-                                lastVisible = t.getResult().getDocuments().get(t.getResult().size() - 1);
-
-                                if (t.getResult().size() < limit) {
-                                    isLastItemReached = true;
-                                }
-                            }
-                        }
-                    });
-                }
+            public void onFailure(Call<CreatedVideo> call, Throwable t) {
 
             }
         });
-
-    }
-
-    private void shareOnWhatsapp() {
-        try {
-            Intent shareIntent = new Intent();
-            shareIntent.setAction(Intent.ACTION_SEND);
-            shareIntent.setPackage("com.whatsapp");
-            shareIntent.putExtra(Intent.EXTRA_TEXT, "Hey your friend is using *Ding Dong* which is an *Hybrid video sharing app*. Here is the *download* link:\nhttps://bit.ly/33bQke3\n\n*Create . Share . Earn*");
-            shareIntent.setType("text/plain");
-            startActivity(shareIntent);
-        } catch (Exception e) {
-            e.printStackTrace();
-            Intent shareIntent = new Intent();
-            shareIntent.setAction(Intent.ACTION_SEND);
-            shareIntent.setPackage("com.whatsapp.w4b");
-            shareIntent.putExtra(Intent.EXTRA_TEXT, "Hey your friend is using *Ding Dong* which is an *Hybrid video sharing app*. Here is the *download* link:\nhttps://bit.ly/33bQke3\n\n*Create . Share . Earn*");
-            shareIntent.setType("text/plain");
-            startActivity(shareIntent);
-        }
     }
 
 
     @Override
     public void onClick(View v) {
-        if (v == ivWhatsapp) {
-            shareOnWhatsapp();
-        }
+
     }
 
 

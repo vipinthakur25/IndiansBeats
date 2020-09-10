@@ -32,7 +32,7 @@ public class ReservedCoinTxnPresenter {
     public void fetchTxn(String uid){
         List<ReservedCoinsTxn> reservedCoinsTxnList = new ArrayList<>();
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("users")
+        db.collection("customers")
                 .document(uid)
                 .collection("reserved_coins_txn")
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {

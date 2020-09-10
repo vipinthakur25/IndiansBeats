@@ -19,9 +19,6 @@ public class PassbookPagerAdapter extends FragmentPagerAdapter {
                 return new ReservedFragment();
 
             case 1:
-                return new UnreservedFragment();
-
-            case 2:
                 return new CashbackFragment();
 
             default:

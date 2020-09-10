@@ -21,4 +21,6 @@
     <string name="folder_creation_problem">folder not created</string>
     <string name="gallery">Gallery</string>
     <string name="filters">Filters</string>
+    <string name="unfollow">Unfollow</string>
+    <string name="follow_back">Follow Back</string>
 </resources>

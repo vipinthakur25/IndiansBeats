@@ -57,7 +57,7 @@ public class BanksAdapter extends RecyclerView.Adapter<BanksAdapter.ViewHolder> 
                         .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
-                                    db.collection("users")
+                                    db.collection("customers")
                                             .document(firebaseAuth.getCurrentUser().getUid())
                                             .collection("banks")
                                             .document(banks.getId())

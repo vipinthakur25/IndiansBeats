@@ -1,33 +1,48 @@
 package com.tetravalstartups.dingdong.modules.passbook;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.fragment.app.DialogFragment;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
-import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.tetravalstartups.dingdong.R;
+import com.tetravalstartups.dingdong.api.APIClient;
+import com.tetravalstartups.dingdong.api.PlanInterface;
+import com.tetravalstartups.dingdong.api.UserInterface;
 import com.tetravalstartups.dingdong.auth.Master;
-import com.tetravalstartups.dingdong.utils.Constant;
+import com.tetravalstartups.dingdong.modules.passbook.redeem.model.PayoutRequestResponse;
+import com.tetravalstartups.dingdong.modules.passbook.redeem.view.PayoutConfirmationBottomSheet;
+import com.tetravalstartups.dingdong.modules.passbook.redeem.view.RedeemActivity;
+import com.tetravalstartups.dingdong.modules.passbook.transactions.model.TransactionResponse;
 import com.tetravalstartups.dingdong.utils.DDLoading;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class CoinRedeemBottomSheet extends BottomSheetDialogFragment implements View.OnClickListener {
 
@@ -49,11 +64,15 @@ public class CoinRedeemBottomSheet extends BottomSheetDialogFragment implements 
 
     private String earning_type;
 
-    int processing = 0;
     int in_hand = 0;
-    int w_draw = 0;
-
+    double redeemable_inr = 0;
+    String earning_status;
     private DDLoading ddLoading;
+    private UserInterface userInterface;
+    private PlanInterface planInterface;
+
+
+    private static final String TAG = "CoinRedeemBottomSheet";
 
     @Nullable
     @Override
@@ -82,14 +101,17 @@ public class CoinRedeemBottomSheet extends BottomSheetDialogFragment implements 
         tvInHand = view.findViewById(R.id.tvInHand);
 
         ddLoading = DDLoading.getInstance();
+        userInterface = APIClient.getRetrofitInstance().create(UserInterface.class);
+        planInterface = APIClient.getRetrofitInstance().create(PlanInterface.class);
 
-        String redeemable_percent = this.getArguments().getString("redeemable_percent");
-        String processing_fees = this.getArguments().getString("processing_fees");
+
+        int redeemable_percent = this.getArguments().getInt("redeemable_percent");
+        int processing_fees = this.getArguments().getInt("processing_fees");
         earning_type = this.getArguments().getString("earning_type");
-        String earning = this.getArguments().getString("earning");
-        String conversion_rate = this.getArguments().getString("conversion_rate");
+        int earning = this.getArguments().getInt("earning");
+        double conversion_rate = this.getArguments().getDouble("conversion_rate");
 
-        setupRateCard(redeemable_percent, processing_fees, earning_type, earning, conversion_rate);
+        setupRateCard(redeemable_percent, processing_fees, earning, conversion_rate);
 
         etAmountToWithdraw.addTextChangedListener(new TextWatcher() {
             @Override
@@ -99,36 +121,23 @@ public class CoinRedeemBottomSheet extends BottomSheetDialogFragment implements 
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-                int fees = Integer.parseInt(processing_fees);
-                int percent = Integer.parseInt(redeemable_percent);
-                int amount = Integer.parseInt(earning);
-                int conversion = Integer.parseInt(conversion_rate);
-                int in_inr = amount * conversion;
-                int redeemable = (in_inr * percent) / 100;
-
                 String withdraw = etAmountToWithdraw.getText().toString();
-                if (!withdraw.isEmpty()) {
-                    w_draw = Integer.parseInt(withdraw);
-                    if (w_draw >= 0) {
-                        if (w_draw <= redeemable) {
-
-                            processing = (w_draw * fees) / 100;
-                            in_hand = w_draw - processing;
-
-                            tvProcessingFee.setText(processing + "");
-                            tvInHand.setText(in_hand + "");
-
-                        } else {
-                            etAmountToWithdraw.setError("Amount must be less than " + redeemable);
-                        }
-                    }
+                if (withdraw.isEmpty()) {
+                    tvProcessingFee.setText("...");
+                    tvInHand.setText("...");
                 } else {
-                    tvProcessingFee.setText("0");
-                    tvInHand.setText("0");
+                    int withdraw_int = Integer.parseInt(withdraw);
+                    int redeemable = (earning * redeemable_percent) / 100;
+                    redeemable_inr = redeemable * conversion_rate;
+                    if (withdraw_int <= redeemable_inr) {
+                        int fees = (withdraw_int * 10) / 100;
+                        in_hand = withdraw_int - fees;
+                        tvInHand.setText(in_hand + "");
+                        tvProcessingFee.setText(fees + "");
+                    } else {
+                        etAmountToWithdraw.setError("Amount must me less than ₹" + redeemable_inr);
+                    }
                 }
-
-
             }
 
             @Override
@@ -141,109 +150,63 @@ public class CoinRedeemBottomSheet extends BottomSheetDialogFragment implements 
     @Override
     public void onClick(View view) {
         if (view == tvRequest) {
-
-            ddLoading.showProgress(getActivity(), "Processing Request...", false);
-
-            String redeemable_percent = this.getArguments().getString("redeemable_percent");
-            String processing_fees = this.getArguments().getString("processing_fees");
-            earning_type = this.getArguments().getString("earning_type");
-            String earning = this.getArguments().getString("earning");
-            String conversion_rate = this.getArguments().getString("conversion_rate");
-
-            int percent = Integer.parseInt(redeemable_percent);
-            int amount = Integer.parseInt(earning);
-            double conversion = Double.parseDouble(conversion_rate);
-            double in_inr = amount * conversion;
-            double redeemable = (in_inr * percent) / 100;
-
-            CollectionReference collectionReference = db.collection("payouts");
-            DocumentReference documentReference = collectionReference.document();
-            String request_id = documentReference.getId();
-
-            DateFormat df = new SimpleDateFormat("h:mm a ~ d MMM yyyy");
-            String date = df.format(Calendar.getInstance().getTime());
-
-            DateFormat dfTime = new SimpleDateFormat("h:mm a");
-            String txnTime = dfTime.format(Calendar.getInstance().getTime());
-
-            DateFormat dfDate = new SimpleDateFormat("d MMM yyyy");
-            String txnDate = dfDate.format(Calendar.getInstance().getTime());
-
-            PayoutRequest payoutRequest = new PayoutRequest();
-            payoutRequest.setId(request_id);
-            payoutRequest.setUser_id(master.getId());
-            payoutRequest.setUser_name(master.getName());
-            payoutRequest.setUser_handle(master.getHandle());
-            payoutRequest.setUser_email(master.getEmail());
-            payoutRequest.setUser_photo(master.getPhoto());
-
-            if (earning_type.equals("organic")) {
-                payoutRequest.setRequest_type(Constant.PAYOUT_REQUEST_TYPE_ORGANIC);
-            } else if (earning_type.equals("subscription")) {
-                payoutRequest.setRequest_type(Constant.PAYOUT_REQUEST_TYPE_SUBS);
+            String withdraw = etAmountToWithdraw.getText().toString();
+            if (withdraw.isEmpty()) {
+                etAmountToWithdraw.setError("Withdrawal amount required");
+                return;
             }
 
-            payoutRequest.setCoin_balance_at_request(earning);
-            payoutRequest.setInr_balance_at_request(in_inr + "");
-            payoutRequest.setConversion_rate_at_request(conversion_rate);
-            payoutRequest.setRedeemable_percent_at_request(redeemable_percent);
-            payoutRequest.setRedeemable_balance_at_request(redeemable + "");
-            payoutRequest.setProcessing_fee_percent_at_request(processing_fees);
-            payoutRequest.setProcessing_fee_amount_at_request(processing + "");
-            payoutRequest.setIn_hand_balance_at_request(in_hand + "");
-            payoutRequest.setTo_withdraw_balance_at_request(w_draw + "");
-            payoutRequest.setStatus(String.valueOf(Constant.TXN_STATUS_PENDING));
-            payoutRequest.setTxn_date(txnDate);
-            payoutRequest.setTxn_time(txnTime);
+            if (in_hand < 500) {
+                etAmountToWithdraw.setError("In hand amount must be greater than ₹500");
+                return;
+            }
 
+            if (in_hand > redeemable_inr) {
+                etAmountToWithdraw.setError("In hand amount must be less than ₹" + redeemable_inr);
+                return;
+            }
 
-            db.collection("payouts")
-                    .document(request_id)
-                    .set(payoutRequest)
-                    .addOnCompleteListener(new OnCompleteListener<Void>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Void> task) {
-
-                            int updated_balance = amount - w_draw;
-                            HashMap hashMap = new HashMap();
-                            if (earning_type.equals("organic")) {
-                                hashMap.put("unreserved", updated_balance + "");
-                            } else if (earning_type.equals("subscription")) {
-                                hashMap.put("subscription", updated_balance + "");
-                            }
-
-                            db.collection("users")
-                                    .document(master.getId())
-                                    .collection("passbook")
-                                    .document("balance")
-                                    .update(hashMap)
-                                    .addOnCompleteListener(new OnCompleteListener() {
-                                        @Override
-                                        public void onComplete(@NonNull Task task) {
-                                            etAmountToWithdraw.setText("");
-                                            ddLoading.hideProgress();
-                                            coinRedeemListener.sendData("done");
-                                        }
-                                    });
-                        }
-                    });
+            showConfirmationDialog();
         }
     }
 
-    private void setupRateCard(String redeemable_percent, String processing_fees, String earning_type, String earning, String conversion_rate) {
-        int percent = Integer.parseInt(redeemable_percent);
-        int amount = Integer.parseInt(earning);
-        double conversion = Double.parseDouble(conversion_rate);
+    private void showConfirmationDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        LayoutInflater inflater = this.getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.payout_confirmation, null);
+        AlertDialog alertDialog = builder.create();
+        alertDialog.setView(dialogView);
+        TextView tvOkay = dialogView.findViewById(R.id.tvOkay);
+        TextView tvCancel = dialogView.findViewById(R.id.tvCancel);
+        tvOkay.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                alertDialog.dismiss();
+                ddLoading.showProgress(getContext(), "Hold On...", false);
+                doRequestPayout();
+            }
+        });
 
-        double in_inr = amount * conversion;
-        int redeemable = (amount * percent) / 100;
+        tvCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                alertDialog.dismiss();
+            }
+        });
 
-        tvBalanceInCoins.setText(amount + "");
-        tvConversionRate.setText(conversion + "");
-        tvBalanceInRs.setText(in_inr + "");
-        tvRedeemableBalance.setText(redeemable + "");
-
+        alertDialog.show();
     }
+
+    private void setupRateCard(int redeemable_percent, int processing_fees, int earning, double conversion_rate) {
+        double in_inr = earning * conversion_rate;
+        int redeemable = (earning * redeemable_percent) / 100;
+        double redeemable_inr = redeemable * conversion_rate;
+        tvBalanceInCoins.setText(earning + "");
+        tvConversionRate.setText(conversion_rate + "");
+        tvBalanceInRs.setText(in_inr + "");
+        tvRedeemableBalance.setText(redeemable_inr + "");
+    }
+
 
     public interface CoinRedeemListener {
         void sendData(String data);
@@ -252,14 +215,62 @@ public class CoinRedeemBottomSheet extends BottomSheetDialogFragment implements 
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
-
         try {
             coinRedeemListener = (CoinRedeemBottomSheet.CoinRedeemListener) context;
         } catch (ClassCastException e) {
             throw new ClassCastException(context.toString()
                     + " must implement BottomSheetListener");
         }
+    }
 
+    private void doRequestPayout() {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        DocumentReference documentReference = db.collection("Payouts").document();
+        String id = documentReference.getId();
+        if (earning_type.equals("organic")) {
+            earning_status = "0";
+        } else if (earning_type.equals("subscription")) {
+            earning_status = "1";
+        }
+        Call<PayoutRequestResponse> call = userInterface.payoutRequest(
+                id,
+                master.getId(),
+                String.valueOf(in_hand),
+                earning_status
+        );
+        call.enqueue(new Callback<PayoutRequestResponse>() {
+            @Override
+            public void onResponse(Call<PayoutRequestResponse> call, Response<PayoutRequestResponse> response) {
+                ddLoading.hideProgress();
+                if (response.code() == 200) {
+                    etAmountToWithdraw.setText("");
+                    coinRedeemListener.sendData("success");
+                    Toast.makeText(getContext(), "Payout Request Successful", Toast.LENGTH_SHORT).show();
+                    ((RedeemActivity) getContext()).fetchPayoutRequest();
+                } else if (response.code() == 400) {
+                    coinRedeemListener.sendData("failed");
+                    Toast.makeText(getContext(), "You have already request for payout in this month.", Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<PayoutRequestResponse> call, Throwable t) {
+                ddLoading.hideProgress();
+                Log.e(TAG, "onFailure: " + t.getMessage());
+            }
+        });
+    }
+
+    private String getCurrentDate() {
+        DateFormat dfDate = new SimpleDateFormat("d MMM yyyy");
+        String txnDate = dfDate.format(Calendar.getInstance().getTime());
+        return txnDate;
+    }
+
+    private String getCurrentTime() {
+        DateFormat dfTime = new SimpleDateFormat("h:mm a");
+        String txnTime = dfTime.format(Calendar.getInstance().getTime());
+        return txnTime;
     }
 
 

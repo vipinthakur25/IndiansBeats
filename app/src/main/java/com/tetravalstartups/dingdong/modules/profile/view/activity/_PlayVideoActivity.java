@@ -94,20 +94,20 @@ public class _PlayVideoActivity extends BaseActivity {
                             privateDraftVideosList.clear();
                             for (DocumentSnapshot snapshot : queryDocumentSnapshots.getDocuments()){
                                 Video video = new Video();
-                                video.setId(snapshot.getString("id"));
-                                video.setVideo_desc(snapshot.getString("video_desc"));
-                                video.setSound_id(snapshot.getString("sound_id"));
-                                video.setSound_title(snapshot.getString("sound_title"));
-                                video.setLikes_count(snapshot.getString("likes_count"));
-                                video.setShare_count(snapshot.getString("share_count"));
-                                video.setComment_count(snapshot.getString("comment_count"));
-                                video.setView_count(snapshot.getString("view_count"));
-                                video.setUser_id(snapshot.getString("user_id"));
-                                video.setUser_handle(snapshot.getString("user_handle"));
-                                video.setUser_photo(snapshot.getString("user_photo"));
-                                video.setVideo_thumbnail(snapshot.getString("video_thumbnail"));
-                                video.setVideo_status(snapshot.getString("video_status"));
-                                video.setVideo_status(snapshot.getString("video_status"));
+//                                video.setId(snapshot.getString("id"));
+//                                video.setVideo_desc(snapshot.getString("video_desc"));
+//                                video.setSound_id(snapshot.getString("sound_id"));
+//                                video.setSound_title(snapshot.getString("sound_title"));
+//                                video.setLikes_count(snapshot.getString("likes_count"));
+//                                video.setShare_count(snapshot.getString("share_count"));
+//                                video.setComment_count(snapshot.getString("comment_count"));
+//                                video.setView_count(snapshot.getString("view_count"));
+//                                video.setUser_id(snapshot.getString("user_id"));
+//                                video.setUser_handle(snapshot.getString("user_handle"));
+//                                video.setUser_photo(snapshot.getString("user_photo"));
+//                                video.setVideo_thumbnail(snapshot.getString("video_thumbnail"));
+//                                video.setVideo_status(snapshot.getString("video_status"));
+//                                video.setVideo_status(snapshot.getString("video_status"));
                                 privateDraftVideosList.add(video);
                             }
 
@@ -232,20 +232,20 @@ public class _PlayVideoActivity extends BaseActivity {
                                 videoList.clear();
                                 for (DocumentSnapshot snapshot : task.getResult()) {
                                     Video video = new Video();
-                                    video.setId(snapshot.getString("id"));
-                                    video.setVideo_desc(snapshot.getString("video_desc"));
-                                    video.setSound_id(snapshot.getString("sound_id"));
-                                    video.setSound_title(snapshot.getString("sound_title"));
-                                    video.setLikes_count(snapshot.getString("likes_count"));
-                                    video.setShare_count(snapshot.getString("share_count"));
-                                    video.setComment_count(snapshot.getString("comment_count"));
-                                    video.setView_count(snapshot.getString("view_count"));
-                                    video.setUser_id(snapshot.getString("user_id"));
-                                    video.setUser_handle(snapshot.getString("user_handle"));
-                                    video.setUser_photo(snapshot.getString("user_photo"));
-                                    video.setVideo_thumbnail(snapshot.getString("video_thumbnail"));
-                                    video.setVideo_status(snapshot.getString("video_status"));
-                                    video.setVideo_status(snapshot.getString("video_status"));
+//                                    video.setId(snapshot.getString("id"));
+//                                    video.setVideo_desc(snapshot.getString("video_desc"));
+//                                    video.setSound_id(snapshot.getString("sound_id"));
+//                                    video.setSound_title(snapshot.getString("sound_title"));
+//                                    video.setLikes_count(snapshot.getString("likes_count"));
+//                                    video.setShare_count(snapshot.getString("share_count"));
+//                                    video.setComment_count(snapshot.getString("comment_count"));
+//                                    video.setView_count(snapshot.getString("view_count"));
+//                                    video.setUser_id(snapshot.getString("user_id"));
+//                                    video.setUser_handle(snapshot.getString("user_handle"));
+//                                    video.setUser_photo(snapshot.getString("user_photo"));
+//                                    video.setVideo_thumbnail(snapshot.getString("video_thumbnail"));
+//                                    video.setVideo_status(snapshot.getString("video_status"));
+//                                    video.setVideo_status(snapshot.getString("video_status"));
                                     videoList.add(video);
                                 }
 

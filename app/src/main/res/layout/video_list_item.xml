@@ -125,8 +125,8 @@
 
                <com.like.LikeButton
                    android:id="@+id/likeVideo"
-                   android:layout_width="55dp"
-                   android:layout_height="40dp"
+                   android:layout_width="45dp"
+                   android:layout_height="30dp"
                    app:icon_size="35dp"
                    app:icon_type="heart"
                    app:like_drawable="@drawable/dd_home_liked"
@@ -138,6 +138,7 @@
                    android:layout_height="wrap_content"
                    android:fontFamily="@font/montserrat_bold"
                    android:text="14.2K"
+                   android:textSize="12sp"
                    android:textColor="@color/colorTextTitle" />
 
             </LinearLayout>
@@ -151,8 +152,8 @@
                 android:orientation="vertical">
 
                <ImageView
-                   android:layout_width="40dp"
-                   android:layout_height="40dp"
+                   android:layout_width="30dp"
+                   android:layout_height="30dp"
                    android:src="@drawable/dd_home_comment" />
 
                <TextView
@@ -173,8 +174,8 @@
                 android:orientation="vertical">
 
                <ImageView
-                   android:layout_width="40dp"
-                   android:layout_height="40dp"
+                   android:layout_width="30dp"
+                   android:layout_height="30dp"
                    android:src="@drawable/dd_home_share" />
 
                <TextView
@@ -230,8 +231,8 @@
 
          <ImageView
              android:id="@+id/ivSoundCD"
-             android:layout_width="50dp"
-             android:layout_height="50dp"
+             android:layout_width="40dp"
+             android:layout_height="40dp"
              android:src="@drawable/dd_sound_cd" />
 
       </LinearLayout>

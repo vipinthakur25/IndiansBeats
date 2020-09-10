@@ -114,7 +114,7 @@ public class BuyCoinBottomSheetFragment extends BottomSheetDialogFragment implem
         lvBuyCoin.setVisibility(View.GONE);
         lvTxn.setVisibility(View.VISIBLE);
         tvSubscription.setEnabled(false);
-        db.collection("users")
+        db.collection("customers")
                 .document(firebaseAuth.getCurrentUser().getUid())
                 .collection("passbook")
                 .document("balance")
@@ -132,7 +132,7 @@ public class BuyCoinBottomSheetFragment extends BottomSheetDialogFragment implem
 
                             HashMap<String, Object> hashMap = new HashMap<>();
                             hashMap.put("unreserved", unreserved);
-                            db.collection("users")
+                            db.collection("customers")
                                     .document(firebaseAuth.getCurrentUser().getUid())
                                     .collection("passbook")
                                     .document("balance")
@@ -141,7 +141,7 @@ public class BuyCoinBottomSheetFragment extends BottomSheetDialogFragment implem
                                         @Override
                                         public void onComplete(@NonNull Task<Void> task) {
                                             if (task.isSuccessful()){
-                                                DocumentReference documentReference = db.collection("users").document();
+                                                DocumentReference documentReference = db.collection("customers").document();
                                                 String id = documentReference.getId();
                                                 UnreservedCoinTxn unreservedCoinTxn = new UnreservedCoinTxn();
                                                 unreservedCoinTxn.setId(id);
@@ -151,7 +151,7 @@ public class BuyCoinBottomSheetFragment extends BottomSheetDialogFragment implem
                                                 unreservedCoinTxn.setDate(txnDate);
                                                 unreservedCoinTxn.setRemark(Constant.TXN_REMARK_COIN_PURCHASE);
                                                 unreservedCoinTxn.setStatus(String.valueOf(2));
-                                                db.collection("users")
+                                                db.collection("customers")
                                                         .document(firebaseAuth.getCurrentUser().getUid())
                                                         .collection("unreserved_coins_txn")
                                                         .document(id)

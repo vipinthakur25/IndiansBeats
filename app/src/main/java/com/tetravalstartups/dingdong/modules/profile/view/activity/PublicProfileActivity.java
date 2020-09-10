@@ -1,43 +1,41 @@
 package com.tetravalstartups.dingdong.modules.profile.view.activity;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.viewpager.widget.ViewPager;
-
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.viewpager.widget.ViewPager;
+
 import com.bumptech.glide.Glide;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QuerySnapshot;
+import com.tetravalstartups.dingdong.api.APIClient;
 import com.tetravalstartups.dingdong.R;
-import com.tetravalstartups.dingdong.auth.LoginActivity;
+import com.tetravalstartups.dingdong.api.RequestInterface;
 import com.tetravalstartups.dingdong.auth.Master;
-import com.tetravalstartups.dingdong.auth.Profile;
+import com.tetravalstartups.dingdong.auth.PhoneActivity;
+import com.tetravalstartups.dingdong.modules.profile.external.PublicProfile;
+import com.tetravalstartups.dingdong.modules.profile.external.PublicProfileResponse;
+import com.tetravalstartups.dingdong.modules.profile.model.Follow;
 import com.tetravalstartups.dingdong.modules.profile.view.adapter.PublicProfilePagerAdapter;
-import com.tetravalstartups.dingdong.utils.Constant;
 import com.tetravalstartups.dingdong.utils.DDLoading;
 import com.tetravalstartups.dingdong.utils.LightBox;
 
-import java.util.HashMap;
 import java.util.Objects;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class PublicProfileActivity extends AppCompatActivity implements View.OnClickListener {
 
+    private static final String TAG = "PublicProfileActivity";
     private ViewPager videoPager;
     private TabLayout videoTab;
     private LinearLayout lvLikes;
@@ -55,22 +53,12 @@ public class PublicProfileActivity extends AppCompatActivity implements View.OnC
     private TextView tvFollow;
     private TextView tvVideosCount;
     private LinearLayout lvParent;
-
     private FirebaseFirestore db;
     private FirebaseAuth firebaseAuth;
     private DDLoading ddLoading;
     private Master master;
-
-    private Profile userProfile;
-
-
-    public enum FollowingStatus {
-        FOLLOWING,
-        NOT_FOLLOWING
-    }
-
-    private FollowingStatus followingStatus;
-
+    private PublicProfileResponse profile;
+    private RequestInterface requestInterface;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,35 +92,85 @@ public class PublicProfileActivity extends AppCompatActivity implements View.OnC
         ivGoBack = findViewById(R.id.ivGoBack);
         tvVideosCount = findViewById(R.id.tvVideosCount);
         ivGoBack.setOnClickListener(this);
+        profile = new PublicProfileResponse();
 
+        requestInterface = APIClient.getRetrofitInstance().create(RequestInterface.class);
         ddLoading = DDLoading.getInstance();
         db = FirebaseFirestore.getInstance();
         firebaseAuth = FirebaseAuth.getInstance();
         master = new Master(PublicProfileActivity.this);
         ddLoading.showProgress(PublicProfileActivity.this, "Loading...", false);
 
-        fetchUserProfile(getIntent().getStringExtra("user_id"));
+        if (firebaseAuth.getCurrentUser() == null) {
+            fetchUserProfile(getIntent().getStringExtra("user_id"), getIntent().getStringExtra("user_id"));
+        } else {
+            fetchUserProfile(getIntent().getStringExtra("user_id"), master.getId());
+        }
         setupViewPager(getIntent().getStringExtra("user_id"));
     }
 
-    private void fetchUserProfile(String id) {
-        db.collection("users")
-                .document(id)
-                .addSnapshotListener(new EventListener<DocumentSnapshot>() {
-                    @Override
-                    public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
-                        Profile profile = documentSnapshot.toObject(Profile.class);
-                        userProfile = profile;
-                        setupProfile(profile);
-                        fetchVideosCount(id);
-                    }
-                });
+    private void fetchUserProfile(String id, String user_id) {
+        Call<PublicProfile> call = requestInterface.getUserData(id, user_id);
+        call.enqueue(new Callback<PublicProfile>() {
+            @Override
+            public void onResponse(Call<PublicProfile> call, Response<PublicProfile> response) {
+                PublicProfileResponse publicProfileResponse = response.body().getPublicProfileResponse();
+                profile = publicProfileResponse;
+                setupProfile();
+                ddLoading.hideProgress();
+            }
 
+            @Override
+            public void onFailure(Call<PublicProfile> call, Throwable t) {
+                Log.e(TAG, "onFailure: " + t.getMessage());
+                ddLoading.hideProgress();
+            }
+        });
     }
 
-    private void setupProfile(Profile profile) {
+    private void setupProfile() {
         tvName.setText(profile.getName());
         tvHandle.setText(profile.getHandle());
+        tvFollowerCount.setText(profile.getFollowers() + "");
+        tvFollowingCount.setText(profile.getFollowing() + "");
+        tvLikeCount.setText(profile.getLikes() + "");
+        tvVideosCount.setText(profile.getVideos() + " videos");
+
+        if (firebaseAuth.getCurrentUser() == null) {
+            tvFollow.setVisibility(View.VISIBLE);
+            tvFollow.setText(getResources().getString(R.string.follow));
+            tvFollow.setBackground(getResources().getDrawable(R.drawable.bg_button_gradient));
+            tvFollow.setTextColor(getResources().getColor(R.color.colorTextTitle));
+            tvFollow.setVisibility(View.VISIBLE);
+
+        } else {
+            if (profile.getId().equals(master.getId())) {
+                tvFollow.setVisibility(View.GONE);
+
+            } else if (profile.getMyfollow().equals("notfollowed")) {
+                tvFollow.setVisibility(View.VISIBLE);
+                tvFollow.setText("Follow");
+                tvFollow.setBackground(getResources().getDrawable(R.drawable.bg_button_gradient));
+                tvFollow.setTextColor(getResources().getColor(R.color.colorTextTitle));
+                tvFollow.setVisibility(View.VISIBLE);
+
+            } else if (profile.getMyfollow().equals("following")) {
+                tvFollow.setVisibility(View.VISIBLE);
+                tvFollow.setText("Unfollow");
+                tvFollow.setBackground(getResources().getDrawable(R.drawable.bg_button_disabled));
+                tvFollow.setTextColor(getResources().getColor(R.color.colorPrimary));
+                tvFollow.setVisibility(View.VISIBLE);
+
+            } else if (profile.getMyfollow().equals("followBack")) {
+                tvFollow.setVisibility(View.VISIBLE);
+                tvFollow.setText("Follow Back");
+                tvFollow.setBackground(getResources().getDrawable(R.drawable.bg_button_gradient));
+                tvFollow.setTextColor(getResources().getColor(R.color.colorTextTitle));
+                tvFollow.setVisibility(View.VISIBLE);
+
+            }
+        }
+
         if (profile.getBio() != null) {
             tvBio.setText(profile.getBio());
         } else {
@@ -150,249 +188,36 @@ public class PublicProfileActivity extends AppCompatActivity implements View.OnC
                 new LightBox(PublicProfileActivity.this).showLightBox(profile.getPhoto());
             }
         });
-
-        if (profile.getLikes() != null) {
-            tvLikeCount.setText(profile.getLikes());
-        } else {
-            tvLikeCount.setText("0");
-        }
-
-        if (profile.getFollowers() != null) {
-            tvFollowerCount.setText(profile.getFollowers());
-        } else {
-            tvFollowerCount.setText("0");
-        }
-
-        if (profile.getFollowing() != null) {
-            tvFollowingCount.setText(profile.getFollowing());
-        } else {
-            tvFollowingCount.setText("0");
-        }
-
-        if (firebaseAuth.getCurrentUser() != null) {
-            Query followingQuery = db.collection("users").document(master.getId())
-                    .collection("following").whereEqualTo("id", profile.getId());
-            followingQuery.
-                    addSnapshotListener(new EventListener<QuerySnapshot>() {
-                        @Override
-                        public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
-                            Query followingQuery = db.collection("users").document(master.getId())
-                                    .collection("following").whereEqualTo("id", profile.getId());
-                            followingQuery.addSnapshotListener(new EventListener<QuerySnapshot>() {
-                                @Override
-                                public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
-                                    if (profile.getId().equals(master.getId())) {
-                                        tvFollow.setVisibility(View.GONE);
-                                    } else if (queryDocumentSnapshots.getDocuments().isEmpty()) {
-                                        tvFollow.setVisibility(View.VISIBLE);
-                                        tvFollow.setText("Follow");
-                                        followingStatus = FollowingStatus.NOT_FOLLOWING;
-                                        tvFollow.setBackground(getResources().getDrawable(R.drawable.bg_button_gradient));
-                                        tvFollow.setTextColor(getResources().getColor(R.color.colorTextTitle));
-                                    } else {
-                                        tvFollow.setVisibility(View.VISIBLE);
-                                        tvFollow.setText("Unfollow");
-                                        followingStatus = FollowingStatus.FOLLOWING;
-                                        tvFollow.setBackground(getResources().getDrawable(R.drawable.bg_button_white));
-                                        tvFollow.setTextColor(getResources().getColor(R.color.colorPrimary));
-                                    }
-                                }
-                            });
-
-
-                            ddLoading.hideProgress();
-                            lvParent.setVisibility(View.VISIBLE);
-                        }
-                    });
-
-
-//                        if (master.getId().equals(profile.getId())) {
-//                            tvFollow.setVisibility(View.GONE);
-//                        } else if (queryDocumentSnapshots.getDocuments().isEmpty()){
-//                            tvFollow.setText("Follow");
-//                            followingStatus = FollowingStatus.NOT_FOLLOWING;
-//                            tvFollow.setBackground(getResources().getDrawable(R.drawable.bg_button_gradient));
-//                            tvFollow.setTextColor(getResources().getColor(R.color.colorTextTitle));
-//                        } else {
-//                            tvFollow.setText("Unfollow");
-//                            followingStatus = FollowingStatus.FOLLOWING;
-//                            tvFollow.setBackground(getResources().getDrawable(R.drawable.bg_button_white));
-//                            tvFollow.setTextColor(getResources().getColor(R.color.colorPrimary));
-//                        }
-
-
-
-
-        } else {
-            tvFollow.setVisibility(View.VISIBLE);
-            tvFollow.setText("Follow");
-            followingStatus = FollowingStatus.NOT_FOLLOWING;
-            tvFollow.setBackground(getResources().getDrawable(R.drawable.bg_button_gradient));
-            tvFollow.setTextColor(getResources().getColor(R.color.colorTextTitle));
-
-            fetchFollowerFollowing(profile);
-            ddLoading.hideProgress();
-            lvParent.setVisibility(View.VISIBLE);
-        }
-
     }
 
     private void setupViewPager(String user_id) {
-        SharedPreferences preferences = getSharedPreferences("videoPref", 0);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putString("profile_type", "public");
-        editor.putString("user_id", user_id);
-        editor.apply();
-
-        PublicProfilePagerAdapter publicProfilePagerAdapter =
-                new PublicProfilePagerAdapter(getSupportFragmentManager());
+        PublicProfilePagerAdapter publicProfilePagerAdapter = new PublicProfilePagerAdapter(getSupportFragmentManager(), user_id);
         videoPager.setAdapter(publicProfilePagerAdapter);
         videoTab.setupWithViewPager(videoPager);
-
         Objects.requireNonNull(videoTab.getTabAt(0)).setIcon(R.drawable.ic_dd_public_videos_inactive);
-
-    }
-
-    private void fetchFollowerFollowing(Profile profile) {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("users")
-                .document(profile.getId())
-                .collection("following")
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            if (task.getResult().getDocuments().isEmpty()){
-                                tvFollowingCount.setText("0");
-                            } else {
-                                int following = task.getResult().getDocuments().size();
-                                if (following >= 1000) {
-                                    int following_in_k = following/1000;
-                                    tvFollowingCount.setText(following_in_k+"K");
-                                } else {
-                                    tvFollowingCount.setText(following+"");
-                                }
-                                tvFollowingCount.setText(following+"");
-                                HashMap hashMap = new HashMap();
-                                hashMap.put("following", following+"");
-
-                                db.collection("users")
-                                        .document(profile.getId())
-                                        .update(hashMap);
-                            }
-                        }
-                    }
-                });
-
-        db.collection("users")
-                .document(profile.getId())
-                .collection("followers")
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            if (task.getResult().getDocuments().isEmpty()){
-                                tvFollowerCount.setText("0");
-                            } else {
-                                int followers = task.getResult().getDocuments().size();
-                                if (followers >= 1000) {
-                                    int followers_in_k = followers/1000;
-                                    tvFollowerCount.setText(followers_in_k+"K");
-                                } else {
-                                    tvFollowerCount.setText(followers+"");
-                                }
-                                tvFollowerCount.setText(followers+"");
-                                HashMap hashMap = new HashMap();
-                                hashMap.put("followers", followers+"");
-
-                                db.collection("users")
-                                        .document(profile.getId())
-                                        .update(hashMap);
-                            }
-                        }
-                    }
-                });
 
     }
 
     @Override
     public void onClick(View v) {
         if (v == tvFollow) {
-            if (firebaseAuth.getCurrentUser() != null) {
-
-                if (followingStatus == FollowingStatus.FOLLOWING){
-
-                    db.collection("users")
-                            .document(master.getId())
-                            .collection("following")
-                            .document(getIntent().getStringExtra("user_id"))
-                            .delete();
-
-                    db.collection("users")
-                            .document(getIntent().getStringExtra("user_id"))
-                            .collection("followers")
-                            .document(getIntent().getStringExtra("user_id"))
-                            .delete();
-
-                    followingStatus = FollowingStatus.NOT_FOLLOWING;
-
-                } else {
-
-                    HashMap hmFollowing = new HashMap();
-                    hmFollowing.put("id", userProfile.getId());
-                    hmFollowing.put("handle", userProfile.getHandle());
-                    hmFollowing.put("photo", userProfile.getPhoto());
-                    hmFollowing.put("name", userProfile.getName());
-
-
-                    HashMap hmFollower = new HashMap();
-                    hmFollower.put("id", master.getId());
-                    hmFollower.put("handle", master.getHandle());
-                    hmFollower.put("photo", master.getPhoto());
-                    hmFollower.put("name", master.getName());
-
-                    db.collection("users")
-                            .document(master.getId())
-                            .collection("following")
-                            .document(getIntent().getStringExtra("user_id"))
-                            .set(hmFollowing);
-
-                    db.collection("users")
-                            .document(getIntent().getStringExtra("user_id"))
-                            .collection("followers")
-                            .document(getIntent().getStringExtra("user_id"))
-                            .set(hmFollower);
-
-                    followingStatus = FollowingStatus.FOLLOWING;
-
-                }
-
+            if (firebaseAuth.getCurrentUser() == null) {
+                startActivity(new Intent(PublicProfileActivity.this, PhoneActivity.class));
             } else {
-                startActivity(new Intent(PublicProfileActivity.this, LoginActivity.class));
-                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                doFollow();
             }
-
-
-            onResume();
-
-        }
-
-        if (v == lvLikes) {
-
         }
 
         if (v == lvFollower) {
             Intent intent = new Intent(PublicProfileActivity.this, FollowersActivity.class);
-            intent.putExtra("user_id", userProfile.getId());
+            intent.putExtra("user_id", profile.getId());
             startActivity(intent);
             overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
         }
 
         if (v == lvFollowing) {
             Intent intent = new Intent(PublicProfileActivity.this, FollowingActivity.class);
-            intent.putExtra("user_id", userProfile.getId());
+            intent.putExtra("user_id", profile.getId());
             startActivity(intent);
             overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
         }
@@ -405,25 +230,37 @@ public class PublicProfileActivity extends AppCompatActivity implements View.OnC
 
     }
 
-    private void fetchVideosCount(String id) {
-        Query query = db.collection("videos").whereEqualTo("user_id", id)
-                .whereEqualTo("video_status", Constant.VIDEO_STATUS_PUBLIC);
-        query.addSnapshotListener(new EventListener<QuerySnapshot>() {
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (firebaseAuth.getCurrentUser() == null) {
+            fetchUserProfile(getIntent().getStringExtra("user_id"), getIntent().getStringExtra("user_id"));
+        } else {
+            fetchUserProfile(getIntent().getStringExtra("user_id"), master.getId());
+        }
+    }
+
+    private void doFollow() {
+        Call<Follow> call = requestInterface.doFollowUser(master.getId(), profile.getId());
+        call.enqueue(new Callback<Follow>() {
             @Override
-            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
-                if (queryDocumentSnapshots.getDocuments().isEmpty()) {
-                    tvVideosCount.setText("0 Videos");
+            public void onResponse(Call<Follow> call, Response<Follow> response) {
+                if (response.code() == 200) {
+                    if (firebaseAuth.getCurrentUser() == null) {
+                        fetchUserProfile(getIntent().getStringExtra("user_id"), getIntent().getStringExtra("user_id"));
+                    } else {
+                        fetchUserProfile(getIntent().getStringExtra("user_id"), master.getId());
+                    }
                 } else {
-                    String videos_count = String.valueOf(queryDocumentSnapshots.getDocuments().size());
-                    tvVideosCount.setText(videos_count+" Videos");
+                    Log.e(TAG, "onResponse: " + response.message());
                 }
+            }
+
+            @Override
+            public void onFailure(Call<Follow> call, Throwable t) {
+                Log.e(TAG, "onFailure: " + t.getMessage());
             }
         });
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        fetchUserProfile(getIntent().getStringExtra("user_id"));
-    }
 }

@@ -11,15 +11,15 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <LinearLayout
+       <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="56dp"
             android:orientation="vertical">
 
             <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
+                android:layout_height="56dp"
                 android:gravity="center"
                 android:orientation="horizontal">
 
@@ -55,187 +55,204 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:orientation="vertical">
-
-                    <de.hdodenhof.circleimageview.CircleImageView
-                        android:id="@+id/ivPhoto"
-                        android:layout_width="100dp"
-                        android:layout_height="100dp"
-                        android:layout_marginTop="16dp"
-                        app:civ_border_width="2dp"
-                        android:background="@drawable/bg_white_ring"
-                        android:padding="2dp"
-                        android:src="@drawable/emma" />
-
-                    <TextView
-                        android:id="@+id/tvHandle"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="16dp"
-                        android:layout_marginTop="4dp"
-                        android:layout_marginEnd="16dp"
-                        android:layout_marginBottom="4dp"
-                        android:fontFamily="@font/montserrat_bold"
-                        android:gravity="center"
-                        android:textColor="@color/colorTextTitle"
-                        android:textSize="16sp" />
-
-                    <TextView
-                        android:id="@+id/tvBio"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="16dp"
-                        android:layout_marginEnd="16dp"
-                        android:fontFamily="@font/montserrat"
-                        android:gravity="center"
-                        android:text="Add Bio"
-                        android:textColor="@color/colorAccentV1" />
-
-                    <TextView
-                        android:id="@+id/tvVideosCount"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="16dp"
-                        android:layout_marginEnd="16dp"
-                        android:layout_marginTop="16dp"
-                        android:fontFamily="@font/montserrat_bold"
-                        android:gravity="center"
-                        android:background="@drawable/bg_button_disabled"
-                        android:paddingStart="16dp"
-                        android:paddingTop="2dp"
-                        android:paddingEnd="16dp"
-                        android:paddingBottom="2dp"
-                        android:text="0 Videos"
-                        android:textSize="12sp"
-                        android:textColor="@color/colorPrimary" />
-
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
-                        android:orientation="horizontal">
+                        android:gravity="center"
+                        android:orientation="vertical">
 
-                        <LinearLayout
-                            android:id="@+id/lvLikes"
+                        <de.hdodenhof.circleimageview.CircleImageView
+                            android:id="@+id/ivPhoto"
+                            android:layout_width="100dp"
+                            android:layout_height="100dp"
+                            android:layout_marginTop="16dp"
+                            android:background="@drawable/bg_white_ring"
+                            android:padding="2dp"
+                            app:civ_border_width="2dp" />
+
+                        <TextView
+                            android:id="@+id/tvHandle"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
+                            android:layout_marginStart="16dp"
+                            android:layout_marginTop="4dp"
+                            android:layout_marginEnd="16dp"
+                            android:layout_marginBottom="4dp"
+                            android:fontFamily="@font/montserrat"
                             android:gravity="center"
-                            android:orientation="vertical"
-                            android:padding="8dp">
+                            android:textColor="@color/colorTextTitle"
+                            android:textSize="16sp" />
 
-                            <TextView
-                                android:id="@+id/tvLikeCount"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:fontFamily="@font/montserrat_bold"
-                                android:gravity="center"
-                                android:textColor="@color/colorTextTitle" />
-
-                            <TextView
-                                android:id="@+id/tvLikesTitle"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:fontFamily="@font/montserrat"
-                                android:gravity="center"
-                                android:text="Likes"
-                                android:textSize="12sp"
-                                android:textColor="@color/colorPrimaryDarkV2" />
-                        </LinearLayout>
-
-                        <View
-                            android:layout_width="1dp"
-                            android:layout_height="30dp"
-                            android:layout_gravity="center_vertical"
-                            android:background="@color/colorAccentV1" />
-
-                        <LinearLayout
-                            android:id="@+id/lvFollower"
+                        <TextView
+                            android:id="@+id/tvBio"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
+                            android:layout_marginStart="16dp"
+                            android:layout_marginEnd="16dp"
+                            android:fontFamily="@font/montserrat"
                             android:gravity="center"
-                            android:orientation="vertical"
-                            android:padding="8dp">
-
-                            <TextView
-                                android:id="@+id/tvFollowerCount"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:fontFamily="@font/montserrat_bold"
-                                android:gravity="center"
-                                android:textColor="@color/colorTextTitle" />
-
-                            <TextView
-                                android:id="@+id/tvFollowerTitle"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:fontFamily="@font/montserrat"
-                                android:gravity="center"
-                                android:text="Followers"
-                                android:textSize="12sp"
-                                android:textColor="@color/colorPrimaryDarkV2" />
-                        </LinearLayout>
-
-                        <View
-                            android:layout_width="1dp"
-                            android:layout_height="30dp"
-                            android:layout_gravity="center_vertical"
-                            android:background="@color/colorAccentV1" />
+                            android:textColor="@color/colorPrimaryDarkV2"
+                            android:textSize="12sp" />
 
                         <LinearLayout
-                            android:id="@+id/lvFollowing"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:gravity="center"
-                            android:orientation="vertical"
-                            android:padding="8dp">
+                            android:layout_marginTop="16dp"
+                            android:orientation="horizontal">
 
-                            <TextView
-                                android:id="@+id/tvFollowingCount"
+                            <LinearLayout
+                                android:id="@+id/lvVideos"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:fontFamily="@font/montserrat_bold"
+                                android:layout_weight="1"
                                 android:gravity="center"
-                                android:textColor="@color/colorTextTitle" />
+                                android:orientation="vertical"
+                                android:padding="8dp">
 
-                            <TextView
-                                android:id="@+id/tvFollowingTitle"
+                                <TextView
+                                    android:id="@+id/tvVideosCount"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="@font/montserrat"
+                                    android:gravity="center"
+                                    android:text="..."
+                                    android:textColor="@color/colorTextTitle" />
+
+                                <TextView
+                                    android:id="@+id/tvVideoTitle"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="@font/montserrat"
+                                    android:gravity="center"
+                                    android:text="Videos"
+                                    android:textColor="@color/colorPrimaryDarkV2"
+                                    android:textSize="10sp" />
+                            </LinearLayout>
+
+                            <View
+                                android:layout_width="1dp"
+                                android:layout_height="30dp"
+                                android:layout_gravity="center_vertical"
+                                android:background="@color/colorPrimaryDarkV5" />
+
+                            <LinearLayout
+                                android:id="@+id/lvLikes"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:fontFamily="@font/montserrat"
+                                android:layout_weight="1"
                                 android:gravity="center"
-                                android:text="Following"
-                                android:textSize="12sp"
-                                android:textColor="@color/colorPrimaryDarkV2" />
+                                android:orientation="vertical"
+                                android:padding="8dp">
+
+                                <TextView
+                                    android:id="@+id/tvLikeCount"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="@font/montserrat"
+                                    android:gravity="center"
+                                    android:text="..."
+                                    android:textColor="@color/colorTextTitle" />
+
+                                <TextView
+                                    android:id="@+id/tvLikesTitle"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="@font/montserrat"
+                                    android:gravity="center"
+                                    android:text="Likes"
+                                    android:textColor="@color/colorPrimaryDarkV2"
+                                    android:textSize="10sp" />
+                            </LinearLayout>
+
+                            <View
+                                android:layout_width="1dp"
+                                android:layout_height="30dp"
+                                android:layout_gravity="center_vertical"
+                                android:background="@color/colorPrimaryDarkV5" />
+
+                            <LinearLayout
+                                android:id="@+id/lvFollower"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:gravity="center"
+                                android:orientation="vertical"
+                                android:padding="8dp">
+
+                                <TextView
+                                    android:id="@+id/tvFollowerCount"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="@font/montserrat"
+                                    android:gravity="center"
+                                    android:text="..."
+                                    android:textColor="@color/colorTextTitle" />
+
+                                <TextView
+                                    android:id="@+id/tvFollowerTitle"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="@font/montserrat"
+                                    android:gravity="center"
+                                    android:text="Followers"
+                                    android:textColor="@color/colorPrimaryDarkV2"
+                                    android:textSize="10sp" />
+                            </LinearLayout>
+
+                            <View
+                                android:layout_width="1dp"
+                                android:layout_height="30dp"
+                                android:layout_gravity="center_vertical"
+                                android:background="@color/colorPrimaryDarkV5" />
+
+                            <LinearLayout
+                                android:id="@+id/lvFollowing"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:gravity="center"
+                                android:orientation="vertical"
+                                android:padding="8dp">
+
+                                <TextView
+                                    android:id="@+id/tvFollowingCount"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="@font/montserrat"
+                                    android:gravity="center"
+                                    android:text="..."
+                                    android:textColor="@color/colorTextTitle" />
+
+                                <TextView
+                                    android:id="@+id/tvFollowingTitle"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="@font/montserrat"
+                                    android:gravity="center"
+                                    android:text="Following"
+                                    android:textColor="@color/colorPrimaryDarkV2"
+                                    android:textSize="10sp" />
+                            </LinearLayout>
                         </LinearLayout>
+
+                        <TextView
+                            android:id="@+id/tvEditProfile"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="16dp"
+                            android:background="@drawable/bg_button_gradient"
+                            android:fontFamily="@font/montserrat"
+                            android:gravity="center"
+                            android:paddingStart="8dp"
+                            android:paddingTop="4dp"
+                            android:paddingEnd="8dp"
+                            android:paddingBottom="4dp"
+                            android:text="Edit Profile"
+                            android:textColor="@color/colorPrimary" />
+
                     </LinearLayout>
 
 
-
-                    <TextView
-                        android:id="@+id/tvEditProfile"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:layout_marginStart="8dp"
-                        android:layout_marginEnd="8dp"
-                        android:background="@drawable/bg_gradient_no_corner"
-                        android:fontFamily="@font/montserrat"
-                        android:gravity="center"
-                        android:paddingStart="8dp"
-                        android:paddingTop="4dp"
-                        android:paddingEnd="8dp"
-                        android:paddingBottom="4dp"
-                        android:text="Edit Profile"
-                        android:textColor="@color/colorTextTitle" />
-
-                </LinearLayout>
 
 
             </LinearLayout>
@@ -244,15 +261,15 @@
                 android:id="@+id/videoTab"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:tabIndicatorFullWidth="false"
                 app:tabIconTint="@color/colorAccentV1"
                 app:tabIndicatorColor="@color/colorGradientStart"
+                app:tabIndicatorFullWidth="false"
                 app:tabTextAppearance="@style/DingDongTabLayout">
 
                 <com.google.android.material.tabs.TabItem
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:icon="@drawable/ic_dd_public_videos_active" />
+                    android:icon="@drawable/ic_dd_public_videos_inactive" />
 
                 <com.google.android.material.tabs.TabItem
                     android:layout_width="wrap_content"
@@ -270,7 +287,7 @@
                 android:id="@+id/videoPager"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginBottom="56dp"/>
+                android:layout_marginBottom="56dp" />
 
         </ru.noties.scrollable.ScrollableLayout>
 

@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:focusableInTouchMode="true"
-    tools:context=".modules.create.PostActivity">
+    android:orientation="vertical"
+    tools:context=".modules.publish.PostActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -54,8 +53,8 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="16dp"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:padding="16dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -66,16 +65,16 @@
                         android:id="@+id/etVideoDesc"
                         android:layout_width="match_parent"
                         android:layout_height="100dp"
-                        android:textColorHint="@color/colorPrimaryDarkV2"
-                        android:hint="Describe you video"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_trans"
                         android:fontFamily="@font/montserrat"
                         android:gravity="top"
-                        android:textCursorDrawable="@color/colorTextTitle"
-                        android:textColor="@color/colorTextTitle"
-                        android:background="@drawable/bg_trans"
+                        android:hint="Describe you video"
                         android:maxLength="140"
-                        android:textSize="12sp"
-                        android:layout_weight="1"/>
+                        android:textColor="@color/colorTextTitle"
+                        android:textColorHint="@color/colorPrimaryDarkV2"
+                        android:textCursorDrawable="@color/colorTextTitle"
+                        android:textSize="12sp" />
 
                     <FrameLayout
                         android:layout_width="match_parent"
@@ -87,32 +86,32 @@
                             android:id="@+id/ivVideoCover"
                             android:layout_width="match_parent"
                             android:layout_height="100dp"
-                            android:scaleType="centerCrop"/>
+                            android:scaleType="centerCrop" />
 
                         <ImageView
                             android:id="@+id/ivPlayVideo"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center"
-                            app:srcCompat="@drawable/ic_dd_music_play_white"/>
+                            app:srcCompat="@drawable/ic_dd_music_play_white" />
 
 
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="20dp"
-                            android:alpha="0.8"
                             android:layout_gravity="bottom"
-                            android:background="@color/colorPrimary"/>
+                            android:alpha="0.8"
+                            android:background="@color/colorPrimary" />
 
-                        <!--                <TextView-->
-                        <!--                    android:layout_width="match_parent"-->
-                        <!--                    android:layout_height="20dp"-->
-                        <!--                    android:text="Select Cover"-->
-                        <!--                    android:layout_gravity="bottom"-->
-                        <!--                    android:gravity="center"-->
-                        <!--                    android:textColor="@color/colorTextTitle"-->
-                        <!--                    android:fontFamily="@font/montserrat"-->
-                        <!--                    android:textSize="10sp"/>-->
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="20dp"
+                            android:layout_gravity="bottom"
+                            android:fontFamily="@font/montserrat"
+                            android:gravity="center"
+                            android:text="Preview"
+                            android:textColor="@color/colorTextTitle"
+                            android:textSize="10sp" />
 
                     </FrameLayout>
 
@@ -127,24 +126,24 @@
                         android:id="@+id/tvHashTag"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="#Hashtags"
                         android:background="@color/colorPrimaryDarkV3"
+                        android:fontFamily="@font/montserrat_bold"
                         android:padding="4dp"
-                        android:textSize="12sp"
+                        android:text="#Hashtags"
                         android:textColor="@color/colorTextTitle"
-                        android:fontFamily="@font/montserrat_bold"/>
+                        android:textSize="12sp" />
 
                     <TextView
                         android:id="@+id/tvAtTheRate"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="4dp"
-                        android:text="&#64;Friends"
                         android:background="@color/colorPrimaryDarkV3"
+                        android:fontFamily="@font/montserrat_bold"
                         android:padding="4dp"
-                        android:textSize="12sp"
+                        android:text="&#64;Friends"
                         android:textColor="@color/colorTextTitle"
-                        android:fontFamily="@font/montserrat_bold"/>
+                        android:textSize="12sp" />
 
                 </LinearLayout>
 
@@ -155,13 +154,13 @@
                 android:layout_height="1dp"
                 android:layout_marginStart="16dp"
                 android:layout_marginEnd="16dp"
-                android:background="@color/colorDisableText"/>
+                android:background="@color/colorDisableText" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="16dp"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:padding="16dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -172,20 +171,20 @@
                     <TextView
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:text="Make this video private"
-                        android:fontFamily="@font/montserrat"
                         android:layout_weight="1"
-                        android:textSize="12sp"
-                        android:textColor="@color/colorTextTitle"/>
+                        android:fontFamily="@font/montserrat"
+                        android:text="Make this video private"
+                        android:textColor="@color/colorTextTitle"
+                        android:textSize="12sp" />
 
                     <Switch
                         android:id="@+id/switchVideoStatus"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:background="@drawable/bg_button_gradient"
                         android:fontFamily="@font/montserrat"
                         android:padding="4dp"
-                        android:background="@drawable/bg_button_gradient"
-                        android:textColor="@color/colorTextTitle"/>
+                        android:textColor="@color/colorTextTitle" />
 
                 </LinearLayout>
 
@@ -198,19 +197,19 @@
                     <TextView
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:fontFamily="@font/montserrat"
                         android:text="Disable Comments"
-                        android:fontFamily="@font/montserrat"
-                        android:layout_weight="1"
-                        android:textSize="12sp"
-                        android:textColor="@color/colorTextTitle"/>
+                        android:textColor="@color/colorTextTitle"
+                        android:textSize="12sp" />
 
                     <Switch
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:background="@drawable/bg_button_gradient"
                         android:fontFamily="@font/montserrat"
                         android:padding="4dp"
-                        android:background="@drawable/bg_button_gradient"
-                        android:textColor="@color/colorTextTitle"/>
+                        android:textColor="@color/colorTextTitle" />
 
                 </LinearLayout>
 
@@ -223,19 +222,19 @@
                     <TextView
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:text="Allow Duet and React"
-                        android:fontFamily="@font/montserrat"
                         android:layout_weight="1"
-                        android:textSize="12sp"
-                        android:textColor="@color/colorTextTitle"/>
+                        android:fontFamily="@font/montserrat"
+                        android:text="Allow Duet and React"
+                        android:textColor="@color/colorTextTitle"
+                        android:textSize="12sp" />
 
                     <Switch
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:background="@drawable/bg_button_gradient"
                         android:fontFamily="@font/montserrat"
                         android:padding="4dp"
-                        android:background="@drawable/bg_button_gradient"
-                        android:textColor="@color/colorTextTitle"/>
+                        android:textColor="@color/colorTextTitle" />
 
                 </LinearLayout>
 
@@ -247,19 +246,19 @@
                     <TextView
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:text="Save to device"
-                        android:fontFamily="@font/montserrat"
                         android:layout_weight="1"
-                        android:textSize="12sp"
-                        android:textColor="@color/colorTextTitle"/>
+                        android:fontFamily="@font/montserrat"
+                        android:text="Save to device"
+                        android:textColor="@color/colorTextTitle"
+                        android:textSize="12sp" />
 
                     <Switch
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:background="@drawable/bg_button_gradient"
                         android:fontFamily="@font/montserrat"
                         android:padding="4dp"
-                        android:background="@drawable/bg_button_gradient"
-                        android:textColor="@color/colorTextTitle"/>
+                        android:textColor="@color/colorTextTitle" />
 
                 </LinearLayout>
 
@@ -268,16 +267,16 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="16dp"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:padding="16dp">
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/montserrat"
-                    android:textSize="10sp"
+                    android:text="Share posted video to:"
                     android:textColor="@color/colorDisable"
-                    android:text="Share posted video to:"/>
+                    android:textSize="10sp" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -288,7 +287,7 @@
                     <ImageView
                         android:layout_width="40dp"
                         android:layout_height="40dp"
-                        android:src="@drawable/dd_snapchat_bw"/>
+                        android:src="@drawable/dd_snapchat_bw" />
 
                 </LinearLayout>
 
@@ -297,22 +296,22 @@
             <View
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="1"/>
+                android:layout_weight="1" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="16dp"
                 android:gravity="center"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:padding="16dp">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Draft"
                     android:layout_marginEnd="16dp"
                     android:fontFamily="@font/montserrat_bold"
-                    android:textColor="@color/colorTextTitle"/>
+                    android:text="Draft"
+                    android:textColor="@color/colorTextTitle" />
 
                 <TextView
                     android:id="@+id/tvPost"
@@ -320,18 +319,16 @@
                     android:layout_height="45dp"
                     android:background="@drawable/bg_button_gradient"
                     android:fontFamily="@font/montserrat_bold"
+                    android:gravity="center"
                     android:text="Post"
                     android:textColor="@color/colorAccentV1"
-                    android:textSize="18sp"
-                    android:gravity="center"/>
+                    android:textSize="18sp" />
 
             </LinearLayout>
 
         </LinearLayout>
 
     </ScrollView>
-
-
 
 
 </LinearLayout>

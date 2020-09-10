@@ -37,10 +37,10 @@ public class BanksPresenter {
         db = FirebaseFirestore.getInstance();
         List<Banks> banksList = new ArrayList<>();
 
-//        DocumentReference documentReference = db.collection("users").document();
+//        DocumentReference documentReference = db.collection("customers").document();
 //        String id = documentReference.getId();
 
-        db.collection("users")
+        db.collection("customers")
                 .document(uid)
                 .collection("banks")
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {

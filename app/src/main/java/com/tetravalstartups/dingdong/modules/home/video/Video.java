@@ -12,29 +12,29 @@ import java.util.Date;
 public class Video implements Parcelable {
     public static final int MAX_VIDEO_DURATION = 60000;
 
-    @ServerTimestamp
-    private Date timestamp;
+    private String timestamp;
     private String id;
     private String video_desc;
     private String sound_id;
     private String sound_title;
-    private String likes_count;
-    private String share_count;
-    private String comment_count;
-    private String view_count;
+    private int likes_count;
+    private int share_count;
+    private int comment_count;
+    private int view_count;
     private String user_id;
     private String user_handle;
     private String user_name;
     private String user_photo;
     private String video_thumbnail;
     private String video_url;
-    private String video_status;
+    private int video_status;
     private String video_index;
+    private int mylike;
 
     public Video() {
     }
 
-    public Video(Date timestamp, String id, String video_desc, String sound_id, String sound_title, String likes_count, String share_count, String comment_count, String view_count, String user_id, String user_handle, String user_name, String user_photo, String video_thumbnail, String video_url, String video_status, String video_index) {
+    public Video(String timestamp, String id, String video_desc, String sound_id, String sound_title, int likes_count, int share_count, int comment_count, int view_count, String user_id, String user_handle, String user_name, String user_photo, String video_thumbnail, String video_url, int video_status, String video_index, int mylike) {
         this.timestamp = timestamp;
         this.id = id;
         this.video_desc = video_desc;
@@ -52,25 +52,28 @@ public class Video implements Parcelable {
         this.video_url = video_url;
         this.video_status = video_status;
         this.video_index = video_index;
+        this.mylike = mylike;
     }
 
     protected Video(Parcel in) {
+        timestamp = in.readString();
         id = in.readString();
         video_desc = in.readString();
         sound_id = in.readString();
         sound_title = in.readString();
-        likes_count = in.readString();
-        share_count = in.readString();
-        comment_count = in.readString();
-        view_count = in.readString();
+        likes_count = in.readInt();
+        share_count = in.readInt();
+        comment_count = in.readInt();
+        view_count = in.readInt();
         user_id = in.readString();
         user_handle = in.readString();
         user_name = in.readString();
         user_photo = in.readString();
         video_thumbnail = in.readString();
         video_url = in.readString();
-        video_status = in.readString();
+        video_status = in.readInt();
         video_index = in.readString();
+        mylike = in.readInt();
     }
 
     public static final Creator<Video> CREATOR = new Creator<Video>() {
@@ -85,11 +88,11 @@ public class Video implements Parcelable {
         }
     };
 
-    public Date getTimestamp() {
+    public String getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(Date timestamp) {
+    public void setTimestamp(String timestamp) {
         this.timestamp = timestamp;
     }
 
@@ -125,35 +128,35 @@ public class Video implements Parcelable {
         this.sound_title = sound_title;
     }
 
-    public String getLikes_count() {
+    public int getLikes_count() {
         return likes_count;
     }
 
-    public void setLikes_count(String likes_count) {
+    public void setLikes_count(int likes_count) {
         this.likes_count = likes_count;
     }
 
-    public String getShare_count() {
+    public int getShare_count() {
         return share_count;
     }
 
-    public void setShare_count(String share_count) {
+    public void setShare_count(int share_count) {
         this.share_count = share_count;
     }
 
-    public String getComment_count() {
+    public int getComment_count() {
         return comment_count;
     }
 
-    public void setComment_count(String comment_count) {
+    public void setComment_count(int comment_count) {
         this.comment_count = comment_count;
     }
 
-    public String getView_count() {
+    public int getView_count() {
         return view_count;
     }
 
-    public void setView_count(String view_count) {
+    public void setView_count(int view_count) {
         this.view_count = view_count;
     }
 
@@ -205,11 +208,11 @@ public class Video implements Parcelable {
         this.video_url = video_url;
     }
 
-    public String getVideo_status() {
+    public int getVideo_status() {
         return video_status;
     }
 
-    public void setVideo_status(String video_status) {
+    public void setVideo_status(int video_status) {
         this.video_status = video_status;
     }
 
@@ -221,28 +224,38 @@ public class Video implements Parcelable {
         this.video_index = video_index;
     }
 
+    public int getMylike() {
+        return mylike;
+    }
+
+    public void setMylike(int mylike) {
+        this.mylike = mylike;
+    }
+
     @Override
     public int describeContents() {
         return 0;
     }
 
     @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(id);
-        dest.writeString(video_desc);
-        dest.writeString(sound_id);
-        dest.writeString(sound_title);
-        dest.writeString(likes_count);
-        dest.writeString(share_count);
-        dest.writeString(comment_count);
-        dest.writeString(view_count);
-        dest.writeString(user_id);
-        dest.writeString(user_handle);
-        dest.writeString(user_name);
-        dest.writeString(user_photo);
-        dest.writeString(video_thumbnail);
-        dest.writeString(video_url);
-        dest.writeString(video_status);
-        dest.writeString(video_index);
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeString(timestamp);
+        parcel.writeString(id);
+        parcel.writeString(video_desc);
+        parcel.writeString(sound_id);
+        parcel.writeString(sound_title);
+        parcel.writeInt(likes_count);
+        parcel.writeInt(share_count);
+        parcel.writeInt(comment_count);
+        parcel.writeInt(view_count);
+        parcel.writeString(user_id);
+        parcel.writeString(user_handle);
+        parcel.writeString(user_name);
+        parcel.writeString(user_photo);
+        parcel.writeString(video_thumbnail);
+        parcel.writeString(video_url);
+        parcel.writeInt(video_status);
+        parcel.writeString(video_index);
+        parcel.writeInt(mylike);
     }
 }

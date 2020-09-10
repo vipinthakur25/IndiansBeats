@@ -52,7 +52,7 @@ public class ComingSoonActivity extends AppCompatActivity implements View.OnClic
         firebaseAuth = FirebaseAuth.getInstance();
 
         if (firebaseAuth.getCurrentUser() != null){
-            db.collection("users")
+            db.collection("customers")
                     .document(firebaseAuth.getCurrentUser().getUid())
                     .get()
                     .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
@@ -77,7 +77,7 @@ public class ComingSoonActivity extends AppCompatActivity implements View.OnClic
     }
 
     public void fetchPeoplesCount(){
-        db.collection("users")
+        db.collection("customers")
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(@Nullable QuerySnapshot documentSnapshots, @Nullable FirebaseFirestoreException e) {

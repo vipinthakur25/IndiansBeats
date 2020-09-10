@@ -25,6 +25,7 @@ public class SubscriptionPagerAdapter extends PagerAdapter {
     }
 
     @NonNull
+
     @Override
     public Object instantiateItem(@NonNull ViewGroup container, int position) {
         LayoutInflater inflater = LayoutInflater.from(context);

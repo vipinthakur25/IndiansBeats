@@ -114,81 +114,81 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
         etName.setEnabled(false);
         etEmail.setEnabled(false);
         etPassword.setEnabled(false);
-        doSignUp(name, email, password);
+       // doSignUp(name, email, password);
     }
 
-    private void doSignUp(final String name, final String email, final String password) {
-        final FirebaseAuth auth = FirebaseAuth.getInstance();
-        auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-            @Override
-            public void onComplete(@NonNull Task<AuthResult> task) {
-                if (task.isSuccessful()){
-                    FirebaseFirestore db = FirebaseFirestore.getInstance();
-                    Profile profile = new Profile();
-                    String[] handle = email.split("@");
-                    profile.setId(auth.getCurrentUser().getUid());
-                    profile.setName(name);
-                    profile.setEmail(email);
-                    profile.setPhoto(Constant.DD_IV_PLACEHOLDER);
-                    profile.setBio(Constant.DEFAULT_BIO);
-                    profile.setHandle(handle[0]);
-                    profile.setLikes(Constant.INITIAL_LIKES);
-                    profile.setFollowers(Constant.INITIAL_FOLLOWER);
-                    profile.setFollowing(Constant.INITIAL_FOLLOWING);
-
-                    HashMap hashMap = new HashMap();
-                    hashMap.put("reserved", "0");
-                    hashMap.put("unreserved", "0");
-                    hashMap.put("cashback", "0");
-                    hashMap.put("video", "0");
-                    hashMap.put("subscription", "0");
-
-
-
-                    db.collection("users")
-                            .document(auth.getCurrentUser().getUid())
-                            .set(profile)
-                            .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                @Override
-                                public void onComplete(@NonNull Task<Void> task) {
-                                    if (task.isSuccessful()){
-
-                                        db.collection("users")
-                                                .document(auth.getCurrentUser().getUid())
-                                                .collection("passbook")
-                                                .document("balance")
-                                                .set(hashMap)
-                                                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                    @Override
-                                                    public void onComplete(@NonNull Task<Void> task) {
-
-                                                        tvSignUp.setEnabled(true);
-                                                        etName.setEnabled(true);
-                                                        etEmail.setEnabled(true);
-                                                        etPassword.setEnabled(true);
-                                                        progressBar.setVisibility(View.INVISIBLE);
-                                                        auth.signOut();
-                                                        onBackPressed();
-                                                        finish();
-                                                        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-
-                                                    }
-                                                });
-                                    }
-                                }
-                            });
-                }
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                tvSignUp.setEnabled(true);
-                etName.setEnabled(true);
-                etEmail.setEnabled(true);
-                etPassword.setEnabled(true);
-                progressBar.setVisibility(View.INVISIBLE);
-                Toast.makeText(SignUpActivity.this, ""+e.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
+//    private void doSignUp(final String name, final String email, final String password) {
+//        final FirebaseAuth auth = FirebaseAuth.getInstance();
+//        auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+//            @Override
+//            public void onComplete(@NonNull Task<AuthResult> task) {
+//                if (task.isSuccessful()){
+//                    FirebaseFirestore db = FirebaseFirestore.getInstance();
+//                    Profile profile = new Profile();
+//                    String[] handle = email.split("@");
+//                    profile.setId(auth.getCurrentUser().getUid());
+//                    profile.setName(name);
+//                    profile.setEmail(email);
+//                    profile.setPhoto(Constant.DD_IV_PLACEHOLDER);
+//                    profile.setBio(Constant.DEFAULT_BIO);
+//                    profile.setHandle(handle[0]);
+//                    profile.setLikes(Constant.INITIAL_LIKES);
+//                    profile.setFollowers(Constant.INITIAL_FOLLOWER);
+//                    profile.setFollowing(Constant.INITIAL_FOLLOWING);
+//
+//                    HashMap hashMap = new HashMap();
+//                    hashMap.put("reserved", "0");
+//                    hashMap.put("unreserved", "0");
+//                    hashMap.put("cashback", "0");
+//                    hashMap.put("video", "0");
+//                    hashMap.put("subscription", "0");
+//
+//
+//
+//                    db.collection("users")
+//                            .document(auth.getCurrentUser().getUid())
+//                            .set(profile)
+//                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+//                                @Override
+//                                public void onComplete(@NonNull Task<Void> task) {
+//                                    if (task.isSuccessful()){
+//
+//                                        db.collection("users")
+//                                                .document(auth.getCurrentUser().getUid())
+//                                                .collection("passbook")
+//                                                .document("balance")
+//                                                .set(hashMap)
+//                                                .addOnCompleteListener(new OnCompleteListener<Void>() {
+//                                                    @Override
+//                                                    public void onComplete(@NonNull Task<Void> task) {
+//
+//                                                        tvSignUp.setEnabled(true);
+//                                                        etName.setEnabled(true);
+//                                                        etEmail.setEnabled(true);
+//                                                        etPassword.setEnabled(true);
+//                                                        progressBar.setVisibility(View.INVISIBLE);
+//                                                        auth.signOut();
+//                                                        onBackPressed();
+//                                                        finish();
+//                                                        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+//
+//                                                    }
+//                                                });
+//                                    }
+//                                }
+//                            });
+//                }
+//            }
+//        }).addOnFailureListener(new OnFailureListener() {
+//            @Override
+//            public void onFailure(@NonNull Exception e) {
+//                tvSignUp.setEnabled(true);
+//                etName.setEnabled(true);
+//                etEmail.setEnabled(true);
+//                etPassword.setEnabled(true);
+//                progressBar.setVisibility(View.INVISIBLE);
+//                Toast.makeText(SignUpActivity.this, ""+e.getMessage(), Toast.LENGTH_SHORT).show();
+//            }
+//        });
+//    }
 }

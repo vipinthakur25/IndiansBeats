@@ -30,11 +30,6 @@
         android:layout_height="300dp"
         android:scaleType="centerCrop"
         android:src="@drawable/emma"/>
-    
-<!--    <View-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="1dp"-->
-<!--        android:background="@color/colorPrimaryDarkV2"/>-->
 
     <LinearLayout
         android:layout_width="match_parent"

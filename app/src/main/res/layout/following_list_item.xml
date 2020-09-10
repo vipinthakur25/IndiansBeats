@@ -17,6 +17,7 @@
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_margin="8dp"
+            android:src="@drawable/emma"
             app:civ_border_color="@color/colorPrimaryDarkV2"
             app:civ_border_width="1dp"/>
 
@@ -26,22 +27,23 @@
             android:layout_weight="1"
             android:orientation="vertical">
 
-
-            <TextView
-                android:id="@+id/tvName"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/montserrat_bold"
-                android:textSize="16sp"
-                android:textColor="@color/colorTextTitle" />
-
             <TextView
                 android:id="@+id/tvHandle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/montserrat"
                 android:textSize="12sp"
+                android:text="sahilsingh"
                 android:textColor="@color/colorTextTitle" />
+
+            <TextView
+                android:id="@+id/tvName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/montserrat_bold"
+                android:textSize="10dp"
+                android:text="Sahil Singh"
+                android:textColor="@color/colorPrimaryDarkV2" />
 
         </LinearLayout>
 

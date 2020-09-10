@@ -230,17 +230,29 @@
                 android:layout_marginTop="8dp"
                 android:layout_marginStart="16dp"
                 android:layout_marginEnd="16dp"
+                android:layout_marginBottom="16dp"
                 android:visibility="visible"
                 android:fontFamily="@font/montserrat_bold"
                 android:textColor="@color/colorTextTitle"
                 android:textSize="18sp"
                 android:text="My Subscriptions:" />
 
+            <TextView
+                android:id="@+id/tvNoSubs"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="No Subscriptions"
+                android:layout_margin="16dp"
+                android:visibility="gone"
+                android:fontFamily="@font/montserrat"
+                android:textColor="@color/colorPrimaryDarkV2"
+                android:layout_gravity="center"/>
+
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerSubscribed"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="visible"
+                android:visibility="gone"
                 android:layout_gravity="center"/>
 
             <TextView
@@ -249,6 +261,7 @@
                 android:layout_marginTop="8dp"
                 android:layout_marginStart="16dp"
                 android:layout_marginEnd="16dp"
+                android:layout_marginBottom="16dp"
                 android:fontFamily="@font/montserrat_bold"
                 android:textColor="@color/colorTextTitle"
                 android:textSize="18sp"

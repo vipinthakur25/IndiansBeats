@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/colorPrimaryDarkV3"
+    android:background="@color/colorPrimaryDarkV6"
     android:id="@+id/lvTxnDetails"
     android:orientation="vertical">
 
@@ -157,7 +157,7 @@
             <ImageView
                 android:layout_width="50dp"
                 android:layout_height="50dp"
-                android:src="@drawable/dingdong_placeholder"/>
+                android:src="@drawable/dd_logo_placeholder"/>
 
         </LinearLayout>
 

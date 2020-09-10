@@ -1,62 +1,96 @@
 package com.tetravalstartups.dingdong;
 
+import android.Manifest;
+import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.bumptech.glide.Glide;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.nabinbhandari.android.permissions.PermissionHandler;
+import com.nabinbhandari.android.permissions.Permissions;
+import com.tetravalstartups.dingdong.api.APIClient;
+import com.tetravalstartups.dingdong.api.RequestInterface;
 import com.tetravalstartups.dingdong.auth.LoginActivity;
 import com.tetravalstartups.dingdong.auth.Master;
 import com.tetravalstartups.dingdong.auth.PhoneActivity;
-import com.tetravalstartups.dingdong.auth.Profile;
-import com.tetravalstartups.dingdong.modules.home.HomeFragment;
+import com.tetravalstartups.dingdong.modules.discover.DiscoverFragment;
+import com.tetravalstartups.dingdong.modules.notification.NotificationFragment;
 import com.tetravalstartups.dingdong.modules.player.PlayerFragment;
+import com.tetravalstartups.dingdong.modules.profile.external.PublicProfile;
 import com.tetravalstartups.dingdong.modules.profile.view.fragment.ProfileFragment;
+import com.tetravalstartups.dingdong.modules.publish.PublishMeta;
 import com.tetravalstartups.dingdong.modules.record.RecordActivity;
+import com.tetravalstartups.dingdong.service.PublishService;
+import com.tetravalstartups.dingdong.utils.DDAlert;
+import com.tetravalstartups.dingdong.utils.DialogVideoUploadSuccess;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class MainActivity extends BaseActivity implements View.OnClickListener {
 
+    boolean doubleBackToExitPressedOnce = false;
     private LinearLayout lvHome;
     private LinearLayout lvDiscover;
     private LinearLayout lvNotification;
     private LinearLayout lvProfile;
-
     private ImageView ivHome;
     private ImageView ivDiscover;
     private ImageView ivCreate;
     private ImageView ivNotification;
     private ImageView ivProfile;
-
     private TextView tvHome;
     private TextView tvDiscover;
     private TextView tvNotification;
     private TextView tvProfile;
-
     private FirebaseFirestore db;
     private FirebaseAuth auth;
-
-    Fragment fragment = null;
-
-    private SharedPreferences preferences;
-
+    private Fragment fragment = null;
     private LinearLayout lvMain;
+    private FrameLayout progressUpload;
+    private ImageView ivVideoCover;
+    private DialogVideoUploadSuccess dialogVideoUploadSuccess;
+    private com.tetravalstartups.dingdong.api.RequestInterface RequestInterface;
+    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String status = intent.getStringExtra("status");
+            String thumbnail = intent.getStringExtra("thumbnail");
+            if (status.equals("published")) {
+                ivCreate.setVisibility(View.VISIBLE);
+                progressUpload.setVisibility(View.GONE);
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (!isFinishing()) {
+                            dialogVideoUploadSuccess.showAlert(MainActivity.this, thumbnail, false);
+                        }
+                    }
+                });
+            }
+
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,7 +102,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     }
 
     private void initView() {
-
         lvHome = findViewById(R.id.lvHome);
         lvDiscover = findViewById(R.id.lvDiscover);
         lvNotification = findViewById(R.id.lvNotification);
@@ -86,6 +119,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         tvProfile = findViewById(R.id.tvProfile);
 
         lvMain = findViewById(R.id.lvMain);
+        progressUpload = findViewById(R.id.progressUpload);
+        ivVideoCover = findViewById(R.id.ivVideoCover);
 
         lvHome.setOnClickListener(this);
         lvDiscover.setOnClickListener(this);
@@ -97,60 +132,86 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
         db = FirebaseFirestore.getInstance();
         auth = FirebaseAuth.getInstance();
+        RequestInterface = APIClient.getRetrofitInstance().create(RequestInterface.class);
 
         fragment = new PlayerFragment();
         loadFragment(fragment);
         switchHome();
 
-        if (auth.getCurrentUser() != null){
+        if (auth.getCurrentUser() != null) {
             String id = auth.getCurrentUser().getUid();
             getProfileData(id);
+            Bundle bundle = getIntent().getExtras();
+            if (bundle != null) {
+                String thumbnail = bundle.getString("thumbnail");
+                showUploadingAnimation(thumbnail);
+            }
         }
 
+        dialogVideoUploadSuccess = DialogVideoUploadSuccess.getInstance();
 
+        LocalBroadcastManager.getInstance(getApplicationContext()).registerReceiver(
+                mMessageReceiver, new IntentFilter("publishService"));
 
     }
 
-
+    private void showUploadingAnimation(String thumbnail) {
+        ivCreate.setVisibility(View.GONE);
+        progressUpload.setVisibility(View.VISIBLE);
+        Glide.with(MainActivity.this).load(thumbnail).into(ivVideoCover);
+    }
 
     @Override
     public void onClick(View v) {
-        if (v == lvHome){
+        if (v == lvHome) {
             fragment = new PlayerFragment();
             loadFragment(fragment);
             switchHome();
         }
-        if (v == lvDiscover){
-            Toast.makeText(this, "Coming Soon", Toast.LENGTH_SHORT).show();
-//            fragment = new DiscoverFragment();
-//            loadFragment(fragment);
-//            switchSearch();
+
+        if (v == lvDiscover) {
+            fragment = new DiscoverFragment();
+            loadFragment(fragment);
+            switchSearch();
         }
-        if (v == ivCreate){
-            if (auth.getCurrentUser() != null){
-                startActivity(new Intent(MainActivity.this, RecordActivity.class));
+
+        if (v == ivCreate) {
+            if (auth.getCurrentUser() != null) {
+                String[] permissions = {Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                        Manifest.permission.READ_EXTERNAL_STORAGE,
+                        Manifest.permission.CAMERA,
+                        Manifest.permission.RECORD_AUDIO};
+                Permissions.check(this/*context*/, permissions,
+                        null/*rationale*/, null/*options*/,
+                        new PermissionHandler() {
+                            @Override
+                            public void onGranted() {
+                                startActivity(new Intent(MainActivity.this, RecordActivity.class));
+                            }
+                        });
             } else {
                 startActivity(new Intent(MainActivity.this, PhoneActivity.class));
             }
             overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
 
         }
-        if (v == lvNotification){
-//            if (auth.getCurrentUser() != null){
-//                fragment = new NotificationFragment();
-//                loadFragment(fragment);
-//                switchNotification();
-//            } else {
-//                startActivity(new Intent(MainActivity.this, LoginActivity.class));
-//                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-//            }
-            Toast.makeText(this, "Coming Soon", Toast.LENGTH_SHORT).show();
+
+        if (v == lvNotification) {
+            if (auth.getCurrentUser() != null){
+                fragment = new NotificationFragment();
+                loadFragment(fragment);
+                switchNotification();
+            } else {
+                startActivity(new Intent(MainActivity.this, PhoneActivity.class));
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+            }
         }
-        if (v == lvProfile){
+
+        if (v == lvProfile) {
             fragment = new ProfileFragment();
 
-            if (auth.getCurrentUser() != null){
-               switchProfile();
+            if (auth.getCurrentUser() != null) {
+                switchProfile();
                 loadFragment(fragment);
             } else {
                 startActivity(new Intent(MainActivity.this, PhoneActivity.class));
@@ -171,82 +232,76 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         return false;
     }
 
-    private void switchHome(){
+    private void switchHome() {
         ivHome.setImageDrawable(getResources().getDrawable(R.drawable.ic_dd_home_active));
         ivDiscover.setImageDrawable(getResources().getDrawable(R.drawable.ic_dd_discover_inactive));
         ivNotification.setImageDrawable(getResources().getDrawable(R.drawable.ic_dd_notification_inactive));
         ivProfile.setImageDrawable(getResources().getDrawable(R.drawable.ic_dd_profile_inactive));
 
-        tvHome.setTextColor(getResources().getColor(R.color.colorBrandYellow));
+        tvHome.setTextColor(getResources().getColor(R.color.colorGradientStart));
         tvDiscover.setTextColor(getResources().getColor(R.color.colorTextTitle));
         tvNotification.setTextColor(getResources().getColor(R.color.colorTextTitle));
         tvProfile.setTextColor(getResources().getColor(R.color.colorTextTitle));
 
     }
 
-    private void switchSearch(){
+    private void switchSearch() {
         ivDiscover.setImageDrawable(getResources().getDrawable(R.drawable.ic_dd_discover_active));
         ivHome.setImageDrawable(getResources().getDrawable(R.drawable.ic_dd_home_inactive));
         ivNotification.setImageDrawable(getResources().getDrawable(R.drawable.ic_dd_notification_inactive));
         ivProfile.setImageDrawable(getResources().getDrawable(R.drawable.ic_dd_profile_inactive));
 
-        tvDiscover.setTextColor(getResources().getColor(R.color.colorBrandYellow));
+        tvDiscover.setTextColor(getResources().getColor(R.color.colorGradientStart));
         tvHome.setTextColor(getResources().getColor(R.color.colorTextTitle));
         tvNotification.setTextColor(getResources().getColor(R.color.colorTextTitle));
         tvProfile.setTextColor(getResources().getColor(R.color.colorTextTitle));
 
     }
 
-    private void switchNotification(){
+    private void switchNotification() {
         ivNotification.setImageDrawable(getResources().getDrawable(R.drawable.ic_dd_notification_active));
         ivDiscover.setImageDrawable(getResources().getDrawable(R.drawable.ic_dd_discover_inactive));
         ivHome.setImageDrawable(getResources().getDrawable(R.drawable.ic_dd_home_inactive));
         ivProfile.setImageDrawable(getResources().getDrawable(R.drawable.ic_dd_profile_inactive));
 
-        tvNotification.setTextColor(getResources().getColor(R.color.colorBrandYellow));
+        tvNotification.setTextColor(getResources().getColor(R.color.colorGradientStart));
         tvDiscover.setTextColor(getResources().getColor(R.color.colorTextTitle));
         tvHome.setTextColor(getResources().getColor(R.color.colorTextTitle));
         tvProfile.setTextColor(getResources().getColor(R.color.colorTextTitle));
-
-//        fm.beginTransaction().hide(active).show(notificationFragment).commit();
-//        active = notificationFragment;
-
     }
 
-    private void switchProfile(){
+    private void switchProfile() {
         ivProfile.setImageDrawable(getResources().getDrawable(R.drawable.ic_dd_profile_active));
         ivDiscover.setImageDrawable(getResources().getDrawable(R.drawable.ic_dd_discover_inactive));
         ivNotification.setImageDrawable(getResources().getDrawable(R.drawable.ic_dd_notification_inactive));
         ivHome.setImageDrawable(getResources().getDrawable(R.drawable.ic_dd_home_inactive));
 
-        tvProfile.setTextColor(getResources().getColor(R.color.colorBrandYellow));
+        tvProfile.setTextColor(getResources().getColor(R.color.colorGradientStart));
         tvDiscover.setTextColor(getResources().getColor(R.color.colorTextTitle));
         tvNotification.setTextColor(getResources().getColor(R.color.colorTextTitle));
         tvHome.setTextColor(getResources().getColor(R.color.colorTextTitle));
 
-        if (auth.getCurrentUser() != null){
+        if (auth.getCurrentUser() != null) {
             String id = auth.getCurrentUser().getUid();
             getProfileData(id);
         }
 
     }
 
-    public void getProfileData(String id){
-        db.collection("users")
-                .document(id)
-                .addSnapshotListener(new EventListener<DocumentSnapshot>() {
-                    @Override
-                    public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
-                        Profile profile = documentSnapshot.toObject(Profile.class);
-                        new Master(MainActivity.this).setUser(profile);
-                    }
-                });
-    }
+    public void getProfileData(String id) {
+        Call<PublicProfile> call = RequestInterface.getUserData(id, id);
+        call.enqueue(new Callback<PublicProfile>() {
+            @Override
+            public void onResponse(Call<PublicProfile> call, Response<PublicProfile> response) {
+                new Master(MainActivity.this).setUser(response.body().getPublicProfileResponse());
+            }
 
-    private void renewPlan() {
-    }
+            @Override
+            public void onFailure(Call<PublicProfile> call, Throwable t) {
 
-    boolean doubleBackToExitPressedOnce = false;
+            }
+        });
+    }
 
     @Override
     public void onBackPressed() {
@@ -261,7 +316,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                doubleBackToExitPressedOnce=false;
+                doubleBackToExitPressedOnce = false;
             }
         }, 2000);
     }
@@ -277,4 +332,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         super.onPause();
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
+
+
 }

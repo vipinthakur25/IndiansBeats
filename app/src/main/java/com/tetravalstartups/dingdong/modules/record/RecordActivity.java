@@ -1,14 +1,21 @@
 package com.tetravalstartups.dingdong.modules.record;
 
 import android.Manifest;
+import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.graphics.PointF;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
@@ -24,12 +31,13 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
-import com.jaiselrahman.filepicker.activity.FilePickerActivity;
-import com.jaiselrahman.filepicker.config.Configurations;
-import com.jaiselrahman.filepicker.model.MediaFile;
 import com.nabinbhandari.android.permissions.PermissionHandler;
 import com.nabinbhandari.android.permissions.Permissions;
 import com.otaliastudios.cameraview.CameraListener;
@@ -53,8 +61,11 @@ import com.tetravalstartups.dingdong.R;
 import com.tetravalstartups.dingdong.modules.create.FlashState;
 import com.tetravalstartups.dingdong.modules.create.sound.SoundActivity;
 import com.tetravalstartups.dingdong.modules.home.video.Video;
+import com.tetravalstartups.dingdong.modules.profile.view.adapter.GalleryAdapter;
+import com.tetravalstartups.dingdong.modules.record.gallery.GalleryVideoAdapter;
 import com.tetravalstartups.dingdong.utils.DDLoading;
 import com.tetravalstartups.dingdong.utils.DDLoadingProgress;
+import com.tetravalstartups.dingdong.utils.EqualSpacingItemDecoration;
 
 import java.io.File;
 import java.io.IOException;
@@ -103,6 +114,8 @@ public class RecordActivity extends AppCompatActivity implements View.OnClickLis
     private TextView tvDiscard;
     private TextView tvNext;
 
+    private RecyclerView recyclerVideos;
+
     private enum RECORDER_STATUS {
         STOPPED,
         RECORDING
@@ -137,9 +150,11 @@ public class RecordActivity extends AppCompatActivity implements View.OnClickLis
                 new PermissionHandler() {
             @Override
             public void onGranted() {
-
             }
         });
+
+        LocalBroadcastManager lbm = LocalBroadcastManager.getInstance(RecordActivity.this);
+        lbm.registerReceiver(receiver, new IntentFilter("galleryVideo"));
 
         initView();
     }
@@ -197,6 +212,8 @@ public class RecordActivity extends AppCompatActivity implements View.OnClickLis
         ivRemoveSound = findViewById(R.id.ivRemoveSound);
         ivRemoveSound.setOnClickListener(this);
 
+        recyclerVideos = findViewById(R.id.recyclerVideos);
+
         Bundle bundle = getIntent().getExtras();
         preferences = getSharedPreferences("selected_sound", 0);
 
@@ -235,20 +252,6 @@ public class RecordActivity extends AppCompatActivity implements View.OnClickLis
 
         if (v == lvFilters) {
             flipFilters();
-        }
-
-        if (v == lvGallery) {
-            Intent intent = new Intent(this, FilePickerActivity.class);
-            intent.putExtra(FilePickerActivity.CONFIGS, new Configurations.Builder()
-                    .setCheckPermission(true)
-                    .setShowImages(false)
-                    .setShowAudios(false)
-                    .setShowFiles(false)
-                    .setShowVideos(true)
-                    .setSkipZeroSizeFiles(true)
-                    .setMaxSelection(1)
-                    .build());
-            startActivityForResult(intent, FILE_REQUEST_CODE);
         }
 
         if (v == lhSound) {
@@ -301,21 +304,20 @@ public class RecordActivity extends AppCompatActivity implements View.OnClickLis
 
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == FILE_REQUEST_CODE){
-            if (data != null){
-                ArrayList<MediaFile> files = data.getParcelableArrayListExtra(FilePickerActivity.MEDIA_FILES);
-                Intent intent = new Intent(RecordActivity.this, PreviewActivity.class);
-                intent.putExtra("video_path", files.get(0).getPath());
-                intent.putExtra("sound_title", "Original");
-                startActivity(intent);
+    public BroadcastReceiver receiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent != null) {
+                String video_uri = intent.getStringExtra("video_uri");
+                Intent preview = new Intent(RecordActivity.this, PreviewActivity.class);
+                preview.putExtra("video_path", video_uri);
+                preview.putExtra("sound_title", "Original");
+                preview.putExtra("video_index", "gallery");
+                startActivity(preview);
                 overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
             }
         }
-
-    }
+    };
 
     private void initCamera() {
         camera.setLifecycleOwner(this);
@@ -360,6 +362,43 @@ public class RecordActivity extends AppCompatActivity implements View.OnClickLis
                 prepareRecordingStop();
             }
         });
+
+        initGalleryVideos();
+
+    }
+
+    private void initGalleryVideos() {
+        recyclerVideos.setLayoutManager(new LinearLayoutManager(RecordActivity.this, LinearLayoutManager.HORIZONTAL, false));
+        recyclerVideos.addItemDecoration(new EqualSpacingItemDecoration(8, EqualSpacingItemDecoration.HORIZONTAL));
+        GalleryVideoAdapter galleryVideoAdapter = new GalleryVideoAdapter(RecordActivity.this,
+                getAllShownVideoPath(RecordActivity.this));
+        galleryVideoAdapter.notifyDataSetChanged();
+        recyclerVideos.setAdapter(galleryVideoAdapter);
+    }
+
+    private ArrayList<String> getAllShownVideoPath(Activity activity) {
+        Uri uri;
+        Cursor cursor;
+        int column_index_data, column_index_folder_name;
+        ArrayList<String> listOfAllImages = new ArrayList<String>();
+        String absolutePathOfImage = null;
+        uri = android.provider.MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
+
+        String[] projection = {MediaStore.MediaColumns.DATA,
+                MediaStore.Video.Media.BUCKET_DISPLAY_NAME};
+
+        cursor = activity.getContentResolver().query(uri, projection, null,
+                null, "date_modified DESC");
+
+        column_index_data = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
+        column_index_folder_name = cursor
+                .getColumnIndexOrThrow(MediaStore.Video.Media.BUCKET_DISPLAY_NAME);
+        while (cursor.moveToNext()) {
+            absolutePathOfImage = cursor.getString(column_index_data);
+
+            listOfAllImages.add(absolutePathOfImage);
+        }
+        return listOfAllImages;
     }
 
     private void discardAndResetCamera() {
@@ -377,6 +416,7 @@ public class RecordActivity extends AppCompatActivity implements View.OnClickLis
             } else {
                 intent.putExtra("sound_title", "Original");
             }
+            intent.putExtra("video_index", "camera");
             startActivity(intent);
             overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
         } else {
@@ -638,7 +678,7 @@ public class RecordActivity extends AppCompatActivity implements View.OnClickLis
         } else {
             intent.putExtra("sound_title", "Original");
         }
-
+        intent.putExtra("video_index", "camera");
         startActivity(intent);
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
     }

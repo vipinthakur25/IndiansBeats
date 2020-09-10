@@ -10,13 +10,24 @@ import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.tetravalstartups.dingdong.api.APIClient;
+import com.tetravalstartups.dingdong.api.PlanInterface;
+import com.tetravalstartups.dingdong.auth.Master;
+import com.tetravalstartups.dingdong.modules.subscription.model.MySubscriptionResponse;
+import com.tetravalstartups.dingdong.modules.subscription.model.MySubscriptions;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 public class SubscribedPresenter {
     Context context;
     ISubscribed iSubscribed;
+
+    private static final String TAG = "SubscribedPresenter";
 
     public SubscribedPresenter(Context context, ISubscribed iSubscribed) {
         this.context = context;
@@ -24,38 +35,30 @@ public class SubscribedPresenter {
     }
 
     public interface ISubscribed {
-        void subscribeFetchSuccess(List<Subscribed> subscribedList);
+        void subscribeFetchSuccess(MySubscriptions mySubscriptions);
 
         void subscribeFetchError(String error);
     }
 
-    public void fetchSubscribe(String uid){
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        List<Subscribed> subscribedList = new ArrayList<>();
+    public void fetchSubscribe(){
+        Master master = new Master(context);
+        PlanInterface planInterface = APIClient.getRetrofitInstance().create(PlanInterface.class);
+        Call<MySubscriptions> call = planInterface.fetchMySubs(master.getId());
+        call.enqueue(new Callback<MySubscriptions>() {
+            @Override
+            public void onResponse(Call<MySubscriptions> call, Response<MySubscriptions> response) {
+                if (response.code() == 200) {
+                    iSubscribed.subscribeFetchSuccess(response.body());
+                } else if (response.code() == 400) {
+                    iSubscribed.subscribeFetchError("No Subscriptions");
+                }
+            }
 
-        db.collection("users")
-                .document(uid)
-                .collection("subscription")
-                .addSnapshotListener(new EventListener<QuerySnapshot>() {
-                    @Override
-                    public void onEvent(@Nullable QuerySnapshot documentSnapshots, @Nullable FirebaseFirestoreException e) {
-                        if (documentSnapshots.getDocuments().isEmpty()){
-                            iSubscribed.subscribeFetchError("No Subscriptions");
-                        } else {
-                            subscribedList.clear();
-                            for (DocumentSnapshot snapshot : documentSnapshots.getDocuments()){
-                                if (snapshot.getString("status").equals("1")) {
-                                    Subscribed subscribed = snapshot.toObject(Subscribed.class);
-                                    subscribedList.add(subscribed);
-                                }
-                            }
-
-                            iSubscribed.subscribeFetchSuccess(subscribedList);
-
-                        }
-                    }
-                });
-
+            @Override
+            public void onFailure(Call<MySubscriptions> call, Throwable t) {
+                iSubscribed.subscribeFetchError(t.getMessage());
+            }
+        });
     }
 
 }

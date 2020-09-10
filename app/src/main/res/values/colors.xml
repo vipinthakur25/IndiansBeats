@@ -1,20 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#11111C</color>
-    <color name="colorPrimaryDark">#11111C</color>
-    <color name="colorSurface">#11111C</color>
+    <color name="colorPrimary">#F6F4F8</color>
+    <color name="colorPrimaryDark">#F6F4F8</color>
+    <color name="colorSurface">#F6F4F8</color>
     <color name="colorPrimaryDarkV2">#808188</color>
     <color name="colorPrimaryDarkV3">#3F4042</color>
     <color name="colorPrimaryDarkV4">#B1BACF</color>
     <color name="colorPrimaryDarkV5">#242439</color>
-    <color name="colorAccent">#11111C</color>
+    <color name="colorPrimaryDarkV6">#11111C</color>
+    <color name="colorAccent">#000000</color>
     <color name="colorAccentV1">#F7F7F8</color>
-    <color name="colorTextTitle">#FFFFFF</color>
+    <color name="colorTextTitle">#11111C</color>
 
 <!--    <color name="colorGradientStart">#51A9DA</color>-->
 <!--    <color name="colorGradientEnd">#9C27B0</color>-->
 
-    <color name="colorGradientStart">#FFDD37</color>
+    <color name="colorGradientStart">#FF4081</color>
     <color name="colorGradientCenter">#7C2AE8</color>
     <color name="colorGradientEnd">#E05FB5</color>
 
@@ -31,8 +32,8 @@
     <color name="colorDisableText">#615A5A</color>
     <color name="colorGold">#FFD700</color>
 
-    <color name="colorRed">#EF5350</color>
-    <color name="colorYellow">#F89B14</color>
+    <color name="colorRed">#FF4081</color>
+    <color name="colorYellow">#F89B14</color>0
     <color name="colorGreen">#5F9A1C</color>
     <color name="colorSuccessGreen">#68BE61</color>
 

@@ -1,22 +1,19 @@
 package com.tetravalstartups.dingdong.modules.subscription;
 
 import android.content.Context;
-import android.widget.Toast;
+import android.util.Log;
 
-import androidx.annotation.NonNull;
+import com.tetravalstartups.dingdong.api.APIClient;
+import com.tetravalstartups.dingdong.api.PlanInterface;
+import com.tetravalstartups.dingdong.modules.subscription.model.Plans;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QuerySnapshot;
-
-import java.util.ArrayList;
-import java.util.List;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class SubscriptionPresenter {
 
+    private static final String TAG = "SubscriptionPresenter";
     Context context;
     ISubs iSubs;
 
@@ -25,41 +22,32 @@ public class SubscriptionPresenter {
         this.iSubs = iSubs;
     }
 
-    public interface ISubs {
-        void subsFetchSuccess(List<Subscription> subscriptionList);
+    public void fetchSubs() {
+        PlanInterface planInterface = APIClient.getRetrofitInstance().create(PlanInterface.class);
+        Call<Plans> call = planInterface.fetchPlans();
+        call.enqueue(new Callback<Plans>() {
+            @Override
+            public void onResponse(Call<Plans> call, Response<Plans> response) {
+                if (response.code() == 200) {
+                    iSubs.subsFetchSuccess(response.body());
+                } else {
+                    iSubs.subsFetchError(response.message());
+                }
+            }
 
-        void subsFetchError(String error);
+            @Override
+            public void onFailure(Call<Plans> call, Throwable t) {
+                Log.e(TAG, "onFailure: " + t.getMessage());
+                iSubs.subsFetchError(t.getMessage());
+            }
+        });
+
     }
 
-    public void fetchSubs(){
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        List<Subscription> subscriptionList = new ArrayList<>();
+    public interface ISubs {
+        void subsFetchSuccess(Plans plans);
 
-        Query query = db.collection("subscription");
-        query.orderBy("id", Query.Direction.ASCENDING)
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()){
-                            if (task.getResult().getDocuments().isEmpty()){
-                                iSubs.subsFetchError("No subscription plans");
-                            } else {
-                                for (DocumentSnapshot snapshot : task.getResult()){
-                                    Subscription subscription = snapshot.toObject(Subscription.class);
-                                    subscriptionList.add(subscription);
-                                }
-
-                                iSubs.subsFetchSuccess(subscriptionList);
-
-                            }
-                        } else {
-                            iSubs.subsFetchError(task.getException().getMessage());
-                        }
-                    }
-                });
-
-
+        void subsFetchError(String error);
     }
 
 }

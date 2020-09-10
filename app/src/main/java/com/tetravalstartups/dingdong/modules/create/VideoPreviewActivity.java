@@ -28,21 +28,17 @@ import com.otaliastudios.transcoder.TranscoderOptions;
 import com.otaliastudios.transcoder.engine.TrackType;
 import com.otaliastudios.transcoder.sink.DataSink;
 import com.otaliastudios.transcoder.sink.DefaultDataSink;
-import com.otaliastudios.transcoder.source.DataSource;
-import com.otaliastudios.transcoder.source.UriDataSource;
 import com.tetravalstartups.dingdong.R;
 import com.tetravalstartups.dingdong.auth.Master;
+import com.tetravalstartups.dingdong.modules.publish.PostActivity;
 import com.tetravalstartups.dingdong.utils.DDLoading;
 import com.tetravalstartups.dingdong.utils.DDProgress;
-import com.transloadit.sdk.async.AssemblyProgressListener;
-import com.transloadit.sdk.response.AssemblyResponse;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.DecimalFormat;
 import java.util.concurrent.Future;
 
-public class VideoPreviewActivity extends AppCompatActivity implements View.OnClickListener, AssemblyProgressListener, TranscoderListener {
+public class VideoPreviewActivity extends AppCompatActivity implements View.OnClickListener, TranscoderListener {
 
     private VideoView videoView;
     private static VideoResult videoResult;
@@ -238,31 +234,6 @@ public class VideoPreviewActivity extends AppCompatActivity implements View.OnCl
         super.onBackPressed();
         soundPlayer.stop();
         soundPlayer.reset();
-    }
-
-    @Override
-    public void onUploadFinished() {
-
-    }
-
-    @Override
-    public void onUploadPogress(long uploadedBytes, long totalBytes) {
-
-    }
-
-    @Override
-    public void onAssemblyFinished(AssemblyResponse response) {
-
-    }
-
-    @Override
-    public void onUploadFailed(Exception exception) {
-
-    }
-
-    @Override
-    public void onAssemblyStatusUpdateFailed(Exception exception) {
-
     }
 
     @Override

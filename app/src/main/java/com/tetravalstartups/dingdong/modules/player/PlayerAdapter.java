@@ -12,16 +12,17 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.tetravalstartups.dingdong.R;
 import com.tetravalstartups.dingdong.modules.home.video.Video;
+import com.tetravalstartups.dingdong.modules.profile.videos.VideoResponseDatum;
 
 import java.util.List;
 
 public class PlayerAdapter extends RecyclerView.Adapter<PlayerViewHolder> {
 
     Context context;
-    List<Video> videoList;
+    List<VideoResponseDatum> videoList;
     private SharedPreferences preferences;
 
-    public PlayerAdapter(Context context, List<Video> videoList) {
+    public PlayerAdapter(Context context, List<VideoResponseDatum> videoList) {
         this.context = context;
         this.videoList = videoList;
     }
@@ -36,7 +37,7 @@ public class PlayerAdapter extends RecyclerView.Adapter<PlayerViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull PlayerViewHolder holder, int position) {
-        Video video = videoList.get(position);
+        VideoResponseDatum video = videoList.get(position);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putString("index", position+1+"");
         holder.playVideo(video);

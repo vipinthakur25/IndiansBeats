@@ -1,7 +1,7 @@
 package com.tetravalstartups.dingdong.modules.profile.view.adapter;
 
 import android.content.Context;
-import android.content.Intent;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,24 +12,28 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.tetravalstartups.dingdong.MainActivity;
+import com.tetravalstartups.dingdong.api.APIClient;
 import com.tetravalstartups.dingdong.R;
+import com.tetravalstartups.dingdong.api.RequestInterface;
 import com.tetravalstartups.dingdong.auth.Master;
+import com.tetravalstartups.dingdong.modules.profile.external.PublicProfile;
 import com.tetravalstartups.dingdong.modules.profile.model.Avatar;
 import com.tetravalstartups.dingdong.modules.profile.view.activity.EditProfileActivity;
-import com.tetravalstartups.dingdong.utils.ProfilePhotoBottomSheet;
 
-import java.util.HashMap;
 import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class AvatarAdapter extends RecyclerView.Adapter<AvatarAdapter.ViewHolder> {
 
     Context context;
     List<Avatar> avatarList;
     String selected_avatar;
+    private RequestInterface requestInterface;
+    private Master master;
+    private static final String TAG = "AvatarAdapter";
 
     public AvatarAdapter(Context context, List<Avatar> avatarList) {
         this.context = context;
@@ -40,6 +44,8 @@ public class AvatarAdapter extends RecyclerView.Adapter<AvatarAdapter.ViewHolder
     @Override
     public AvatarAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.photo_list_item, parent, false);
+        requestInterface = APIClient.getRetrofitInstance().create(RequestInterface.class);
+        master = new Master(context);
         return new ViewHolder(view);
     }
 
@@ -53,13 +59,19 @@ public class AvatarAdapter extends RecyclerView.Adapter<AvatarAdapter.ViewHolder
         holder.lvPhoto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                HashMap<String, Object> hashMap = new HashMap<>();
-                hashMap.put("photo", avatar.getPhoto());
-                FirebaseFirestore db = FirebaseFirestore.getInstance();
-                db.collection("users")
-                        .document(new Master(context).getId())
-                        .update(hashMap);
-                ((EditProfileActivity)context).closeSheet();
+                Call<PublicProfile> call = requestInterface.editUserPhoto(master.getId(), avatar.getPhoto());
+                call.enqueue(new Callback<PublicProfile>() {
+                    @Override
+                    public void onResponse(Call<PublicProfile> call, Response<PublicProfile> response) {
+                        new Master(context).setUser(response.body().getPublicProfileResponse());
+                        ((EditProfileActivity)context).closeSheet();
+                    }
+
+                    @Override
+                    public void onFailure(Call<PublicProfile> call, Throwable t) {
+                        Log.e(TAG, "onFailure: "+t.getMessage() );
+                    }
+                });
             }
         });
     }
