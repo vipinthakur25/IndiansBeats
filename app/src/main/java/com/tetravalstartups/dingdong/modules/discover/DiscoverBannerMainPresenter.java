@@ -29,15 +29,15 @@ public class DiscoverBannerMainPresenter {
     }
 
     public interface IDiscoverMainBanner {
-        void fetchBannerSuccess(ArrayList<SlideModel> discoverBannerMainList);
+        void fetchBannerSuccess(List<DiscoverBannerMain> discoverBannerMainList);
 
         void fetchBannerError(String error);
     }
 
     public void fetchBanner() {
-        ArrayList<SlideModel> discoverBannerMainList = new ArrayList<>();
+        ArrayList<DiscoverBannerMain> discoverBannerMainList = new ArrayList<>();
         db = FirebaseFirestore.getInstance();
-        db.collection("discover_banner")
+        db.collection("discover")
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(@Nullable QuerySnapshot documentSnapshots, @Nullable FirebaseFirestoreException e) {
@@ -46,8 +46,8 @@ public class DiscoverBannerMainPresenter {
                         } else {
                             discoverBannerMainList.clear();
                             for (DocumentSnapshot snapshot : documentSnapshots.getDocuments()){
-                               SlideModel slideModel = new SlideModel(snapshot.getString("banner_url"), ScaleTypes.FIT);
-                               discoverBannerMainList.add(slideModel);
+                                DiscoverBannerMain discoverBannerMain = snapshot.toObject(DiscoverBannerMain.class);
+                                discoverBannerMainList.add(discoverBannerMain);
                             }
                             iDiscoverMainBanner.fetchBannerSuccess(discoverBannerMainList);
                         }

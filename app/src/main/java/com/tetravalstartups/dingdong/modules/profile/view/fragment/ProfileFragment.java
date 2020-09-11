@@ -181,28 +181,6 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         Objects.requireNonNull(videoTab.getTabAt(0)).setIcon(R.drawable.ic_dd_public_videos_inactive);
         Objects.requireNonNull(videoTab.getTabAt(1)).setIcon(R.drawable.ic_dd_liked_videos_inactive);
         Objects.requireNonNull(videoTab.getTabAt(2)).setIcon(R.drawable.ic_dd_private_videos_inactive);
-
-        videoTab.getTabAt(0).getIcon().setColorFilter(getResources().getColor(R.color.colorGradientStart), PorterDuff.Mode.SRC_IN);
-        videoTab.getTabAt(1).getIcon().setColorFilter(getResources().getColor(R.color.colorTextTitle), PorterDuff.Mode.SRC_IN);
-        videoTab.getTabAt(2).getIcon().setColorFilter(getResources().getColor(R.color.colorTextTitle), PorterDuff.Mode.SRC_IN);
-
-        videoTab.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
-            @Override
-            public void onTabSelected(TabLayout.Tab tab) {
-                videoTab.getTabAt(tab.getPosition()).getIcon().setColorFilter(getResources().getColor(R.color.colorGradientStart), PorterDuff.Mode.SRC_IN);
-            }
-
-            @Override
-            public void onTabUnselected(TabLayout.Tab tab) {
-                videoTab.getTabAt(tab.getPosition()).getIcon().setColorFilter(getResources().getColor(R.color.colorTextTitle), PorterDuff.Mode.SRC_IN);
-            }
-
-            @Override
-            public void onTabReselected(TabLayout.Tab tab) {
-
-            }
-        });
-
     }
 
     @Override
