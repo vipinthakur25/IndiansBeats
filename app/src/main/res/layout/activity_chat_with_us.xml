@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".modules.profile.view.activity.ChatWithUsActivity">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/ivGoBack"
+                app:srcCompat="@drawable/ic_dd_back_white"
+                android:layout_width="50dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="center_vertical|start"
+                android:padding="14dp" />
+
+            <TextView
+                android:id="@+id/tvName"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:fontFamily="@font/montserrat_bold"
+                android:gravity="center"
+                android:text="@string/chat_with_us"
+                android:textColor="@color/colorTextTitle"
+                android:textSize="16sp" />
+
+        </FrameLayout>
+
+    </LinearLayout>
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Enter your alternate email"
+                android:textColor="@color/colorTextTitle"
+                android:fontFamily="@font/montserrat"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:layout_marginBottom="10dp"/>
+
+            <EditText
+                android:id="@+id/etAlternateEmail"
+                android:layout_width="match_parent"
+                android:layout_height="45dp"
+                android:background="@drawable/bg_edittext"
+                android:fontFamily="@font/montserrat_bold"
+                android:hint="Email"
+                android:textSize="16sp"
+                android:autofillHints="password"
+                android:inputType="textEmailAddress"
+                android:gravity="center_vertical"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginBottom="10dp"
+                android:layout_marginEnd="16dp"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Enter your alternate number"
+                android:textColor="@color/colorTextTitle"
+                android:fontFamily="@font/montserrat"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:layout_marginBottom="10dp"
+                />
+
+            <EditText
+                android:id="@+id/etAlternateNumber"
+                android:layout_width="match_parent"
+                android:layout_height="45dp"
+                android:background="@drawable/bg_edittext"
+                android:fontFamily="@font/montserrat_bold"
+                android:hint="Phone number"
+                android:textSize="16sp"
+                android:autofillHints="password"
+                android:inputType="number"
+                android:gravity="center_vertical"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:layout_marginBottom="10dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Description"
+                android:textColor="@color/colorTextTitle"
+                android:fontFamily="@font/montserrat"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:layout_marginBottom="10dp"
+                />
+
+            <EditText
+                android:id="@+id/etDescription"
+                android:layout_width="match_parent"
+                android:layout_height="45dp"
+                android:background="@drawable/bg_edittext"
+                android:fontFamily="@font/montserrat_bold"
+                android:hint="Enter your query"
+                android:textSize="16sp"
+                android:autofillHints="password"
+                android:inputType="text"
+                android:gravity="center_vertical"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"/>
+
+            <TextView
+                android:id="@+id/tvSend"
+                android:layout_width="match_parent"
+                android:layout_height="45dp"
+                android:background="@drawable/bg_button_disabled"
+                android:fontFamily="@font/montserrat_bold"
+                android:text="Send"
+                android:textColor="@color/colorAccentV1"
+                android:textSize="18dp"
+                android:gravity="center"
+                android:layout_marginTop="54dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"/>
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

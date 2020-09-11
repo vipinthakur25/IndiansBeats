@@ -51,7 +51,7 @@ public class DiscoverFragment extends Fragment implements DiscoverBannerMainPres
 
     private void initView() {
         frameUsers  = view.findViewById(R.id.frameUsers);
-        imageSlider = view.findViewById(R.id.imageSlider);
+       // imageSlider = view.findViewById(R.id.imageSlider);
         etSearch = view.findViewById(R.id.etSearch);
         recyclerSearch = view.findViewById(R.id.recyclerSearch);
         tvNoData = view.findViewById(R.id.tvNoData);
@@ -72,9 +72,14 @@ public class DiscoverFragment extends Fragment implements DiscoverBannerMainPres
     }
 
 
+//    @Override
+//    public void fetchBannerSuccess(ArrayList<SlideModel> discoverBannerMainList) {
+//        imageSlider.setImageList(discoverBannerMainList, ScaleTypes.FIT);
+//    }
+
     @Override
-    public void fetchBannerSuccess(ArrayList<SlideModel> discoverBannerMainList) {
-        imageSlider.setImageList(discoverBannerMainList, ScaleTypes.FIT);
+    public void fetchBannerSuccess(List<DiscoverBannerMain> discoverBannerMainList) {
+
     }
 
     @Override

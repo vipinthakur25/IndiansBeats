@@ -41,6 +41,7 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
     private LinearLayout lhPassbook;
     private LinearLayout lhTAndC;
     private LinearLayout lhSecurity;
+    private LinearLayout lhHelp;
     private FirebaseAuth auth;
 
     private static final String TAG = "SettingsActivity";
@@ -63,6 +64,7 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
         lhPassbook = findViewById(R.id.lhPassbook);
         lhTAndC = findViewById(R.id.lhTAndC);
         lhSecurity = findViewById(R.id.lhSecurity);
+        lhHelp = findViewById(R.id.lhHelp);
 
         ivGoBack.setOnClickListener(this);
         lhLogout.setOnClickListener(this);
@@ -70,6 +72,7 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
         lhPassbook.setOnClickListener(this);
         lhTAndC.setOnClickListener(this);
         lhSecurity.setOnClickListener(this);
+        lhHelp.setOnClickListener(this);
 
         auth = FirebaseAuth.getInstance();
         planInterface = APIClient.getRetrofitInstance().create(PlanInterface.class);
@@ -113,6 +116,10 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
             fetchUsers();
             //fetchTransactions();
 //            fetchSubscriptions();
+        }
+        if (v == lhHelp){
+            startActivity(new Intent(SettingsActivity.this, HelpActivity.class));
+            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
         }
 
     }

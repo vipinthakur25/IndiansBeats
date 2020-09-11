@@ -37,6 +37,8 @@ public class PhoneActivity extends AppCompatActivity implements View.OnClickList
 
         tvSendOtp = findViewById(R.id.tvSendOtp);
         tvSendOtp.setOnClickListener(this);
+
+
     }
 
     @Override
