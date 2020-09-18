@@ -14,16 +14,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QuerySnapshot;
 import com.tetravalstartups.dingdong.MainActivity;
 import com.tetravalstartups.dingdong.R;
 import com.tetravalstartups.dingdong.api.APIClient;
@@ -46,9 +41,9 @@ import retrofit2.Response;
 public class PostActivity extends AppCompatActivity implements View.OnClickListener, SubPlanChooserBottomSheet.SubPlanListener {
 
     private static final String TAG = "PostActivity";
+    private EditText etVideoDesc;
     private TextView tvPost;
     private ImageView ivVideoCover;
-    private EditText etVideoDesc;
     private TextView tvHashTag;
     private TextView tvAtTheRate;
     private ImageView ivGoBack;
@@ -73,8 +68,6 @@ public class PostActivity extends AppCompatActivity implements View.OnClickListe
 
     private void initView() {
         ddVideoPreview = DDVideoPreview.getInstance();
-        etVideoDesc = findViewById(R.id.etVideoDesc);
-
         tvHashTag = findViewById(R.id.tvHashTag);
         tvHashTag.setOnClickListener(this);
 
@@ -86,6 +79,8 @@ public class PostActivity extends AppCompatActivity implements View.OnClickListe
 
         ivVideoCover = findViewById(R.id.ivVideoCover);
         ivVideoCover.setOnClickListener(this);
+
+        etVideoDesc = findViewById(R.id.etVideoDesc);
 
         tvPost = findViewById(R.id.tvPost);
         tvPost.setOnClickListener(this);

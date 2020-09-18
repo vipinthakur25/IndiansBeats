@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -18,9 +19,11 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.SnapHelper;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.tetravalstartups.dingdong.api.APIClient;
 import com.tetravalstartups.dingdong.R;
 import com.tetravalstartups.dingdong.api.RequestInterface;
+import com.tetravalstartups.dingdong.api.UserInterface;
 import com.tetravalstartups.dingdong.auth.Master;
 import com.tetravalstartups.dingdong.modules.profile.videos.VideoResponseDatum;
 import com.tetravalstartups.dingdong.modules.profile.videos.created.CreatedVideo;
@@ -40,13 +43,16 @@ public class PlayerFragment extends Fragment implements View.OnClickListener, Sw
     private RecyclerView recyclerVideos;
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private List<VideoResponseDatum> videoList = new ArrayList<>();
-    ___PlayerAdapter playerAdapter;
+    PlayerAdapter playerAdapter;
     private TextView tvTrending, tvFollowing;
     private DDLoading ddLoading;
     private SharedPreferences preferences;
     private Master master;
 
     private RequestInterface requestInterface;
+    private UserInterface userInterface;
+    private LinearLayout lhVideoType;
+    private FirebaseAuth firebaseAuth;
 
 
     public PlayerFragment() {
@@ -61,6 +67,7 @@ public class PlayerFragment extends Fragment implements View.OnClickListener, Sw
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_player, container, false);
         requestInterface = APIClient.getRetrofitInstance().create(RequestInterface.class);
+        userInterface = APIClient.getRetrofitInstance().create(UserInterface.class);
         initView();
         return view;
     }
@@ -72,17 +79,73 @@ public class PlayerFragment extends Fragment implements View.OnClickListener, Sw
 
         tvFollowing = view.findViewById(R.id.tvFollowing);
         tvTrending = view.findViewById(R.id.tvTrending);
+        tvFollowing.setOnClickListener(this);
+        tvTrending.setOnClickListener(this);
 
         preferences = getContext().getSharedPreferences("video_index", 0);
 
         master = new Master(getContext());
 
         ddLoading = DDLoading.getInstance();
+
+        lhVideoType = view.findViewById(R.id.lhVideoType);
+        firebaseAuth = FirebaseAuth.getInstance();
+        if (firebaseAuth.getCurrentUser() != null) {
+            lhVideoType.setVisibility(View.VISIBLE);
+        }
+
         mSwipeRefreshLayout.setRefreshing(true);
-        setupAdapter();
+        fetchTrendingVideos();
     }
 
-    private void setupAdapter() {
+
+    @Override
+    public void onClick(View v) {
+        if (v == tvFollowing) {
+            tvFollowing.setTextColor(getResources().getColor(R.color.colorGradientStart));
+            tvTrending.setTextColor(getResources().getColor(R.color.colorDisable));
+            fetchUserFollowingVideos();
+        }
+
+        if (v == tvTrending) {
+            tvFollowing.setTextColor(getResources().getColor(R.color.colorDisable));
+            tvTrending.setTextColor(getResources().getColor(R.color.colorGradientStart));
+            fetchTrendingVideos();
+        }
+    }
+
+    private void fetchUserFollowingVideos() {
+        mSwipeRefreshLayout.setRefreshing(true);
+        recyclerVideos.setLayoutManager(new LinearLayoutManager(getContext()));
+        SnapHelper snapHelper = new PagerSnapHelper();
+        if (recyclerVideos.getOnFlingListener() == null)
+            snapHelper.attachToRecyclerView(recyclerVideos);
+        Call<CreatedVideo> call = userInterface.getUserFollowingVideos(master.getId(), 250, 0);
+        call.enqueue(new Callback<CreatedVideo>() {
+            @Override
+            public void onResponse(Call<CreatedVideo> call, Response<CreatedVideo> response) {
+                if (response.code() == 200) {
+                    CreatedVideo createdVideo = response.body();
+                    List<VideoResponseDatum> createdVideosArrayList = new ArrayList<>(createdVideo.getData());
+                    playerAdapter = new PlayerAdapter(getContext(), createdVideosArrayList);
+                    playerAdapter.notifyDataSetChanged();
+                    recyclerVideos.setAdapter(playerAdapter);
+                    mSwipeRefreshLayout.setRefreshing(false);
+                } else {
+                    Toast.makeText(getContext(), "No Videos", Toast.LENGTH_SHORT).show();
+                }
+
+            }
+
+            @Override
+            public void onFailure(Call<CreatedVideo> call, Throwable t) {
+
+            }
+        });
+    }
+
+    private void fetchTrendingVideos() {
+        mSwipeRefreshLayout.setRefreshing(true);
         recyclerVideos.setLayoutManager(new LinearLayoutManager(getContext()));
         SnapHelper snapHelper = new PagerSnapHelper();
         if (recyclerVideos.getOnFlingListener() == null)
@@ -94,7 +157,7 @@ public class PlayerFragment extends Fragment implements View.OnClickListener, Sw
                 if (response.code() == 200) {
                     CreatedVideo createdVideo = response.body();
                     List<VideoResponseDatum> createdVideosArrayList = new ArrayList<>(createdVideo.getData());
-                    playerAdapter = new ___PlayerAdapter(getContext(), createdVideosArrayList);
+                    playerAdapter = new PlayerAdapter(getContext(), createdVideosArrayList);
                     playerAdapter.notifyDataSetChanged();
                     recyclerVideos.setAdapter(playerAdapter);
                     mSwipeRefreshLayout.setRefreshing(false);
@@ -112,15 +175,11 @@ public class PlayerFragment extends Fragment implements View.OnClickListener, Sw
     }
 
 
-    @Override
-    public void onClick(View v) {
-
-    }
 
 
     @Override
     public void onRefresh() {
-        setupAdapter();
+        fetchTrendingVideos();
     }
 }
 

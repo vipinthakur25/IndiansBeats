@@ -55,6 +55,7 @@ public interface RequestInterface {
     @POST("Auth/EditProfile")
     Call<PublicProfile> editUserProfile(@Field("id") String id,
                                   @Field("name") String name,
+                                  @Field("handle") String handle,
                                   @Field("email") String email,
                                   @Field("bio") String bio);
 

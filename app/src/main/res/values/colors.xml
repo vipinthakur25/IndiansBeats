@@ -25,11 +25,11 @@
 
     <color name="colorBrandYellow">#FFDD37</color>
     <color name="colorBrandYellowV2">#F1D75A</color>
+    <color name="colorGold">#F1D75A</color>
     <color name="colorBrandPink">#D686BB</color>
 
     <color name="colorDisable">#AEA7A7</color>
     <color name="colorDisableText">#615A5A</color>
-    <color name="colorGold">#FFD700</color>
 
     <color name="colorRed">#FF4081</color>
     <color name="colorYellow">#F89B14</color>
@@ -44,6 +44,10 @@
     <color name="colorElementDisabled">#AEA7A7</color>
     <color name="colorDark">#808188</color>
     <color name="colorError">#FA1706</color>
+
+    <color name="colorHashtag">#448AFF</color>
+    <color name="colorMention">#FEDC3A</color>
+    <color name="colorPhone">#448AFF</color>
 
 
 

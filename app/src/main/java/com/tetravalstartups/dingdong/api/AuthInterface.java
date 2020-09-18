@@ -2,6 +2,7 @@ package com.tetravalstartups.dingdong.api;
 
 import com.tetravalstartups.dingdong.modules.passbook.model.GeneratePassbook;
 import com.tetravalstartups.dingdong.modules.profile.model.ChatWithUs;
+import com.tetravalstartups.dingdong.modules.profile.model.CheckHandle;
 import com.tetravalstartups.dingdong.modules.profile.model.HelpRequest;
 import com.tetravalstartups.dingdong.modules.profile.model.MyComplain;
 import com.tetravalstartups.dingdong.modules.profile.model.ReportAProblem;
@@ -35,4 +36,10 @@ public interface AuthInterface {
     @FormUrlEncoded
     @POST("Auth/MyComplainsList")
     Call<MyComplain> complainRequest(@Field("user_id") String user_id);
+
+    @FormUrlEncoded
+    @POST("Auth/CheckHandleAvaliblity")
+    Call<CheckHandle> checkHandle(@Field("user_id") String user_id, @Field("handle") String handle);
+
+
 }

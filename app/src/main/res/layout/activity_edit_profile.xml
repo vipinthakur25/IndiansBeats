@@ -134,6 +134,35 @@
                 android:layout_marginEnd="16dp"/>
 
             <TextView
+                android:id="@+id/textView5"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="4dp"
+                android:paddingStart="16dp"
+                android:fontFamily="@font/montserrat_bold"
+                android:textColor="@color/colorTextTitle"
+                android:text="Email" />
+
+            <EditText
+                android:id="@+id/etEmail"
+                android:layout_width="match_parent"
+                android:layout_height="45dp"
+                android:background="@drawable/bg_edittext"
+                android:fontFamily="@font/montserrat_bold"
+                android:hint="Email"
+                android:textSize="16sp"
+                android:autofillHints="password"
+                android:inputType="textEmailAddress|none"
+                android:gravity="center_vertical"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"/>
+
+            <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
@@ -148,19 +177,23 @@
             <EditText
                 android:id="@+id/etBio"
                 android:layout_width="match_parent"
-                android:layout_height="45dp"
+                android:layout_height="100dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:autofillHints="password"
                 android:background="@drawable/bg_edittext"
                 android:fontFamily="@font/montserrat_bold"
+                android:gravity="top|start"
                 android:hint="Bio"
-                android:maxLength="80"
-                android:textSize="16sp"
-                android:autofillHints="password"
-                android:inputType="text|none"
-                android:gravity="center_vertical"
+                android:inputType="textMultiLine"
+                android:maxLength="150"
                 android:paddingStart="16dp"
+                android:paddingTop="8dp"
                 android:paddingEnd="16dp"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="16dp"/>
+                android:lines="4"
+                android:scrollbars="vertical"
+                android:minLines="1"
+                android:textSize="16sp" />
 
             <TextView
                 android:id="@+id/tvUpdate"

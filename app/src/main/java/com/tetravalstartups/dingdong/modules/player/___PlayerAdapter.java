@@ -34,7 +34,7 @@ public class ___PlayerAdapter extends RecyclerView.Adapter<___PlayerViewHolder> 
     @Override
     public void onBindViewHolder(@NonNull ___PlayerViewHolder holder, int position) {
         VideoResponseDatum video = videoList.get(position);
-        holder.playVideo(video);
+        holder.playVideo(video, holder.getAdapterPosition());
     }
 
     @Override

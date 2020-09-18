@@ -1,8 +1,6 @@
 package com.tetravalstartups.dingdong.modules.profile.view.fragment;
 
-import android.content.Context;
 import android.content.Intent;
-import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -12,7 +10,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager.widget.ViewPager;
 
@@ -20,7 +17,6 @@ import com.bumptech.glide.Glide;
 import com.ethanhua.skeleton.Skeleton;
 import com.ethanhua.skeleton.SkeletonScreen;
 import com.google.android.material.tabs.TabLayout;
-import com.google.firebase.auth.FirebaseAuth;
 import com.tetravalstartups.dingdong.MainActivity;
 import com.tetravalstartups.dingdong.R;
 import com.tetravalstartups.dingdong.api.APIClient;
@@ -34,6 +30,7 @@ import com.tetravalstartups.dingdong.modules.profile.view.activity.FollowingActi
 import com.tetravalstartups.dingdong.modules.profile.view.activity.SettingsActivity;
 import com.tetravalstartups.dingdong.modules.profile.view.adapter.VideoTabPagerAdapter;
 import com.tetravalstartups.dingdong.utils.LightBox;
+import com.tylersuehr.socialtextview.SocialTextView;
 
 import java.util.Objects;
 
@@ -55,14 +52,13 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     private TextView tvHandle;
     private ImageView ivPhoto;
     private ImageView ivSettings;
-    private TextView tvBio;
+    private SocialTextView tvBio;
     private TextView tvLikeCount;
     private TextView tvFollowerCount;
     private TextView tvFollowingCount;
     private TextView tvEditProfile;
     private TextView tvVideosCount;
     private Master master;
-    private FirebaseAuth auth;
     private RequestInterface requestInterface;
     private SkeletonScreen skVideo, skLikes, skFollower, skFollowing;
 
@@ -95,7 +91,6 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         tvFollowingCount = view.findViewById(R.id.tvFollowingCount);
         tvVideosCount = view.findViewById(R.id.tvVideosCount);
 
-        auth = FirebaseAuth.getInstance();
         master = new Master(getContext());
 
         ivSettings.setOnClickListener(this);
@@ -124,7 +119,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     private void setupUserDetails() {
         tvName.setText(master.getName());
         tvHandle.setText(String.format("@%s", master.getHandle()));
-        tvBio.setText(master.getBio());
+        tvBio.setLinkText(master.getBio());
 
         if (getActivity() != null) {
             Glide.with(getContext())
@@ -213,10 +208,8 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onResume() {
         super.onResume();
-        if (auth.getCurrentUser() != null) {
-            ((MainActivity) getActivity()).getProfileData(auth.getCurrentUser().getUid());
-            fetchCounts();
-        }
+        ((MainActivity) getActivity()).getProfileData(master.getId());
+        fetchCounts();
     }
 
 

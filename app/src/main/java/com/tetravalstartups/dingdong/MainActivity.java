@@ -1,12 +1,10 @@
 package com.tetravalstartups.dingdong;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.os.Handler;
@@ -16,7 +14,6 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
@@ -29,18 +26,14 @@ import com.nabinbhandari.android.permissions.PermissionHandler;
 import com.nabinbhandari.android.permissions.Permissions;
 import com.tetravalstartups.dingdong.api.APIClient;
 import com.tetravalstartups.dingdong.api.RequestInterface;
-import com.tetravalstartups.dingdong.auth.LoginActivity;
 import com.tetravalstartups.dingdong.auth.Master;
 import com.tetravalstartups.dingdong.auth.PhoneActivity;
 import com.tetravalstartups.dingdong.modules.discover.DiscoverFragment;
-import com.tetravalstartups.dingdong.modules.notification.NotificationFragment;
+import com.tetravalstartups.dingdong.modules.notification.view.NotificationFragment;
 import com.tetravalstartups.dingdong.modules.player.PlayerFragment;
 import com.tetravalstartups.dingdong.modules.profile.external.PublicProfile;
 import com.tetravalstartups.dingdong.modules.profile.view.fragment.ProfileFragment;
-import com.tetravalstartups.dingdong.modules.publish.PublishMeta;
 import com.tetravalstartups.dingdong.modules.record.RecordActivity;
-import com.tetravalstartups.dingdong.service.PublishService;
-import com.tetravalstartups.dingdong.utils.DDAlert;
 import com.tetravalstartups.dingdong.utils.DialogVideoUploadSuccess;
 
 import retrofit2.Call;
@@ -332,6 +325,5 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         super.onPause();
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
-
 
 }

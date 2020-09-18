@@ -108,7 +108,7 @@ public class ___PlayerViewHolder extends RecyclerView.ViewHolder implements Play
         player = new SimpleExoPlayer.Builder(context).build();
     }
 
-    public void playVideo(VideoResponseDatum video) {
+    public void playVideo(VideoResponseDatum video, int position) {
         simpleCache = App.simpleCache;
         cacheDataSourceFactory = new CacheDataSourceFactory(simpleCache, new DefaultHttpDataSourceFactory(Util.getUserAgent(context, "dingdong"))
                 , CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR);
@@ -120,6 +120,7 @@ public class ___PlayerViewHolder extends RecyclerView.ViewHolder implements Play
         player.addListener(this);
         playerView.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FIXED_HEIGHT);
         player.prepare(progressiveMediaSource, true, false);
+        Toast.makeText(context, ""+position, Toast.LENGTH_SHORT).show();
     }
 
     @Override

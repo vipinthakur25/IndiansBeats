@@ -105,6 +105,8 @@ dependencies {
     implementation 'com.ethanhua:skeleton:1.1.2'
     implementation 'io.supercharge:shimmerlayout:2.1.0'
 
+    implementation 'com.github.tylersuehr7:social-text-view:1.0.0'
+
 }
 repositories {
     mavenCentral()

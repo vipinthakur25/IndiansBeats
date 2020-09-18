@@ -26,8 +26,6 @@ private LinearLayout lhReportAProblem;
         lhContactSupport = findViewById(R.id.lhContactSupport);
         lhReportAProblem = findViewById(R.id.lhReportAProblem);
 
-
-
         ivGoBack.setOnClickListener(this);
         lhReportAProblem.setOnClickListener(this);
         lhContactSupport.setOnClickListener(this);

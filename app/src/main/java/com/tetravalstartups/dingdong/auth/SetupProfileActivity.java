@@ -10,6 +10,7 @@ import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
+import android.util.Patterns;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -113,12 +114,17 @@ public class SetupProfileActivity extends AppCompatActivity implements View.OnCl
             String bio = etBio.getText().toString();
 
             if (TextUtils.isEmpty(name)) {
-                Toast.makeText(this, "Full Name required", Toast.LENGTH_SHORT).show();
+                etName.setError("Full name is required");
                 return;
             }
 
             if (TextUtils.isEmpty(email)) {
-                Toast.makeText(this, "Email required", Toast.LENGTH_SHORT).show();
+                etEmail.setError("Email is required");
+                return;
+            }
+
+            if (!isValidEmail(email)) {
+                etEmail.setError("Email is not valid");
                 return;
             }
 
@@ -136,6 +142,10 @@ public class SetupProfileActivity extends AppCompatActivity implements View.OnCl
                 setProfileData(name, email, handle[0], bio);
             }
         }
+    }
+
+    public static boolean isValidEmail(CharSequence target) {
+        return (!TextUtils.isEmpty(target) && Patterns.EMAIL_ADDRESS.matcher(target).matches());
     }
 
     private void setProfileData(String name, String email, String handle, String bio) {

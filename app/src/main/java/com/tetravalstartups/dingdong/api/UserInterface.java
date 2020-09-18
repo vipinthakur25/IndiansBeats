@@ -6,6 +6,7 @@ import com.tetravalstartups.dingdong.modules.passbook.redeem.model.PassbookBalan
 import com.tetravalstartups.dingdong.modules.passbook.redeem.model.PayoutHistory;
 import com.tetravalstartups.dingdong.modules.passbook.redeem.model.PayoutRequestResponse;
 import com.tetravalstartups.dingdong.modules.passbook.transactions.model.Txn;
+import com.tetravalstartups.dingdong.modules.profile.videos.created.CreatedVideo;
 
 import retrofit2.Call;
 import retrofit2.http.Field;
@@ -51,4 +52,8 @@ public interface UserInterface {
                                    @Field("branch") String branch,
                                    @Field("ifsc") String ifsc,
                                    @Field("status") String status);
+
+    @FormUrlEncoded
+    @POST("User/FollowersVideoList")
+    Call<CreatedVideo> getUserFollowingVideos(@Field("id") String id, @Field("limit") int limit, @Field("starting_video_index") int starting_video_index);
 }

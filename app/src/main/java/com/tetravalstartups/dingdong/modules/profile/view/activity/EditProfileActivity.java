@@ -1,11 +1,10 @@
 package com.tetravalstartups.dingdong.modules.profile.view.activity;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.Manifest;
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.InputFilter;
+import android.text.Spanned;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
@@ -14,23 +13,20 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.bumptech.glide.Glide;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QuerySnapshot;
 import com.nabinbhandari.android.permissions.PermissionHandler;
 import com.nabinbhandari.android.permissions.Permissions;
-import com.tetravalstartups.dingdong.api.APIClient;
 import com.tetravalstartups.dingdong.R;
+import com.tetravalstartups.dingdong.api.APIClient;
+import com.tetravalstartups.dingdong.api.AuthInterface;
 import com.tetravalstartups.dingdong.api.RequestInterface;
 import com.tetravalstartups.dingdong.auth.Master;
 import com.tetravalstartups.dingdong.auth.Profile;
 import com.tetravalstartups.dingdong.modules.profile.external.PublicProfile;
+import com.tetravalstartups.dingdong.modules.profile.model.CheckHandle;
 import com.tetravalstartups.dingdong.utils.ProfilePhotoBottomSheet;
-
-import java.util.HashMap;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -41,29 +37,38 @@ public class EditProfileActivity extends AppCompatActivity implements ProfilePho
     private ImageView ivPhoto;
     private EditText etName;
     private EditText etHandle;
+    private EditText etEmail;
     private EditText etBio;
     private TextView tvUpdate;
     private ImageView ivGoBack;
 
-    private String selected_photo;
-
     private Master master;
-
-    private FirebaseFirestore db;
 
     private ProfilePhotoBottomSheet bottomSheet;
     private RequestInterface requestInterface;
+    private AuthInterface authInterface;
     private Profile userProfile;
     private static final String TAG = "EditProfileActivity";
+
+    private String blockCharacterSet = "@.~#^|$%&*!";
+
+    private InputFilter filter = new InputFilter() {
+
+        @Override
+        public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
+
+            if (source != null && blockCharacterSet.contains(("" + source))) {
+                return "";
+            }
+            return null;
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_profile);
-
-        db = FirebaseFirestore.getInstance();
         master = new Master(EditProfileActivity.this);
-
         initView();
     }
 
@@ -71,6 +76,8 @@ public class EditProfileActivity extends AppCompatActivity implements ProfilePho
         ivPhoto = findViewById(R.id.ivPhoto);
         etName = findViewById(R.id.etName);
         etHandle = findViewById(R.id.etHandle);
+        etHandle.setFilters(new InputFilter[] { filter });
+        etEmail = findViewById(R.id.etEmail);
         etBio = findViewById(R.id.etBio);
         ivGoBack = findViewById(R.id.ivGoBack);
         ivGoBack.setOnClickListener(this);
@@ -82,6 +89,7 @@ public class EditProfileActivity extends AppCompatActivity implements ProfilePho
 
         bottomSheet = new ProfilePhotoBottomSheet();
         requestInterface = APIClient.getRetrofitInstance().create(RequestInterface.class);
+        authInterface = APIClient.getRetrofitInstance().create(AuthInterface.class);
 
         getProfileData();
 
@@ -99,7 +107,7 @@ public class EditProfileActivity extends AppCompatActivity implements ProfilePho
             @Override
             public void afterTextChanged(Editable s) {
                 String name = etName.getText().toString();
-                if (name.equals(master.getName())){
+                if (name.equals(master.getName())) {
                     tvUpdate.setVisibility(View.GONE);
                 } else {
                     tvUpdate.setVisibility(View.VISIBLE);
@@ -121,30 +129,54 @@ public class EditProfileActivity extends AppCompatActivity implements ProfilePho
             @Override
             public void afterTextChanged(Editable s) {
                 String handle = etHandle.getText().toString();
-                Query query = db.collection("customers");
-                query.whereEqualTo("handle", handle)
-                        .get()
-                        .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                            @Override
-                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                if (task.getResult().getDocuments().isEmpty()) {
-                                    etHandle.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, R.drawable.ic_dd_user_handle_available, 0);
-                                    tvUpdate.setVisibility(View.VISIBLE);
-                                } else if (handle.isEmpty()) {
-                                    tvUpdate.setVisibility(View.GONE);
-                                    etHandle.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, 0, 0);
-                                } else if (handle.equals(master.getHandle())) {
-                                    tvUpdate.setVisibility(View.GONE);
-                                    etHandle.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, 0, 0);
-                                }
-                                else  {
-                                    etHandle.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, R.drawable.ic_dd_user_handle_unavailable, 0);
-                                    tvUpdate.setVisibility(View.GONE);
-                                }
-                            }
-                        });
+                Call<CheckHandle> checkHandleCall = authInterface.checkHandle(master.getId(), handle);
+                checkHandleCall.enqueue(new Callback<CheckHandle>() {
+                    @Override
+                    public void onResponse(Call<CheckHandle> call, Response<CheckHandle> response) {
+                        if (handle.equals(master.getHandle())) {
+                            etHandle.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, 0, 0);
+                            tvUpdate.setVisibility(View.GONE);
+
+                        } else if (response.code() == 200) {
+                            etHandle.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, R.drawable.ic_dd_user_handle_unavailable, 0);
+                            tvUpdate.setVisibility(View.GONE);
+
+                        } else if (response.code() == 400) {
+                            etHandle.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, R.drawable.ic_dd_user_handle_available, 0);
+                            tvUpdate.setVisibility(View.VISIBLE);
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<CheckHandle> call, Throwable t) {
+
+                    }
+                });
             }
         });
+
+        etEmail.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                String name = etEmail.getText().toString();
+                if (name.equals(master.getName())) {
+                    tvUpdate.setVisibility(View.GONE);
+                } else {
+                    tvUpdate.setVisibility(View.VISIBLE);
+                }
+            }
+        });
+
 
         etBio.addTextChangedListener(new TextWatcher() {
             @Override
@@ -160,7 +192,7 @@ public class EditProfileActivity extends AppCompatActivity implements ProfilePho
             @Override
             public void afterTextChanged(Editable s) {
                 String bio = etBio.getText().toString();
-                if (bio.equals(master.getBio())){
+                if (bio.equals(master.getBio())) {
                     tvUpdate.setVisibility(View.GONE);
                 } else {
                     tvUpdate.setVisibility(View.VISIBLE);
@@ -176,6 +208,7 @@ public class EditProfileActivity extends AppCompatActivity implements ProfilePho
         if (!master.getBio().equals("Add bio")) {
             etBio.setText(master.getBio());
         }
+        etEmail.setText(master.getEmail());
 
         Glide.with(getApplicationContext())
                 .load(master.getPhoto())
@@ -190,7 +223,7 @@ public class EditProfileActivity extends AppCompatActivity implements ProfilePho
 
     @Override
     public void onClick(View v) {
-        if (v == ivPhoto){
+        if (v == ivPhoto) {
             String[] permissions = {Manifest.permission.WRITE_EXTERNAL_STORAGE,
                     Manifest.permission.READ_EXTERNAL_STORAGE};
             Permissions.check(this/*context*/, permissions,
@@ -203,17 +236,13 @@ public class EditProfileActivity extends AppCompatActivity implements ProfilePho
                     });
         }
 
-        if (v == tvUpdate){
+        if (v == tvUpdate) {
             String name = etName.getText().toString();
             String handle = etHandle.getText().toString();
+            String email = etEmail.getText().toString();
             String bio = etBio.getText().toString();
 
-            HashMap profile = new HashMap();
-            profile.put("name", name);
-            profile.put("handle", handle);
-            profile.put("bio", bio);
-
-            Call<PublicProfile> call = requestInterface.editUserProfile(master.getId(), name, master.getEmail(), bio);
+            Call<PublicProfile> call = requestInterface.editUserProfile(master.getId(), name, handle, email, bio);
             call.enqueue(new Callback<PublicProfile>() {
                 @Override
                 public void onResponse(Call<PublicProfile> call, Response<PublicProfile> response) {
@@ -223,7 +252,7 @@ public class EditProfileActivity extends AppCompatActivity implements ProfilePho
 
                 @Override
                 public void onFailure(Call<PublicProfile> call, Throwable t) {
-                    Log.e(TAG, "onFailure: "+t.getMessage() );
+                    Log.e(TAG, "onFailure: " + t.getMessage());
                 }
             });
 
@@ -238,7 +267,7 @@ public class EditProfileActivity extends AppCompatActivity implements ProfilePho
 
     }
 
-    public void getProfileData(){
+    public void getProfileData() {
         Call<PublicProfile> call = requestInterface.getUserData(master.getId(), master.getId());
         call.enqueue(new Callback<PublicProfile>() {
             @Override
@@ -249,12 +278,12 @@ public class EditProfileActivity extends AppCompatActivity implements ProfilePho
 
             @Override
             public void onFailure(Call<PublicProfile> call, Throwable t) {
-                Log.e(TAG, "onFailure: "+t.getMessage() );
+                Log.e(TAG, "onFailure: " + t.getMessage());
             }
         });
     }
 
-    public void closeSheet(){
+    public void closeSheet() {
         bottomSheet.dismiss();
     }
 
