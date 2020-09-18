@@ -5,7 +5,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -50,24 +49,17 @@ public class BannerPageAdapter extends RecyclerView.Adapter<BannerPageAdapter.Ba
         return discoverBannerModelList.size();
     }
 
-    class BannerViewHolder extends RecyclerView.ViewHolder {
+    static class BannerViewHolder extends RecyclerView.ViewHolder {
         private ImageView ivBannerPhoto;
-        private TextView tvHashTagBanner;
-        private TextView tvVideoCount;
+
 
         public BannerViewHolder(@NonNull View itemView) {
             super(itemView);
 
             ivBannerPhoto = itemView.findViewById(R.id.ivBannerPhoto);
-            tvHashTagBanner = itemView.findViewById(R.id.tvHashTagBanner);
-            tvVideoCount = itemView.findViewById(R.id.tvVideoCount);
+
         }
 
-        void setImage(DiscoverBannerModel discoverBannerModel) {
-            ivBannerPhoto.setImageResource(discoverBannerModel.getImage());
-            tvHashTagBanner.setText(discoverBannerModel.getHashtag());
-            tvVideoCount.setText(discoverBannerModel.getCount());
-        }
     }
     private Runnable runnable = new Runnable() {
         @Override

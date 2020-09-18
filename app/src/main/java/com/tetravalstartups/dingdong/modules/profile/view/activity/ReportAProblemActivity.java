@@ -13,14 +13,12 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -33,6 +31,8 @@ import com.tetravalstartups.dingdong.modules.profile.model.MyComplain;
 import com.tetravalstartups.dingdong.modules.profile.model.ReportAProblem;
 import com.tetravalstartups.dingdong.modules.profile.presenter.MyComplainPresenter;
 import com.tetravalstartups.dingdong.modules.profile.view.adapter.MyComplainAdapter;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
 
@@ -160,8 +160,7 @@ public class ReportAProblemActivity extends AppCompatActivity implements View.On
                 Toast.makeText(ReportAProblemActivity.this, "Succeeded", Toast.LENGTH_SHORT).show();
                 imageRef.getDownloadUrl().addOnSuccessListener(uri -> {
                     // getting image uri and converting into string
-                    Uri downloadUrl = uri;
-                    fileUrl = downloadUrl.toString();
+                    fileUrl = uri.toString();
                     Log.e(TAG, "onSuccess: " + fileUrl);
                     sendImageUrlToApi(id, textIssue, fileUrl);
                 });
@@ -172,24 +171,19 @@ public class ReportAProblemActivity extends AppCompatActivity implements View.On
                 Call<ReportAProblem> reportAProblemCall = authInterface.reportProblem(id, text_issue, fileUrl, "", "");
                 reportAProblemCall.enqueue(new Callback<ReportAProblem>() {
                     @Override
-                    public void onResponse(Call<ReportAProblem> call, Response<ReportAProblem> response) {
+                    public void onResponse(@NotNull Call<ReportAProblem> call, @NotNull Response<ReportAProblem> response) {
                         if (response.code() == 200) {
                             Toast.makeText(ReportAProblemActivity.this, "Uploaded to api", Toast.LENGTH_SHORT).show();
                         }
                     }
 
                     @Override
-                    public void onFailure(Call<ReportAProblem> call, Throwable t) {
+                    public void onFailure(@NotNull Call<ReportAProblem> call, @NotNull Throwable t) {
                         Toast.makeText(ReportAProblemActivity.this, "" + t.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
                     }
                 });
             }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Toast.makeText(ReportAProblemActivity.this, "" + e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
+        }).addOnFailureListener(e -> Toast.makeText(ReportAProblemActivity.this, "" + e.getLocalizedMessage(), Toast.LENGTH_SHORT).show());
 
 
     }

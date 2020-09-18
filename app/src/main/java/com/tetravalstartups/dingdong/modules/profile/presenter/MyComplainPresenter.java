@@ -8,6 +8,8 @@ import com.tetravalstartups.dingdong.api.AuthInterface;
 import com.tetravalstartups.dingdong.auth.Master;
 import com.tetravalstartups.dingdong.modules.profile.model.MyComplain;
 
+import org.jetbrains.annotations.NotNull;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -34,7 +36,7 @@ public class MyComplainPresenter {
         Call<MyComplain> myComplainCall = authInterface.complainRequest(userId);
         myComplainCall.enqueue(new Callback<MyComplain>() {
             @Override
-            public void onResponse(Call<MyComplain> call, Response<MyComplain> response) {
+            public void onResponse(@NotNull Call<MyComplain> call, @NotNull Response<MyComplain> response) {
               Log.e(TAG, "onResponse: "+response.message());
                 if (response.code() == 200){
                     iComplain.fetchResponse(response.body());
@@ -42,7 +44,7 @@ public class MyComplainPresenter {
             }
 
             @Override
-            public void onFailure(Call<MyComplain> call, Throwable t) {
+            public void onFailure(@NotNull Call<MyComplain> call, @NotNull Throwable t) {
                 iComplain.fetchError(t.getMessage());
             }
         });

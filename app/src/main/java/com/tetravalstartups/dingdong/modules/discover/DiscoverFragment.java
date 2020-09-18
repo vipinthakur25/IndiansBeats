@@ -3,14 +3,9 @@ package com.tetravalstartups.dingdong.modules.discover;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
-import android.widget.FrameLayout;
-import android.widget.TextView;
 
 import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
@@ -18,12 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
 
-import com.denzcoskun.imageslider.ImageSlider;
-import com.google.firebase.auth.FirebaseAuth;
 import com.tetravalstartups.dingdong.R;
-import com.tetravalstartups.dingdong.modules.discover.search.SearchAdapter;
-import com.tetravalstartups.dingdong.modules.discover.search.SearchPresenter;
-import com.tetravalstartups.dingdong.modules.discover.search.SearchResponse;
 import com.tetravalstartups.dingdong.utils.EqualSpacingItemDecoration;
 
 import java.util.ArrayList;
@@ -34,15 +24,8 @@ public class DiscoverFragment extends Fragment implements DiscoverBannerPresente
     private View view;
 
 
-    private RecyclerView recyclerSearch;
-    private RecyclerView popularPeopleRecyclerView;
-    private RecyclerView trendingNowRecyclerView;
-    private TextView tvNoData;
     private ViewPager2 bannerPager;
-    private CardView contactsCardView;
     private Handler sliderHandler = new Handler();
-    private TrendingNowAdapter trendingNowAdapter;
-    private PopularPeopleAdapter popularPeopleAdapter;
 
     public DiscoverFragment() {
     }
@@ -57,35 +40,27 @@ public class DiscoverFragment extends Fragment implements DiscoverBannerPresente
 
     private void initView() {
 
-        recyclerSearch = view.findViewById(R.id.recyclerSearch);
-        contactsCardView = view.findViewById(R.id.contactsCardView);
+        RecyclerView recyclerSearch = view.findViewById(R.id.recyclerSearch);
+        CardView contactsCardView = view.findViewById(R.id.contactsCardView);
 
-
-        tvNoData = view.findViewById(R.id.tvNoData);
         bannerPager = view.findViewById(R.id.bannerPager);
-
 
         recyclerSearch.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerSearch.addItemDecoration(new EqualSpacingItemDecoration(0, EqualSpacingItemDecoration.VERTICAL));
-        contactsCardView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(getActivity(), ContactsActivity.class);
-                startActivity(intent);
-            }
+        contactsCardView.setOnClickListener(view -> {
+            Intent intent = new Intent(getActivity(), ContactsActivity.class);
+            startActivity(intent);
         });
-
 
         fetchBanners();
         tendingNowRecyclerView();
-        popularPeoplerRecyclerView();
+        popularPeopleRecyclerView();
     }
 
     private void tendingNowRecyclerView() {
-        trendingNowRecyclerView = view.findViewById(R.id.trendingNowRecyclerView);
+        RecyclerView trendingNowRecyclerView = view.findViewById(R.id.trendingNowRecyclerView);
         trendingNowRecyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
         trendingNowRecyclerView.setHasFixedSize(true);
-
 
         List<TrendingNowModel> trendingNowModelArrayList = new ArrayList<>();
         trendingNowModelArrayList.add(new TrendingNowModel(R.drawable.new_image));
@@ -96,12 +71,12 @@ public class DiscoverFragment extends Fragment implements DiscoverBannerPresente
         trendingNowModelArrayList.add(new TrendingNowModel(R.drawable.new_image));
         trendingNowModelArrayList.add(new TrendingNowModel(R.drawable.new_image));
 
-        trendingNowAdapter = new TrendingNowAdapter(getContext(), trendingNowModelArrayList);
+        TrendingNowAdapter trendingNowAdapter = new TrendingNowAdapter(getContext(), trendingNowModelArrayList);
         trendingNowRecyclerView.setAdapter(trendingNowAdapter);
     }
 
-    private void popularPeoplerRecyclerView() {
-        popularPeopleRecyclerView = view.findViewById(R.id.popularPeopleRecyclerView);
+    private void popularPeopleRecyclerView() {
+        RecyclerView popularPeopleRecyclerView = view.findViewById(R.id.popularPeopleRecyclerView);
         popularPeopleRecyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
         popularPeopleRecyclerView.setHasFixedSize(true);
 
@@ -114,7 +89,7 @@ public class DiscoverFragment extends Fragment implements DiscoverBannerPresente
         popularPeopleModelList.add(new PopularPeopleModel(R.drawable.emma, "Emma Watson", "123K Followers"));
         popularPeopleModelList.add(new PopularPeopleModel(R.drawable.emma, "Emma Watson", "123K Followers"));
 
-        popularPeopleAdapter = new PopularPeopleAdapter(getContext(), popularPeopleModelList);
+        PopularPeopleAdapter popularPeopleAdapter = new PopularPeopleAdapter(getContext(), popularPeopleModelList);
         popularPeopleRecyclerView.setAdapter(popularPeopleAdapter);
 
     }
