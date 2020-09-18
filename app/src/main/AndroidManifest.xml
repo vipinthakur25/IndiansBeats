@@ -12,6 +12,7 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FLASHLIGHT" />
     <uses-permission android:name="android.permission.CALL_PHONE" />
+    <uses-permission android:name="android.permission.READ_CONTACTS"/>
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 
     <application
@@ -24,7 +25,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".modules.profile.view.activity.ChatWithUsActivity"></activity>
+        <activity android:name=".modules.discover.ContactsActivity"></activity>
+        <activity android:name=".modules.profile.view.activity.ChatWithUsActivity" />
         <activity android:name=".modules.profile.view.activity.ContactSupportActivity" />
         <activity android:name=".modules.profile.view.activity.ReportAProblemActivity" />
         <activity android:name=".modules.profile.view.activity.HelpActivity" />

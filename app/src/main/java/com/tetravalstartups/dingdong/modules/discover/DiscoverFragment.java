@@ -1,6 +1,8 @@
 package com.tetravalstartups.dingdong.modules.discover;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -9,15 +11,14 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewpager2.widget.ViewPager2;
 
 import com.denzcoskun.imageslider.ImageSlider;
-import com.denzcoskun.imageslider.constants.ScaleTypes;
-import com.denzcoskun.imageslider.models.SlideModel;
 import com.google.firebase.auth.FirebaseAuth;
 import com.tetravalstartups.dingdong.R;
 import com.tetravalstartups.dingdong.modules.discover.search.SearchAdapter;
@@ -28,15 +29,20 @@ import com.tetravalstartups.dingdong.utils.EqualSpacingItemDecoration;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DiscoverFragment extends Fragment implements DiscoverBannerMainPresenter.IDiscoverMainBanner, TextWatcher, SearchPresenter.ISearch {
+public class DiscoverFragment extends Fragment implements DiscoverBannerPresenter.IDiscoverBanner {
 
     private View view;
-    private ImageSlider imageSlider;
-    private EditText etSearch;
-    private FrameLayout frameUsers;
-    private FirebaseAuth firebaseAuth;
+
+
     private RecyclerView recyclerSearch;
+    private RecyclerView popularPeopleRecyclerView;
+    private RecyclerView trendingNowRecyclerView;
     private TextView tvNoData;
+    private ViewPager2 bannerPager;
+    private CardView contactsCardView;
+    private Handler sliderHandler = new Handler();
+    private TrendingNowAdapter trendingNowAdapter;
+    private PopularPeopleAdapter popularPeopleAdapter;
 
     public DiscoverFragment() {
     }
@@ -50,86 +56,112 @@ public class DiscoverFragment extends Fragment implements DiscoverBannerMainPres
     }
 
     private void initView() {
-        frameUsers  = view.findViewById(R.id.frameUsers);
-       // imageSlider = view.findViewById(R.id.imageSlider);
-        etSearch = view.findViewById(R.id.etSearch);
-        recyclerSearch = view.findViewById(R.id.recyclerSearch);
-        tvNoData = view.findViewById(R.id.tvNoData);
 
-        etSearch.addTextChangedListener(this);
+        recyclerSearch = view.findViewById(R.id.recyclerSearch);
+        contactsCardView = view.findViewById(R.id.contactsCardView);
+
+
+        tvNoData = view.findViewById(R.id.tvNoData);
+        bannerPager = view.findViewById(R.id.bannerPager);
+
+
         recyclerSearch.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerSearch.addItemDecoration(new EqualSpacingItemDecoration(0, EqualSpacingItemDecoration.VERTICAL));
+        contactsCardView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getActivity(), ContactsActivity.class);
+                startActivity(intent);
+            }
+        });
 
-        firebaseAuth = FirebaseAuth.getInstance();
+
         fetchBanners();
+        tendingNowRecyclerView();
+        popularPeoplerRecyclerView();
     }
+
+    private void tendingNowRecyclerView() {
+        trendingNowRecyclerView = view.findViewById(R.id.trendingNowRecyclerView);
+        trendingNowRecyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
+        trendingNowRecyclerView.setHasFixedSize(true);
+
+
+        List<TrendingNowModel> trendingNowModelArrayList = new ArrayList<>();
+        trendingNowModelArrayList.add(new TrendingNowModel(R.drawable.new_image));
+        trendingNowModelArrayList.add(new TrendingNowModel(R.drawable.new_image));
+        trendingNowModelArrayList.add(new TrendingNowModel(R.drawable.new_image));
+        trendingNowModelArrayList.add(new TrendingNowModel(R.drawable.new_image));
+        trendingNowModelArrayList.add(new TrendingNowModel(R.drawable.new_image));
+        trendingNowModelArrayList.add(new TrendingNowModel(R.drawable.new_image));
+        trendingNowModelArrayList.add(new TrendingNowModel(R.drawable.new_image));
+
+        trendingNowAdapter = new TrendingNowAdapter(getContext(), trendingNowModelArrayList);
+        trendingNowRecyclerView.setAdapter(trendingNowAdapter);
+    }
+
+    private void popularPeoplerRecyclerView() {
+        popularPeopleRecyclerView = view.findViewById(R.id.popularPeopleRecyclerView);
+        popularPeopleRecyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
+        popularPeopleRecyclerView.setHasFixedSize(true);
+
+        List<PopularPeopleModel> popularPeopleModelList = new ArrayList<>();
+        popularPeopleModelList.add(new PopularPeopleModel(R.drawable.emma, "Emma Watson", "123K Followers"));
+        popularPeopleModelList.add(new PopularPeopleModel(R.drawable.emma, "Emma Watson", "123K Followers"));
+        popularPeopleModelList.add(new PopularPeopleModel(R.drawable.emma, "Emma Watson", "123K Followers"));
+        popularPeopleModelList.add(new PopularPeopleModel(R.drawable.emma, "Emma Watson", "123K Followers"));
+        popularPeopleModelList.add(new PopularPeopleModel(R.drawable.emma, "Emma Watson", "123K Followers"));
+        popularPeopleModelList.add(new PopularPeopleModel(R.drawable.emma, "Emma Watson", "123K Followers"));
+        popularPeopleModelList.add(new PopularPeopleModel(R.drawable.emma, "Emma Watson", "123K Followers"));
+
+        popularPeopleAdapter = new PopularPeopleAdapter(getContext(), popularPeopleModelList);
+        popularPeopleRecyclerView.setAdapter(popularPeopleAdapter);
+
+    }
+
+    private Runnable sliderRunnable = new Runnable() {
+        @Override
+        public void run() {
+            bannerPager.setCurrentItem(bannerPager.getCurrentItem() + 1);
+        }
+    };
 
     private void fetchBanners() {
-        DiscoverBannerMainPresenter discoverBannerMainPresenter =
-                new DiscoverBannerMainPresenter(getContext(),
-                        DiscoverFragment.this);
-        discoverBannerMainPresenter.fetchBanner();
-    }
+        DiscoverBannerPresenter discoverBannerPresenter = new DiscoverBannerPresenter(getContext(), DiscoverFragment.this);
+        discoverBannerPresenter.fetchBanner();
 
+        bannerPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
+            @Override
+            public void onPageSelected(int position) {
+                super.onPageSelected(position);
+                sliderHandler.removeCallbacks(sliderRunnable);
+                sliderHandler.postDelayed(sliderRunnable, 3000);
 
-//    @Override
-//    public void fetchBannerSuccess(ArrayList<SlideModel> discoverBannerMainList) {
-//        imageSlider.setImageList(discoverBannerMainList, ScaleTypes.FIT);
-//    }
-
-    @Override
-    public void fetchBannerSuccess(List<DiscoverBannerMain> discoverBannerMainList) {
-
+            }
+        });
     }
 
     @Override
-    public void fetchBannerError(String error) {
-        //Toast.makeText(getContext(), ""+error, Toast.LENGTH_SHORT).show();
+    public void onPause() {
+        super.onPause();
+        sliderHandler.removeCallbacks(sliderRunnable);
     }
 
     @Override
-    public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
+    public void onResume() {
+        super.onResume();
+        sliderHandler.postDelayed(sliderRunnable, 3000);
     }
 
     @Override
-    public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-        String search = etSearch.getText().toString();
-        if (search.isEmpty()) {
-            frameUsers.setVisibility(View.GONE);
-        } else {
-            frameUsers.setVisibility(View.VISIBLE);
-            doSearch(search);
-        }
-    }
-
-    private void doSearch(String search) {
-        SearchPresenter searchPresenter = new SearchPresenter(getContext(), DiscoverFragment.this);
-        if (firebaseAuth.getCurrentUser() == null) {
-            searchPresenter.fetchSearchQuery("", 0, search);
-        } else {
-            searchPresenter.fetchSearchQuery(firebaseAuth.getCurrentUser().getUid(), 0, search);
-        }
+    public void fetchBannerResponse(DiscoverBanner discoverBanner) {
+        BannerPageAdapter bannerPageAdapter = new BannerPageAdapter(discoverBanner.getData(), bannerPager, getContext());
+        bannerPageAdapter.notifyDataSetChanged();
+        bannerPager.setAdapter(bannerPageAdapter);
     }
 
     @Override
-    public void afterTextChanged(Editable editable) {
+    public void fetchError(String error) {
 
     }
-
-    @Override
-    public void searchSuccess(List<SearchResponse> searchResponseList) {
-        SearchAdapter searchAdapter = new SearchAdapter(getContext(), searchResponseList);
-        searchAdapter.notifyDataSetChanged();
-        recyclerSearch.setAdapter(searchAdapter);
-        recyclerSearch.setVisibility(View.VISIBLE);
-        tvNoData.setVisibility(View.GONE);
-    }
-
-    @Override
-    public void searchFailed(String error) {
-        recyclerSearch.setVisibility(View.GONE);
-        tvNoData.setVisibility(View.VISIBLE);
-    }
-
 }

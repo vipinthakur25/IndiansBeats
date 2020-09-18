@@ -79,6 +79,9 @@ public class Constant {
 
     public static final String SUBS_PURCHASE_REMARK = "Subscription Purchase [IA]";
 
+    public static final int STATUS_QUERY_PENDING = 0;
+    public static final int STATUS_QUERY_ENQUEUE = 1;
+    public static final int STATUS_QUERY_RESOLVED = 2;
 
 
 }

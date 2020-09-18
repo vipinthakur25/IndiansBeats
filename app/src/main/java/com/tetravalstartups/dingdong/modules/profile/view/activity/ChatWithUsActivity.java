@@ -8,12 +8,30 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.tetravalstartups.dingdong.R;
+import com.tetravalstartups.dingdong.api.APIClient;
+import com.tetravalstartups.dingdong.api.AuthInterface;
+import com.tetravalstartups.dingdong.auth.Master;
+import com.tetravalstartups.dingdong.modules.profile.model.ChatWithUs;
+import com.tetravalstartups.dingdong.modules.profile.model.HelpRequest;
+import com.tetravalstartups.dingdong.modules.profile.model.HelpRequestResponse;
+import com.tetravalstartups.dingdong.modules.profile.presenter.HelpRequestPresenter;
+import com.tetravalstartups.dingdong.modules.profile.view.adapter.HelpRequestAdapter;
 
-public class ChatWithUsActivity extends AppCompatActivity implements View.OnClickListener {
+import java.util.ArrayList;
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+public class ChatWithUsActivity extends AppCompatActivity implements View.OnClickListener, HelpRequestPresenter.IHelpRequest {
     private ImageView ivGoBack;
     private EditText etAlternateEmail;
     private EditText etAlternateNumber;
@@ -22,6 +40,10 @@ public class ChatWithUsActivity extends AppCompatActivity implements View.OnClic
     private boolean et1State = false;
     private boolean et2State = false;
     private boolean et3State = false;
+    private Master master;
+    private AuthInterface authInterface;
+    private RecyclerView helpRequestRecyclerView;
+    private HelpRequestAdapter helpRequestAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,10 +59,19 @@ public class ChatWithUsActivity extends AppCompatActivity implements View.OnClic
         etAlternateNumber = findViewById(R.id.etAlternateNumber);
         etDescription = findViewById(R.id.etDescription);
         tvSend = findViewById(R.id.tvSend);
+        helpRequestRecyclerView = findViewById(R.id.helpRequestRecyclerView);
+        helpRequestRecyclerView = findViewById(R.id.helpRequestRecyclerView);
+        helpRequestRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+
+        master = new Master(ChatWithUsActivity.this);
+        authInterface = APIClient.getRetrofitInstance().create(AuthInterface.class);
 
 
         ivGoBack.setOnClickListener(this);
         tvSend.setOnClickListener(this);
+
+
         etAlternateEmail.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -121,7 +152,15 @@ public class ChatWithUsActivity extends AppCompatActivity implements View.OnClic
 
             }
         });
+
+        fetchHelpRequest();
     }
+
+    private void fetchHelpRequest() {
+        HelpRequestPresenter helpRequestPresenter = new HelpRequestPresenter(ChatWithUsActivity.this, ChatWithUsActivity.this);
+        helpRequestPresenter.fetchResponse();
+    }
+
 
     @Override
     public void onClick(View view) {
@@ -138,7 +177,7 @@ public class ChatWithUsActivity extends AppCompatActivity implements View.OnClic
         String alternateEmail = etAlternateEmail.getText().toString();
         String alternateNumber = etAlternateNumber.getText().toString();
         String description = etDescription.getText().toString();
-
+        String id = master.getId();
         if (TextUtils.isEmpty(alternateEmail)) {
             etAlternateEmail.requestFocus();
             etAlternateEmail.setError("Email required");
@@ -152,7 +191,29 @@ public class ChatWithUsActivity extends AppCompatActivity implements View.OnClic
         if (TextUtils.isEmpty(description) || (description.length() < 20)) {
             etDescription.requestFocus();
             etDescription.setError("Description must be more than 20 characters");
+            return;
         }
+        messageData(id, alternateEmail, alternateNumber, description);
+    }
+
+    private void messageData(String id, String alternateEmail, String alternateNumber, String description) {
+        Call<ChatWithUs> chatWithUsCall = authInterface.chatWithUs(id, description, alternateNumber, alternateEmail);
+        chatWithUsCall.enqueue(new Callback<ChatWithUs>() {
+            @Override
+            public void onResponse(Call<ChatWithUs> call, Response<ChatWithUs> response) {
+                if (response.code() == 200){
+                    Toast.makeText(ChatWithUsActivity.this, "Submitted", Toast.LENGTH_SHORT).show();
+                    etAlternateEmail.setText("");
+                    etAlternateNumber.setText("");
+                    etDescription.setText("");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ChatWithUs> call, Throwable t) {
+
+            }
+        });
     }
 
     private void enableButton(boolean inputState) {
@@ -168,4 +229,15 @@ public class ChatWithUsActivity extends AppCompatActivity implements View.OnClic
 
     }
 
+    @Override
+    public void fetchResponse(HelpRequest helpRequest) {
+        helpRequestAdapter = new HelpRequestAdapter(ChatWithUsActivity.this, helpRequest.getData());
+        helpRequestRecyclerView.setAdapter(helpRequestAdapter);
+
+    }
+
+    @Override
+    public void fetchError(String error) {
+        Toast.makeText(this, ""+ error, Toast.LENGTH_SHORT).show();
+    }
 }

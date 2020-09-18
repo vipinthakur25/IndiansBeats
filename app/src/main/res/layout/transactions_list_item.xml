@@ -8,6 +8,7 @@
     android:id="@+id/cardTransaction"
     android:layout_marginStart="16dp"
     android:layout_marginEnd="16dp"
+    android:layout_marginTop="16dp"
     android:layout_marginBottom="16dp"
     app:cardCornerRadius="10dp">
 
@@ -41,13 +42,13 @@
 
                 <TextView
                     android:id="@+id/tvAmount"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="16sp"
+                    android:layout_width="33dp"
+                    android:layout_height="match_parent"
                     android:layout_marginStart="8dp"
                     android:fontFamily="@font/montserrat_bold"
+                    android:text="+83"
                     android:textColor="@color/colorTextTitle"
-                    android:text="+83" />
+                    android:textSize="16sp" />
             </LinearLayout>
 
             <TextView
