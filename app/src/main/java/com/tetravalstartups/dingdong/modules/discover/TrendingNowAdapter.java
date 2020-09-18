@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -33,6 +34,8 @@ public class TrendingNowAdapter extends RecyclerView.Adapter<TrendingNowAdapter.
     @Override
     public void onBindViewHolder(@NonNull TrendingNowAdapter.TrendingNowViewHolder holder, int position) {
         holder.ivTrendingNow.setImageResource(trendingNowModelList.get(position).getImage());
+        holder.tvHashTag.setText(trendingNowModelList.get(position).getHashtags());
+        holder.tvVideoCount.setText(trendingNowModelList.get(position).getVideoCount());
     }
 
     @Override
@@ -42,9 +45,13 @@ public class TrendingNowAdapter extends RecyclerView.Adapter<TrendingNowAdapter.
 
     public class TrendingNowViewHolder extends RecyclerView.ViewHolder {
     private ImageView ivTrendingNow;
+    private TextView tvHashTag;
+    private TextView tvVideoCount;
         public TrendingNowViewHolder(@NonNull View itemView) {
             super(itemView);
             ivTrendingNow = itemView.findViewById(R.id.ivTrendingNow);
+            tvHashTag = itemView.findViewById(R.id.tvHashTag);
+            tvVideoCount = itemView.findViewById(R.id.tvVideoCount);
         }
     }
 }

@@ -63,13 +63,12 @@ public class DiscoverFragment extends Fragment implements DiscoverBannerPresente
         trendingNowRecyclerView.setHasFixedSize(true);
 
         List<TrendingNowModel> trendingNowModelArrayList = new ArrayList<>();
-        trendingNowModelArrayList.add(new TrendingNowModel(R.drawable.new_image));
-        trendingNowModelArrayList.add(new TrendingNowModel(R.drawable.new_image));
-        trendingNowModelArrayList.add(new TrendingNowModel(R.drawable.new_image));
-        trendingNowModelArrayList.add(new TrendingNowModel(R.drawable.new_image));
-        trendingNowModelArrayList.add(new TrendingNowModel(R.drawable.new_image));
-        trendingNowModelArrayList.add(new TrendingNowModel(R.drawable.new_image));
-        trendingNowModelArrayList.add(new TrendingNowModel(R.drawable.new_image));
+        trendingNowModelArrayList.add(new TrendingNowModel(R.drawable.dancing, "#dancing", "10K Videos"));
+        trendingNowModelArrayList.add(new TrendingNowModel(R.drawable.singing, "#singing", "20K Videos"));
+        trendingNowModelArrayList.add(new TrendingNowModel(R.drawable.sports, "#sport", "25k Videos"));
+        trendingNowModelArrayList.add(new TrendingNowModel(R.drawable.technology, "#technology", "50K Videos"));
+        trendingNowModelArrayList.add(new TrendingNowModel(R.drawable.comedy, "#comedy", "75K Videos"));
+        trendingNowModelArrayList.add(new TrendingNowModel(R.drawable.covid, "#corona", "50K Videos"));
 
         TrendingNowAdapter trendingNowAdapter = new TrendingNowAdapter(getContext(), trendingNowModelArrayList);
         trendingNowRecyclerView.setAdapter(trendingNowAdapter);
@@ -81,14 +80,15 @@ public class DiscoverFragment extends Fragment implements DiscoverBannerPresente
         popularPeopleRecyclerView.setHasFixedSize(true);
 
         List<PopularPeopleModel> popularPeopleModelList = new ArrayList<>();
-        popularPeopleModelList.add(new PopularPeopleModel(R.drawable.emma, "Emma Watson", "123K Followers"));
-        popularPeopleModelList.add(new PopularPeopleModel(R.drawable.emma, "Emma Watson", "123K Followers"));
-        popularPeopleModelList.add(new PopularPeopleModel(R.drawable.emma, "Emma Watson", "123K Followers"));
-        popularPeopleModelList.add(new PopularPeopleModel(R.drawable.emma, "Emma Watson", "123K Followers"));
-        popularPeopleModelList.add(new PopularPeopleModel(R.drawable.emma, "Emma Watson", "123K Followers"));
-        popularPeopleModelList.add(new PopularPeopleModel(R.drawable.emma, "Emma Watson", "123K Followers"));
-        popularPeopleModelList.add(new PopularPeopleModel(R.drawable.emma, "Emma Watson", "123K Followers"));
-
+        popularPeopleModelList.add(new PopularPeopleModel(R.drawable.iamwellandgood, "iamwellandgood", "498 Followers"));
+        popularPeopleModelList.add(new PopularPeopleModel(R.drawable.salman, "786salmancool", "100 Followers"));
+        popularPeopleModelList.add(new PopularPeopleModel(R.drawable.naman, "namanbhavsar69", "50 Followers"));
+        popularPeopleModelList.add(new PopularPeopleModel(R.drawable.sahil, "sahilsahu19999", "110 Followers"));
+        popularPeopleModelList.add(new PopularPeopleModel(R.drawable.kavitarathore, "Kavitarathor45", "220 Followers"));
+        popularPeopleModelList.add(new PopularPeopleModel(R.drawable.yogikuber, "yogikuber", "450 Followers"));
+        popularPeopleModelList.add(new PopularPeopleModel(R.drawable.alok, "alok6500", "100 Followers"));
+        popularPeopleModelList.add(new PopularPeopleModel(R.drawable.raysahu, "raysahucsk", "50 Followers"));
+        popularPeopleModelList.add(new PopularPeopleModel(R.drawable.singhrichu, "singhrichu052", "185 Followers"));
         PopularPeopleAdapter popularPeopleAdapter = new PopularPeopleAdapter(getContext(), popularPeopleModelList);
         popularPeopleRecyclerView.setAdapter(popularPeopleAdapter);
 
