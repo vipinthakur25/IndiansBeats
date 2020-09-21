@@ -7,12 +7,13 @@ import com.cloudinary.android.MediaManager;
 import com.google.android.exoplayer2.database.ExoDatabaseProvider;
 import com.google.android.exoplayer2.upstream.cache.LeastRecentlyUsedCacheEvictor;
 import com.google.android.exoplayer2.upstream.cache.SimpleCache;
+import com.onesignal.OneSignal;
 
 import java.io.File;
 
 import static android.content.ContentValues.TAG;
 
-public class App extends Application {
+public class  App extends Application {
 
     public static SimpleCache simpleCache = null;
     public static LeastRecentlyUsedCacheEvictor leastRecentlyUsedCacheEvictor = null;
@@ -39,6 +40,11 @@ public class App extends Application {
             }
             Log.i(TAG, "onCreate: " + simpleCache.getCacheSpace());
         }
+
+        OneSignal.startInit(this)
+                .inFocusDisplaying(OneSignal.OSInFocusDisplayOption.Notification)
+                .unsubscribeWhenNotificationsAreDisabled(true)
+                .init();
 
     }
 

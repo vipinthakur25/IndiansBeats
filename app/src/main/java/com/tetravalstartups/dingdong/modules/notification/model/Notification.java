@@ -11,8 +11,11 @@ public class Notification {
 
     private String id;
     private int type;
-    private String user_id;
-    private String user_photo;
+    private String sender_user_id;
+    private String sender_user_photo;
+    private String sender_user_handle;
+    private String receiver_user_id;
+    private String receiver_user_photo;
     private String video_id;
     private String video_thumbnail;
     private String amount;
@@ -20,11 +23,14 @@ public class Notification {
     public Notification() {
     }
 
-    public Notification(String id, int type, String user_id, String user_photo, String video_id, String video_thumbnail, String amount) {
+    public Notification(String id, int type, String sender_user_id, String sender_user_photo, String sender_user_handle, String receiver_user_id, String receiver_user_photo, String video_id, String video_thumbnail, String amount) {
         this.id = id;
         this.type = type;
-        this.user_id = user_id;
-        this.user_photo = user_photo;
+        this.sender_user_id = sender_user_id;
+        this.sender_user_photo = sender_user_photo;
+        this.sender_user_handle = sender_user_handle;
+        this.receiver_user_id = receiver_user_id;
+        this.receiver_user_photo = receiver_user_photo;
         this.video_id = video_id;
         this.video_thumbnail = video_thumbnail;
         this.amount = amount;
@@ -46,20 +52,44 @@ public class Notification {
         this.type = type;
     }
 
-    public String getUser_id() {
-        return user_id;
+    public String getSender_user_id() {
+        return sender_user_id;
     }
 
-    public void setUser_id(String user_id) {
-        this.user_id = user_id;
+    public void setSender_user_id(String sender_user_id) {
+        this.sender_user_id = sender_user_id;
     }
 
-    public String getUser_photo() {
-        return user_photo;
+    public String getSender_user_photo() {
+        return sender_user_photo;
     }
 
-    public void setUser_photo(String user_photo) {
-        this.user_photo = user_photo;
+    public void setSender_user_photo(String sender_user_photo) {
+        this.sender_user_photo = sender_user_photo;
+    }
+
+    public String getSender_user_handle() {
+        return sender_user_handle;
+    }
+
+    public void setSender_user_handle(String sender_user_handle) {
+        this.sender_user_handle = sender_user_handle;
+    }
+
+    public String getReceiver_user_id() {
+        return receiver_user_id;
+    }
+
+    public void setReceiver_user_id(String receiver_user_id) {
+        this.receiver_user_id = receiver_user_id;
+    }
+
+    public String getReceiver_user_photo() {
+        return receiver_user_photo;
+    }
+
+    public void setReceiver_user_photo(String receiver_user_photo) {
+        this.receiver_user_photo = receiver_user_photo;
     }
 
     public String getVideo_id() {

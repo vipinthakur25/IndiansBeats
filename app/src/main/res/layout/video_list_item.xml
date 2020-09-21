@@ -72,14 +72,17 @@
                 android:textColor="@color/colorTextTitle"
                 android:textSize="18sp" />
 
-            <TextView
+            <com.tylersuehr.socialtextview.SocialTextView
                 android:id="@+id/tvVideoDesc"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/montserrat"
+                android:fontFamily="@font/montserrat_bold"
                 android:text="#dingdong #trending"
                 android:textColor="@color/colorTextTitle"
-                android:textSize="16dp" />
+                app:hashtagColor="@color/colorHashtag"
+                app:linkModes="mention|hashtag"
+                app:mentionColor="@color/colorMention"
+                android:textSize="14sp" />
 
 
          </LinearLayout>

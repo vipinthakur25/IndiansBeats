@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.tetravalstartups.dingdong.R;
@@ -22,6 +23,8 @@ public class NotificationFragment extends Fragment implements NotificationPresen
 
     private View view;
     private RecyclerView recyclerNotification;
+    private LinearLayout lvLoadingData;
+    private LinearLayout lvNoData;
 
     public NotificationFragment() {
     }
@@ -36,6 +39,9 @@ public class NotificationFragment extends Fragment implements NotificationPresen
 
     private void initView() {
         recyclerNotification = view.findViewById(R.id.recyclerNotification);
+        lvLoadingData = view.findViewById(R.id.lvLoadingData);
+        lvNoData = view.findViewById(R.id.lvNoData);
+        lvLoadingData.setVisibility(View.VISIBLE);
         setupNotificationPresenter();
     }
 
@@ -46,7 +52,9 @@ public class NotificationFragment extends Fragment implements NotificationPresen
 
     @Override
     public void notificationsNotFound(String message) {
-        Toast.makeText(getContext(), "Not Found...", Toast.LENGTH_SHORT).show();
+        recyclerNotification.setVisibility(View.GONE);
+        lvLoadingData.setVisibility(View.GONE);
+        lvNoData.setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -55,5 +63,8 @@ public class NotificationFragment extends Fragment implements NotificationPresen
         NotificationAdapter notificationAdapter = new NotificationAdapter(getContext(), notificationArrayList);
         notificationAdapter.notifyDataSetChanged();
         recyclerNotification.setAdapter(notificationAdapter);
+        lvLoadingData.setVisibility(View.GONE);
+        lvNoData.setVisibility(View.GONE);
+        recyclerNotification.setVisibility(View.VISIBLE);
     }
 }

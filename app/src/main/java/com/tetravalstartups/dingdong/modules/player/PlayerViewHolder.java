@@ -64,10 +64,14 @@ import com.tetravalstartups.dingdong.api.RequestInterface;
 import com.tetravalstartups.dingdong.auth.Master;
 import com.tetravalstartups.dingdong.auth.PhoneActivity;
 import com.tetravalstartups.dingdong.modules.comment.InVideoCommentBottomSheet;
+import com.tetravalstartups.dingdong.modules.common.hashtag.HashtagActivity;
+import com.tetravalstartups.dingdong.modules.notification.model.Notification;
 import com.tetravalstartups.dingdong.modules.profile.model.Follow;
 import com.tetravalstartups.dingdong.modules.profile.videos.VideoResponseDatum;
 import com.tetravalstartups.dingdong.modules.profile.view.activity.PublicProfileActivity;
+import com.tetravalstartups.dingdong.utils.Constant;
 import com.tetravalstartups.dingdong.utils.DDLoading;
+import com.tylersuehr.socialtextview.SocialTextView;
 
 import java.io.File;
 import java.util.HashMap;
@@ -76,7 +80,7 @@ import java.util.Map;
 import retrofit2.Call;
 import retrofit2.Callback;
 
-public class PlayerViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, Player.EventListener {
+public class PlayerViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, Player.EventListener, SocialTextView.OnLinkClickListener {
 
     private Context context;
     private VideoView videoView;
@@ -87,7 +91,7 @@ public class PlayerViewHolder extends RecyclerView.ViewHolder implements View.On
     private ImageView ivPause;
     private TextView tvSoundName;
     private TextView tvUserHandle;
-    private TextView tvVideoDesc;
+    private SocialTextView tvVideoDesc;
     private TextView tvLikeCount;
     private TextView tvCommentCount;
     private TextView tvShareCount;
@@ -317,8 +321,10 @@ public class PlayerViewHolder extends RecyclerView.ViewHolder implements View.On
         tvUserHandle.setText("@"+video.getUserHandle());
         tvCommentCount.setText(video.getCommentCount()+"");
         tvShareCount.setText(video.getShareCount()+"");
-        tvVideoDesc.setText(video.getVideoDesc());
+        tvVideoDesc.setLinkText(video.getVideoDesc());
         tvLikeCount.setText(video.getLikesCount()+"");
+
+        tvVideoDesc.setOnLinkClickListener(this);
 
         Glide.with(context).load(video.getUserPhoto())
                 .placeholder(R.drawable.dd_logo_placeholder).into(ivPhoto);
@@ -347,6 +353,9 @@ public class PlayerViewHolder extends RecyclerView.ViewHolder implements View.On
         SharedPreferences commentsPref = context.getSharedPreferences("comments", 0);
         SharedPreferences.Editor editor = commentsPref.edit();
         editor.putString("video_id", videoModel.getId());
+        editor.putString("video_thumbnail", videoModel.getVideoThumbnail());
+        editor.putString("user_id", videoModel.getUserId());
+        editor.putString("user_photo", videoModel.getUserPhoto());
         editor.apply();
         inVideoCommentBottomSheet.setStyle(DialogFragment.STYLE_NORMAL, R.style.DialogStyle);
         inVideoCommentBottomSheet.show(((BaseActivity)context).getSupportFragmentManager(), "comments");
@@ -381,6 +390,25 @@ public class PlayerViewHolder extends RecyclerView.ViewHolder implements View.On
                         int current_like = Integer.parseInt(tvLikeCount.getText().toString());
                         int update = current_like + 1;
                         tvLikeCount.setText(update+"");
+
+                        DocumentReference documentReference = db.collection("notification").document();
+                        String id = documentReference.getId();
+
+                        Notification notification = new Notification();
+                        notification.setId(id);
+                        notification.setType(Notification.NOTIFICATION_TYPE_LIKE);
+                        notification.setSender_user_id(master.getId());
+                        notification.setSender_user_photo(master.getPhoto());
+                        notification.setSender_user_handle(master.getHandle());
+                        notification.setReceiver_user_id(videoModel.getUserId());
+                        notification.setReceiver_user_photo(videoModel.getUserPhoto());
+                        notification.setVideo_id(videoModel.getId());
+                        notification.setVideo_thumbnail(videoModel.getVideoThumbnail());
+                        notification.setAmount("");
+
+                        db.collection("notification")
+                                .document(id)
+                                .set(notification);
                     }
                 },
                 new Response.ErrorListener() {
@@ -586,5 +614,15 @@ public class PlayerViewHolder extends RecyclerView.ViewHolder implements View.On
         } else if (playbackState == Player.STATE_READY) {
 
         }
+    }
+
+    @Override
+    public void onLinkClicked(int i, String s) {
+        if (i == 1) {
+            Intent intent = new Intent(context, HashtagActivity.class);
+            intent.putExtra("data", s);
+            context.startActivity(intent);
+        }
+
     }
 }

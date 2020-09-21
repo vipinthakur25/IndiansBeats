@@ -11,9 +11,10 @@ import android.widget.LinearLayout;
 import com.tetravalstartups.dingdong.R;
 
 public class HelpActivity extends AppCompatActivity implements View.OnClickListener {
-private ImageView ivGoBack;
-private LinearLayout lhContactSupport;
-private LinearLayout lhReportAProblem;
+    private ImageView ivGoBack;
+    private LinearLayout lhContactSupport;
+    private LinearLayout lhReportAProblem;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -33,15 +34,15 @@ private LinearLayout lhReportAProblem;
 
     @Override
     public void onClick(View view) {
-        if (view == ivGoBack){
+        if (view == ivGoBack) {
             onBackPressed();
             overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
         }
-        if (view == lhReportAProblem){
+        if (view == lhReportAProblem) {
             startActivity(new Intent(HelpActivity.this, ReportAProblemActivity.class));
             overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
         }
-        if (view == lhContactSupport){
+        if (view == lhContactSupport) {
             startActivity(new Intent(HelpActivity.this, ContactSupportActivity.class));
             overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
         }

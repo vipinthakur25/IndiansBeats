@@ -1,5 +1,6 @@
 package com.tetravalstartups.dingdong.modules.player;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -16,8 +17,11 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.tetravalstartups.dingdong.BaseActivity;
 import com.tetravalstartups.dingdong.R;
 import com.tetravalstartups.dingdong.api.APIClient;
+import com.tetravalstartups.dingdong.api.CommonInterface;
 import com.tetravalstartups.dingdong.api.RequestInterface;
 import com.tetravalstartups.dingdong.auth.Master;
+import com.tetravalstartups.dingdong.modules.common.hashtag.model.TaggedVideos;
+import com.tetravalstartups.dingdong.modules.common.hashtag.model.TaggedVideosResponse;
 import com.tetravalstartups.dingdong.modules.profile.videos.VideoResponseDatum;
 import com.tetravalstartups.dingdong.modules.profile.videos.created.CreatedVideo;
 import com.tetravalstartups.dingdong.modules.profile.videos.liked.LikedVideos;
@@ -40,6 +44,7 @@ public class PlayerActivity extends BaseActivity implements View.OnClickListener
     private FirebaseFirestore db;
     private String user_id, video_type, pos;
     private RequestInterface requestInterface;
+    private CommonInterface commonInterface;
     private TextView tvTitle;
     private ImageView ivGoBack;
     private Master master;
@@ -62,6 +67,7 @@ public class PlayerActivity extends BaseActivity implements View.OnClickListener
         db = FirebaseFirestore.getInstance();
         firebaseAuth = FirebaseAuth.getInstance();
         requestInterface = APIClient.getRetrofitInstance().create(RequestInterface.class);
+        commonInterface = APIClient.getRetrofitInstance().create(CommonInterface.class);
 
         user_id = getIntent().getStringExtra("user_id");
         video_type = getIntent().getStringExtra("video_type");
@@ -132,6 +138,39 @@ public class PlayerActivity extends BaseActivity implements View.OnClickListener
                 Log.e(TAG, "onFailure: " + t.getMessage());
             }
         });
+    }
+
+    private void fetchTaggedVideos() {
+        SharedPreferences preferences = getSharedPreferences("tags", 0);
+        String tags = preferences.getString("tags", "#dingdong");
+        SnapHelper snapHelper = new PagerSnapHelper();
+        recyclerVideos.setLayoutManager(new LinearLayoutManager(this));
+        if (recyclerVideos.getOnFlingListener() == null)
+            snapHelper.attachToRecyclerView(recyclerVideos);
+        Call<TaggedVideos> call;
+        if (firebaseAuth.getCurrentUser() != null) {
+            call = commonInterface.fetchTaggedVideos(master.getId(), tags);
+        } else {
+            call = commonInterface.fetchTaggedVideos("0", tags);
+        }
+
+        call.enqueue(new Callback<TaggedVideos>() {
+            @Override
+            public void onResponse(Call<TaggedVideos> call, Response<TaggedVideos> response) {
+                if (response.code() == 200) {
+                    playerAdapter = new PlayerAdapter(PlayerActivity.this, response.body().getData());
+                    playerAdapter.notifyDataSetChanged();
+                    recyclerVideos.setAdapter(playerAdapter);
+                    recyclerVideos.scrollToPosition(Integer.parseInt(pos));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<TaggedVideos> call, Throwable t) {
+
+            }
+        });
+
     }
 
     @Override

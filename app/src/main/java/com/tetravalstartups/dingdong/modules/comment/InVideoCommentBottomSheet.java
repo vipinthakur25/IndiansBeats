@@ -28,6 +28,7 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.tetravalstartups.dingdong.R;
 import com.tetravalstartups.dingdong.auth.Master;
+import com.tetravalstartups.dingdong.modules.notification.model.Notification;
 import com.tetravalstartups.dingdong.modules.passbook.BuyCoinBottomSheetFragment;
 
 import java.util.ArrayList;
@@ -110,6 +111,7 @@ public class InVideoCommentBottomSheet extends BottomSheetDialogFragment impleme
     }
 
     private void postComment(String video_id, String message) {
+
         DocumentReference documentReference = db.collection("videos").document();
         String id = documentReference.getId();
 
@@ -126,6 +128,26 @@ public class InVideoCommentBottomSheet extends BottomSheetDialogFragment impleme
                 .collection("comments")
                 .document(id)
                 .set(inVideoComment);
+
+        db.collection("notification").document();
+        String notifyID = documentReference.getId();
+
+        Notification notification = new Notification();
+        notification.setId(notifyID);
+        notification.setType(Notification.NOTIFICATION_TYPE_LIKE);
+        notification.setSender_user_id(master.getId());
+        notification.setSender_user_photo(master.getPhoto());
+        notification.setSender_user_handle(master.getHandle());
+        notification.setReceiver_user_id(commentsPref.getString("user_id", ""));
+        notification.setReceiver_user_photo(commentsPref.getString("user_photo", ""));
+        notification.setVideo_id(video_id);
+        notification.setVideo_thumbnail(commentsPref.getString("video_thumbnail", ""));
+        notification.setAmount("");
+
+        db.collection("notification")
+                .document(notifyID)
+                .set(notification);
+
     }
 
     @Override
