@@ -6,6 +6,7 @@ import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
@@ -19,13 +20,13 @@ import com.tetravalstartups.dingdong.utils.EqualSpacingItemDecoration;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DiscoverFragment extends Fragment implements DiscoverBannerPresenter.IDiscoverBanner {
+public class DiscoverFragment extends Fragment implements DiscoverBannerPresenter.IDiscoverBanner, MostViewVideoPresenter.IMostViewVideo, MostLikedVideoPresenter.IMostLikeVideo {
 
     private View view;
-
-
     private ViewPager2 bannerPager;
     private Handler sliderHandler = new Handler();
+    private RecyclerView mostViewVideoRecyclerView;
+    private RecyclerView mostLikedVideoRecyclerView;
 
     public DiscoverFragment() {
     }
@@ -41,23 +42,59 @@ public class DiscoverFragment extends Fragment implements DiscoverBannerPresente
     private void initView() {
 
         RecyclerView recyclerSearch = view.findViewById(R.id.recyclerSearch);
+
         CardView contactsCardView = view.findViewById(R.id.contactsCardView);
 
         bannerPager = view.findViewById(R.id.bannerPager);
 
         recyclerSearch.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerSearch.addItemDecoration(new EqualSpacingItemDecoration(0, EqualSpacingItemDecoration.VERTICAL));
+
+
         contactsCardView.setOnClickListener(view -> {
             Intent intent = new Intent(getActivity(), ContactsActivity.class);
             startActivity(intent);
         });
 
         fetchBanners();
-        tendingNowRecyclerView();
+
+        fetchMostLikeVideo();
+
+        fetchMostViewVideo();
+
+        tendingNowRecycler();
+
+        mostViewVideoRecyclerView();
+
+        mostLikedVideoRecyclerView();
+
         popularPeopleRecyclerView();
     }
 
-    private void tendingNowRecyclerView() {
+    private void fetchMostLikeVideo() {
+        MostLikedVideoPresenter mostLikedVideoPresenter = new MostLikedVideoPresenter(getContext(), DiscoverFragment.this);
+        mostLikedVideoPresenter.fetchLikeVideo();
+
+    }
+
+    private void mostLikedVideoRecyclerView() {
+        mostLikedVideoRecyclerView = view.findViewById(R.id.mostLikedVideoRecyclerView);
+        mostLikedVideoRecyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
+        mostLikedVideoRecyclerView.setHasFixedSize(true);
+    }
+
+    private void fetchMostViewVideo() {
+        MostViewVideoPresenter mostViewVideoPresenter = new MostViewVideoPresenter(getContext(), DiscoverFragment.this);
+        mostViewVideoPresenter.fetchViewVideo();
+    }
+
+    private void mostViewVideoRecyclerView() {
+        mostViewVideoRecyclerView = view.findViewById(R.id.mostViewVideoRecyclerView);
+        mostViewVideoRecyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
+        mostViewVideoRecyclerView.setHasFixedSize(true);
+    }
+
+    private void tendingNowRecycler() {
         RecyclerView trendingNowRecyclerView = view.findViewById(R.id.trendingNowRecyclerView);
         trendingNowRecyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
         trendingNowRecyclerView.setHasFixedSize(true);
@@ -136,7 +173,22 @@ public class DiscoverFragment extends Fragment implements DiscoverBannerPresente
     }
 
     @Override
-    public void fetchError(String error) {
+    public void fetchResponse(MostViewVideo mostViewVideo) {
+        MostViewVideoAdapter mostViewVideoAdapter = new MostViewVideoAdapter(getContext(), mostViewVideo.getData());
+        mostViewVideoAdapter.notifyDataSetChanged();
+        mostViewVideoRecyclerView.setAdapter(mostViewVideoAdapter);
 
+    }
+
+    @Override
+    public void fetchResponse(MostLikedVideo mostLikedVideo) {
+        MostLikedVideoAdapter mostLikedVideoAdapter = new MostLikedVideoAdapter(getContext(), mostLikedVideo.getData());
+        mostLikedVideoAdapter.notifyDataSetChanged();
+        mostLikedVideoRecyclerView.setAdapter(mostLikedVideoAdapter);
+    }
+
+    @Override
+    public void fetchError(String error) {
+        Toast.makeText(getContext(), "" + error, Toast.LENGTH_SHORT).show();
     }
 }
