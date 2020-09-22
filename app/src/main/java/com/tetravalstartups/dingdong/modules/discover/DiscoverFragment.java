@@ -6,6 +6,7 @@ import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.cardview.widget.CardView;
@@ -20,14 +21,15 @@ import com.tetravalstartups.dingdong.utils.EqualSpacingItemDecoration;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DiscoverFragment extends Fragment implements DiscoverBannerPresenter.IDiscoverBanner, MostViewVideoPresenter.IMostViewVideo, MostLikedVideoPresenter.IMostLikeVideo {
+public class DiscoverFragment extends Fragment implements DiscoverBannerPresenter.IDiscoverBanner, MostViewVideoPresenter.IMostViewVideo, MostLikedVideoPresenter.IMostLikeVideo, View.OnClickListener {
 
     private View view;
     private ViewPager2 bannerPager;
     private Handler sliderHandler = new Handler();
     private RecyclerView mostViewVideoRecyclerView;
     private RecyclerView mostLikedVideoRecyclerView;
-
+    private TextView tvMostLikedSeeMore;
+    private TextView tvMostViewedSeeMore;
     public DiscoverFragment() {
     }
 
@@ -43,19 +45,18 @@ public class DiscoverFragment extends Fragment implements DiscoverBannerPresente
 
         RecyclerView recyclerSearch = view.findViewById(R.id.recyclerSearch);
 
-        CardView contactsCardView = view.findViewById(R.id.contactsCardView);
-
+        tvMostLikedSeeMore = view.findViewById(R.id.tvMostLikedSeeMore);
+        tvMostViewedSeeMore = view.findViewById(R.id.tvMostViewedSeeMore);
         bannerPager = view.findViewById(R.id.bannerPager);
 
         recyclerSearch.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerSearch.addItemDecoration(new EqualSpacingItemDecoration(0, EqualSpacingItemDecoration.VERTICAL));
 
 
-        contactsCardView.setOnClickListener(view -> {
-            Intent intent = new Intent(getActivity(), ContactsActivity.class);
-            startActivity(intent);
-        });
-
+//        contactsCardView.setOnClickListener(view -> {
+//            Intent intent = new Intent(getActivity(), ContactsActivity.class);
+//            startActivity(intent);
+//        });
         fetchBanners();
 
         fetchMostLikeVideo();
@@ -69,11 +70,14 @@ public class DiscoverFragment extends Fragment implements DiscoverBannerPresente
         mostLikedVideoRecyclerView();
 
         popularPeopleRecyclerView();
+
+        tvMostViewedSeeMore.setOnClickListener(this);
+        tvMostLikedSeeMore.setOnClickListener(this);
     }
 
     private void fetchMostLikeVideo() {
         MostLikedVideoPresenter mostLikedVideoPresenter = new MostLikedVideoPresenter(getContext(), DiscoverFragment.this);
-        mostLikedVideoPresenter.fetchLikeVideo();
+        mostLikedVideoPresenter.fetchLikeVideo(20);
 
     }
 
@@ -85,7 +89,7 @@ public class DiscoverFragment extends Fragment implements DiscoverBannerPresente
 
     private void fetchMostViewVideo() {
         MostViewVideoPresenter mostViewVideoPresenter = new MostViewVideoPresenter(getContext(), DiscoverFragment.this);
-        mostViewVideoPresenter.fetchViewVideo();
+        mostViewVideoPresenter.fetchViewVideo(20);
     }
 
     private void mostViewVideoRecyclerView() {
@@ -100,9 +104,9 @@ public class DiscoverFragment extends Fragment implements DiscoverBannerPresente
         trendingNowRecyclerView.setHasFixedSize(true);
 
         List<TrendingNowModel> trendingNowModelArrayList = new ArrayList<>();
-        //trendingNowModelArrayList.add(new TrendingNowModel(R.drawable.dancing, "#dancing", "10K Videos"));
-        //trendingNowModelArrayList.add(new TrendingNowModel(R.drawable.singing, "#singing", "20K Videos"));
-        //trendingNowModelArrayList.add(new TrendingNowModel(R.drawable.sports, "#sport", "25k Videos"));
+        trendingNowModelArrayList.add(new TrendingNowModel(R.drawable.dancing, "#dancing", "10K Videos"));
+        trendingNowModelArrayList.add(new TrendingNowModel(R.drawable.singing, "#singing", "20K Videos"));
+        trendingNowModelArrayList.add(new TrendingNowModel(R.drawable.sports, "#sport", "25k Videos"));
         trendingNowModelArrayList.add(new TrendingNowModel(R.drawable.technology, "#technology", "50K Videos"));
         trendingNowModelArrayList.add(new TrendingNowModel(R.drawable.comedy, "#comedy", "75K Videos"));
         trendingNowModelArrayList.add(new TrendingNowModel(R.drawable.covid, "#corona", "50K Videos"));
@@ -117,16 +121,17 @@ public class DiscoverFragment extends Fragment implements DiscoverBannerPresente
         popularPeopleRecyclerView.setHasFixedSize(true);
 
         List<PopularPeopleModel> popularPeopleModelList = new ArrayList<>();
-        popularPeopleModelList.add(new PopularPeopleModel(R.drawable.iamwellandgood, "iamwellandgood", "498 Followers"));
-        popularPeopleModelList.add(new PopularPeopleModel(R.drawable.salman, "786salmancool", "100 Followers"));
-        popularPeopleModelList.add(new PopularPeopleModel(R.drawable.naman, "namanbhavsar69", "50 Followers"));
-        popularPeopleModelList.add(new PopularPeopleModel(R.drawable.sahil, "sahilsahu19999", "110 Followers"));
-        popularPeopleModelList.add(new PopularPeopleModel(R.drawable.kavitarathore, "Kavitarathor45", "220 Followers"));
-        popularPeopleModelList.add(new PopularPeopleModel(R.drawable.yogikuber, "yogikuber", "450 Followers"));
-        popularPeopleModelList.add(new PopularPeopleModel(R.drawable.alok, "alok6500", "100 Followers"));
-        popularPeopleModelList.add(new PopularPeopleModel(R.drawable.raysahu, "raysahucsk", "50 Followers"));
-        popularPeopleModelList.add(new PopularPeopleModel(R.drawable.singhrichu, "singhrichu052", "185 Followers"));
+
+        popularPeopleModelList.add(new PopularPeopleModel(R.drawable.salman, "786salmancool", "100 Followers", "Gou9Qd7QUkMQ4YBYuKqh3UZjrVk1"));
+        popularPeopleModelList.add(new PopularPeopleModel(R.drawable.naman, "namanbhavsar69", "50 Followers", "S9uNFZ3zLYZSbmuufDWk69GYsSX2"));
+        popularPeopleModelList.add(new PopularPeopleModel(R.drawable.sahil, "sahilsahu19999", "110 Followers", "xRYX1etmr3OzP62utfMWqDiscos2"));
+        popularPeopleModelList.add(new PopularPeopleModel(R.drawable.kavitarathore, "Kavitarathor45", "220 Followers", "gAoweOAyo1MflhkujFg7uHrqchj1"));
+        popularPeopleModelList.add(new PopularPeopleModel(R.drawable.yogikuber, "yogikuber", "450 Followers", "lUzboGGSONRVuspJ2CSl5AlZlcd2"));
+        popularPeopleModelList.add(new PopularPeopleModel(R.drawable.alok, "alok6500", "100 Followers", "r7zAkoOggrT7Rl7zwCaa06QocKg2"));
+        popularPeopleModelList.add(new PopularPeopleModel(R.drawable.raysahu, "raysahucsk", "50 Followers", "FsI5Cv01bBVHdBmknxXlH6000Bn1"));
+        popularPeopleModelList.add(new PopularPeopleModel(R.drawable.singhrichu, "singhrichu052", "185 Followers", "oBcxf6TaDOQrHh1QgWzCGMFQbSK2"));
         PopularPeopleAdapter popularPeopleAdapter = new PopularPeopleAdapter(getContext(), popularPeopleModelList);
+
         popularPeopleRecyclerView.setAdapter(popularPeopleAdapter);
 
     }
@@ -190,5 +195,17 @@ public class DiscoverFragment extends Fragment implements DiscoverBannerPresente
     @Override
     public void fetchError(String error) {
         Toast.makeText(getContext(), "" + error, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onClick(View view) {
+        if (view == tvMostViewedSeeMore){
+           Intent intent = new Intent(getActivity(), MostViewedActivity.class);
+           getContext().startActivity(intent);
+        }
+        if (view == tvMostLikedSeeMore){
+            Intent intent = new Intent(getActivity(), MostLikedActivity.class);
+            getContext().startActivity(intent);
+        }
     }
 }

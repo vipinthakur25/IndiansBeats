@@ -55,58 +55,7 @@
 
                 app:cardCornerRadius="15dp">
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:orientation="vertical"
-                    android:padding="10dp">
 
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="3"
-                        android:orientation="horizontal">
-
-                        <ImageView
-                            android:layout_width="50dp"
-                            android:layout_height="50dp"
-                            android:layout_gravity="center"
-                            android:src="@drawable/contacts_ding_dong" />
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_horizontal"
-                            android:layout_marginStart="16dp"
-                            android:layout_weight="1"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:fontFamily="@font/montserrat_bold"
-                                android:text="Your contacts on Ding Dong"
-                                android:textColor="@color/colorPrimary"
-                                android:textSize="14sp" />
-
-                            <TextView
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:fontFamily="@font/montserrat"
-                                android:text="See your contacts"
-                                android:textColor="@color/colorPrimary"
-                                android:textSize="14sp" />
-                        </LinearLayout>
-
-                        <ImageView
-                            android:layout_width="35dp"
-                            android:layout_height="match_parent"
-                            android:layout_gravity="center"
-
-                            android:src="@drawable/ic_dd_arrow_right" />
-                    </LinearLayout>
-                </LinearLayout>
             </androidx.cardview.widget.CardView>
 
             <TextView
@@ -116,7 +65,7 @@
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="16dp"
                 android:fontFamily="@font/montserrat_bold"
-                android:text="Trending now"
+                android:text="Popular Tags"
                 android:textColor="@color/colorAccentV1"
                 android:textSize="16sp" />
 
@@ -157,6 +106,7 @@
                     android:textColor="@color/colorAccentV1"
                     android:textSize="16sp" />
                 <TextView
+                    android:id="@+id/tvMostViewedSeeMore"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
@@ -187,6 +137,7 @@
                     android:textColor="@color/colorAccentV1"
                     android:textSize="16sp" />
                 <TextView
+                    android:id="@+id/tvMostLikedSeeMore"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"

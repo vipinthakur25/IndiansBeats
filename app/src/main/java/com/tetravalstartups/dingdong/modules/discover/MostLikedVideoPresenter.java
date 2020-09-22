@@ -25,12 +25,12 @@ public class MostLikedVideoPresenter {
 
         void fetchError(String error);
     }
-    public void fetchLikeVideo(){
+    public void fetchLikeVideo(int limit){
         Master master = new Master(context);
         String userId = master.getId();
 
         CommonInterface commonInterface = APIClient.getRetrofitInstance().create(CommonInterface.class);
-        Call<MostLikedVideo> mostLikedVideoCall = commonInterface.mostLiked(userId, 20);
+        Call<MostLikedVideo> mostLikedVideoCall = commonInterface.mostLiked(userId, limit);
 
         mostLikedVideoCall.enqueue(new Callback<MostLikedVideo>() {
             @Override

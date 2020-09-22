@@ -29,7 +29,7 @@
             <ImageView
                 android:layout_width="15dp"
                 android:layout_height="15dp"
-                android:src="@drawable/dd_home_like"/>
+                android:src="@drawable/dd_video_play"/>
 
             <TextView
                 android:id="@+id/tvLikeCount"

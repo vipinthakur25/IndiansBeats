@@ -15,44 +15,42 @@ import com.tetravalstartups.dingdong.R;
 
 import java.util.List;
 
-public class MostLikedVideoAdapter extends RecyclerView.Adapter<MostLikedVideoAdapter.MostLikedideoViewHolder> {
-
+public class MostLikedSeeMoreAdapter extends RecyclerView.Adapter<MostLikedSeeMoreAdapter.MostLikedSeeMoreViewHolder> {
     private Context context;
     private List<MostLikedVideoResponse> mostLikedVideoResponseList;
 
 
-    public MostLikedVideoAdapter(Context context, List<MostLikedVideoResponse> mostLikedVideoResponseList) {
+    public MostLikedSeeMoreAdapter(Context context, List<MostLikedVideoResponse> mostLikedVideoResponseList) {
         this.context = context;
         this.mostLikedVideoResponseList = mostLikedVideoResponseList;
     }
 
     @NonNull
     @Override
-    public MostLikedVideoAdapter.MostLikedideoViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.most_liked_video_item, parent, false);
-        return new MostLikedideoViewHolder(view);
+    public MostLikedSeeMoreAdapter.MostLikedSeeMoreViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(context).inflate(R.layout.liked_video_list_item, parent, false);
+        return new MostLikedSeeMoreViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull MostLikedVideoAdapter.MostLikedideoViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull MostLikedSeeMoreAdapter.MostLikedSeeMoreViewHolder holder, int position) {
         MostLikedVideoResponse mostLikedVideoResponse = mostLikedVideoResponseList.get(position);
         Glide.with(context).load(mostLikedVideoResponse.getVideoThumbnail()).placeholder(R.drawable.dd_logo_placeholder).into(holder.ivThumbnail);
-        holder.tvLikeCount.setText(""+mostLikedVideoResponse.getViewCount());
+        holder.tvViews.setText(""+mostLikedVideoResponse.getViewCount());
     }
 
     @Override
     public int getItemCount() {
-        return 20;
+        return mostLikedVideoResponseList.size();
     }
 
-    public static class MostLikedideoViewHolder extends RecyclerView.ViewHolder {
+    public class MostLikedSeeMoreViewHolder extends RecyclerView.ViewHolder {
         private ImageView ivThumbnail;
-        private TextView tvLikeCount;
-        public MostLikedideoViewHolder(@NonNull View itemView) {
+        private TextView tvViews;
+        public MostLikedSeeMoreViewHolder(@NonNull View itemView) {
             super(itemView);
-
             ivThumbnail = itemView.findViewById(R.id.ivThumbnail);
-            tvLikeCount = itemView.findViewById(R.id.tvLikeCount);
+            tvViews = itemView.findViewById(R.id.tvViews);
         }
     }
 }

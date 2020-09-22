@@ -26,11 +26,11 @@ public class MostViewVideoPresenter {
         void fetchError(String error);
     }
 
-    public void fetchViewVideo() {
+    public void fetchViewVideo(int limit) {
         Master master = new Master(context);
         String userId = master.getId();
         CommonInterface commonInterface = APIClient.getRetrofitInstance().create(CommonInterface.class);
-        Call<MostViewVideo> mostViewVideoCall = commonInterface.mostView(userId, 20);
+        Call<MostViewVideo> mostViewVideoCall = commonInterface.mostView(userId, limit);
         mostViewVideoCall.enqueue(new Callback<MostViewVideo>() {
             @Override
             public void onResponse(Call<MostViewVideo> call, Response<MostViewVideo> response) {

@@ -25,7 +25,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".modules.common.hashtag.HashtagActivity"></activity>
+        <activity android:name=".modules.common.hashtag.HashtagActivity"/>
         <activity android:name=".modules.discover.ContactsActivity" />
         <activity android:name=".modules.profile.view.activity.ChatWithUsActivity" />
         <activity android:name=".modules.profile.view.activity.ContactSupportActivity" />
@@ -114,12 +114,11 @@
             </intent-filter>
         </activity>
         <activity android:name=".MainActivity" />
+        <activity android:name=".modules.discover.MostViewedActivity" />
+        <activity android:name=".modules.discover.MostLikedActivity" />
 
         <service android:name=".service.PublishService" />
 
-        <meta-data
-            android:name="CLOUDINARY_URL"
-            android:value="cloudinary://797981641311225:ILAhO04JbFeOrF9ZQp3pDtFUowY@sevenbillion" />
     </application>
 
 </manifest>
