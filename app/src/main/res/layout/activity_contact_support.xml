@@ -70,30 +70,7 @@
                 android:layout_marginEnd="16dp"
                 app:srcCompat="@drawable/ic_dd_arrow_right"/>
         </LinearLayout>
-        <LinearLayout
-            android:id="@+id/lhCallUs"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="10dp">
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="+91 9981806327"
-                android:textColor="@color/colorTextTitle"
-                android:fontFamily="@font/montserrat"
-                android:gravity="center_vertical"
-                android:paddingStart="16dp"
-                android:layout_weight="1"
-                android:drawableStart="@drawable/ic_call"
-                android:drawablePadding="10dp"
-                android:textSize="16sp"/>
-            <ImageView
-                android:layout_width="25dp"
-                android:layout_height="25dp"
-                android:layout_marginEnd="16dp"
-                app:srcCompat="@drawable/ic_dd_arrow_right"/>
-        </LinearLayout>
+
         <LinearLayout
             android:id="@+id/lhChatWithUs"
             android:layout_width="match_parent"

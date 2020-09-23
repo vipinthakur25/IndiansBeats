@@ -28,6 +28,7 @@ public class VideoTabPagerAdapter extends FragmentPagerAdapter {
         switch (position){
             case 0:
                 bundle.putString("user_id", user_id);
+                bundle.putString("type", "1");
                 CreatedVideoFragment createdVideoFragment = new CreatedVideoFragment();
                 createdVideoFragment.setArguments(bundle);
                 return createdVideoFragment;

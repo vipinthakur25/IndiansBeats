@@ -26,11 +26,12 @@
         android:inputType="textPersonName|none"
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
-        android:textColor="@color/colorTextTitle"
+        android:textColor="@color/colorBlack"
         android:textColorHint="@color/colorPrimaryDarkV2"
         android:textSize="16sp" />
 
     <androidx.core.widget.NestedScrollView
+        android:id="@+id/scrollVideos"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:visibility="visible">

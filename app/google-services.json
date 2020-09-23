@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "976344041860",
+    "firebase_url": "https://dingdong-7b.firebaseio.com",
+    "project_id": "dingdong-7b",
+    "storage_bucket": "dingdong-7b.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:976344041860:android:f69d2430684755f74eb5d1",
+        "android_client_info": {
+          "package_name": "com.tetravalstartups.dingdong"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "976344041860-5nf4batu8url73mv0p23u6cl4guj0uev.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB2dcxJfhK9ZRPkLEZW5F95Q3J9VNDMvjI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "976344041860-5nf4batu8url73mv0p23u6cl4guj0uev.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -18,7 +18,6 @@ import com.tetravalstartups.dingdong.R;
 public class ContactSupportActivity extends AppCompatActivity implements View.OnClickListener {
     private ImageView ivGoBack;
     private LinearLayout lhMailUs;
-    private LinearLayout lhCallUs;
     private LinearLayout lhChatWithUs;
 
     @Override
@@ -32,11 +31,9 @@ public class ContactSupportActivity extends AppCompatActivity implements View.On
     private void initViews() {
         ivGoBack = findViewById(R.id.ivGoBack);
         lhMailUs = findViewById(R.id.lhMailUs);
-        lhCallUs = findViewById(R.id.lhCallUs);
         lhChatWithUs = findViewById(R.id.lhChatWithUs);
 
         ivGoBack.setOnClickListener(this);
-        lhCallUs.setOnClickListener(this);
         lhMailUs.setOnClickListener(this);
         lhChatWithUs.setOnClickListener(this);
     }
@@ -50,28 +47,10 @@ public class ContactSupportActivity extends AppCompatActivity implements View.On
         if (view == lhMailUs) {
             sentMail();
         }
-        if (view == lhCallUs){
-            callUs();
-        }
         if (view == lhChatWithUs){
            startActivity(new Intent(ContactSupportActivity.this, ChatWithUsActivity.class));
             overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
         }
-    }
-
-    private void callUs() {
-        String[] permissions = {Manifest.permission.CALL_PHONE};
-        Permissions.check(this/*context*/, permissions,
-                null/*rationale*/, null/*options*/,
-                new PermissionHandler() {
-                    @Override
-                    public void onGranted() {
-                        Intent dialIntent = new Intent(Intent.ACTION_DIAL);
-                        dialIntent.setData(Uri.parse("tel:" + "9981806327"));
-                        startActivity(dialIntent);
-                    }
-                });
-
     }
 
     private void sentMail() {

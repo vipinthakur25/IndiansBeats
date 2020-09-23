@@ -22,6 +22,7 @@ import com.tetravalstartups.dingdong.api.RequestInterface;
 import com.tetravalstartups.dingdong.auth.Master;
 import com.tetravalstartups.dingdong.modules.common.hashtag.model.TaggedVideos;
 import com.tetravalstartups.dingdong.modules.common.hashtag.model.TaggedVideosResponse;
+import com.tetravalstartups.dingdong.modules.discover.MostLikedVideo;
 import com.tetravalstartups.dingdong.modules.profile.videos.VideoResponseDatum;
 import com.tetravalstartups.dingdong.modules.profile.videos.created.CreatedVideo;
 import com.tetravalstartups.dingdong.modules.profile.videos.liked.LikedVideos;
@@ -75,11 +76,20 @@ public class PlayerActivity extends BaseActivity implements View.OnClickListener
         master = new Master(PlayerActivity.this);
 
         if (video_type.equals("created")) {
-            tvTitle.setText("Created Videos");
+            tvTitle.setText("Created");
             setupCreatedVideoAdapter();
         } else if (video_type.equals("liked")) {
-            tvTitle.setText("Liked Videos");
+            tvTitle.setText("Liked");
             setupLikedVideoAdapter();
+        } else if (video_type.equals("hashtag")) {
+            tvTitle.setText("Popular");
+            fetchTaggedVideos();
+        } else if (video_type.equals("most_liked")) {
+            tvTitle.setText("Most Liked");
+            fetchMostLikedVideos();
+        } else if (video_type.equals("most_viewed")) {
+            tvTitle.setText("Most Viewed");
+            fetchMostViewedVideos();
         }
 
     }
@@ -171,6 +181,40 @@ public class PlayerActivity extends BaseActivity implements View.OnClickListener
             }
         });
 
+    }
+
+    private void fetchMostViewedVideos() {
+        SnapHelper snapHelper = new PagerSnapHelper();
+        recyclerVideos.setLayoutManager(new LinearLayoutManager(this));
+        if (recyclerVideos.getOnFlingListener() == null)
+            snapHelper.attachToRecyclerView(recyclerVideos);
+
+    }
+
+    private void fetchMostLikedVideos() {
+        SnapHelper snapHelper = new PagerSnapHelper();
+        recyclerVideos.setLayoutManager(new LinearLayoutManager(this));
+        if (recyclerVideos.getOnFlingListener() == null)
+            snapHelper.attachToRecyclerView(recyclerVideos);
+        CommonInterface commonInterface = APIClient.getRetrofitInstance().create(CommonInterface.class);
+        Call<MostLikedVideo> mostLikedVideoCall = commonInterface.mostLiked("", 20);
+        mostLikedVideoCall.enqueue(new Callback<MostLikedVideo>() {
+            @Override
+            public void onResponse(Call<MostLikedVideo> call, Response<MostLikedVideo> response) {
+                if (response.code() == 200) {
+                    
+                } else if (response.code() == 400) {
+
+                } else {
+
+                }
+            }
+
+            @Override
+            public void onFailure(Call<MostLikedVideo> call, Throwable t) {
+
+            }
+        });
     }
 
     @Override

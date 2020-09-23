@@ -24,6 +24,7 @@ import com.tetravalstartups.dingdong.auth.Master;
 import com.tetravalstartups.dingdong.modules.profile.videos.VideoResponseDatum;
 import com.tetravalstartups.dingdong.modules.profile.videos.created.CreatedVideo;
 import com.tetravalstartups.dingdong.modules.profile.view.adapter.InProfileCreatedVideoAdapter;
+import com.tetravalstartups.dingdong.modules.profile.view.adapter.PublicProfileCreatedVideoAdapter;
 import com.tetravalstartups.dingdong.utils.EqualSpacingItemDecoration;
 
 import java.util.ArrayList;
@@ -39,6 +40,7 @@ public class CreatedVideoFragment extends Fragment {
     private RecyclerView recyclerVideos;
     private List<VideoResponseDatum> createdVideosArrayList;
     private InProfileCreatedVideoAdapter inProfileCreatedVideoAdapter;
+    private PublicProfileCreatedVideoAdapter publicProfileCreatedVideoAdapter;
     private FirebaseFirestore db;
     private Master master;
     private TextView tvNoVideos;
@@ -68,10 +70,10 @@ public class CreatedVideoFragment extends Fragment {
         lbm.registerReceiver(receiver, new IntentFilter("deleteVideo"));
 
         requestInterface = APIClient.getRetrofitInstance().create(RequestInterface.class);
-        fetchCreatedVideos(getArguments().getString("user_id"));
+        fetchCreatedVideos(getArguments().getString("user_id"), getArguments().getString("type"));
     }
 
-    public void fetchCreatedVideos(String id) {
+    public void fetchCreatedVideos(String id, String type) {
         recyclerVideos.setHasFixedSize(true);
         recyclerVideos.setLayoutManager(new GridLayoutManager(getContext(), 3));
         recyclerVideos.addItemDecoration(new EqualSpacingItemDecoration(4, EqualSpacingItemDecoration.GRID));
@@ -83,9 +85,15 @@ public class CreatedVideoFragment extends Fragment {
                 if (response.code() == 200) {
                     CreatedVideo createdVideo = response.body();
                     createdVideosArrayList = new ArrayList<>(createdVideo.getData());
-                    inProfileCreatedVideoAdapter = new InProfileCreatedVideoAdapter(getContext(), createdVideosArrayList);
-                    inProfileCreatedVideoAdapter.notifyDataSetChanged();
-                    recyclerVideos.setAdapter(inProfileCreatedVideoAdapter);
+                    if (type.equals("1")) {
+                        inProfileCreatedVideoAdapter = new InProfileCreatedVideoAdapter(getContext(), createdVideosArrayList);
+                        inProfileCreatedVideoAdapter.notifyDataSetChanged();
+                        recyclerVideos.setAdapter(inProfileCreatedVideoAdapter);
+                    } else if (type.equals("2")) {
+                        publicProfileCreatedVideoAdapter = new PublicProfileCreatedVideoAdapter(getContext(), createdVideosArrayList);
+                        publicProfileCreatedVideoAdapter.notifyDataSetChanged();
+                        recyclerVideos.setAdapter(publicProfileCreatedVideoAdapter);
+                    }
                     tvNoVideos.setVisibility(View.GONE);
                     recyclerVideos.setVisibility(View.VISIBLE);
                 } else {
@@ -107,7 +115,7 @@ public class CreatedVideoFragment extends Fragment {
             if (intent != null) {
                 String code = intent.getStringExtra("code");
                 if (code.equals("200")) {
-                    fetchCreatedVideos(getArguments().getString("user_id"));
+                    fetchCreatedVideos(getArguments().getString("user_id"), getArguments().getString("type"));
                 }
             }
         }

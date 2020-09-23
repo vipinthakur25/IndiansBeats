@@ -27,6 +27,7 @@ public class PublicProfilePagerAdapter extends FragmentPagerAdapter {
             case 0:
                 Bundle bundle = new Bundle();
                 bundle.putString("user_id", id);
+                bundle.putString("type", "2");
                 CreatedVideoFragment createdVideoFragment = new CreatedVideoFragment();
                 createdVideoFragment.setArguments(bundle);
                 return createdVideoFragment;

@@ -14,7 +14,6 @@ public class MostLikedVideoPresenter {
     private Context context;
     private IMostLikeVideo iMostLikeVideo;
 
-
     public MostLikedVideoPresenter(Context context, IMostLikeVideo iMostLikeVideo) {
         this.context = context;
         this.iMostLikeVideo = iMostLikeVideo;

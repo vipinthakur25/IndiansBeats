@@ -3,25 +3,35 @@ package com.tetravalstartups.dingdong.modules.discover;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.cardview.widget.CardView;
+import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.tetravalstartups.dingdong.R;
+import com.tetravalstartups.dingdong.auth.Master;
+import com.tetravalstartups.dingdong.modules.discover.search.SearchAdapter;
+import com.tetravalstartups.dingdong.modules.discover.search.SearchPresenter;
+import com.tetravalstartups.dingdong.modules.discover.search.SearchResponse;
 import com.tetravalstartups.dingdong.utils.EqualSpacingItemDecoration;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class DiscoverFragment extends Fragment implements DiscoverBannerPresenter.IDiscoverBanner, MostViewVideoPresenter.IMostViewVideo, MostLikedVideoPresenter.IMostLikeVideo, View.OnClickListener {
+public class DiscoverFragment extends Fragment implements DiscoverBannerPresenter.IDiscoverBanner, MostViewVideoPresenter.IMostViewVideo, MostLikedVideoPresenter.IMostLikeVideo, View.OnClickListener, SearchPresenter.ISearch {
 
     private View view;
     private ViewPager2 bannerPager;
@@ -30,6 +40,14 @@ public class DiscoverFragment extends Fragment implements DiscoverBannerPresente
     private RecyclerView mostLikedVideoRecyclerView;
     private TextView tvMostLikedSeeMore;
     private TextView tvMostViewedSeeMore;
+    private EditText etSearch;
+    private NestedScrollView scrollVideos;
+    private FrameLayout frameUsers;
+    private FirebaseAuth firebaseAuth;
+    private Master master;
+    private TextView tvNoData;
+    private RecyclerView recyclerSearch;
+
     public DiscoverFragment() {
     }
 
@@ -43,20 +61,46 @@ public class DiscoverFragment extends Fragment implements DiscoverBannerPresente
 
     private void initView() {
 
-        RecyclerView recyclerSearch = view.findViewById(R.id.recyclerSearch);
-
         tvMostLikedSeeMore = view.findViewById(R.id.tvMostLikedSeeMore);
         tvMostViewedSeeMore = view.findViewById(R.id.tvMostViewedSeeMore);
         bannerPager = view.findViewById(R.id.bannerPager);
+        etSearch = view.findViewById(R.id.etSearch);
+        scrollVideos = view.findViewById(R.id.scrollVideos);
+        frameUsers = view.findViewById(R.id.frameUsers);
+        tvNoData = view.findViewById(R.id.tvNoData);
+        recyclerSearch = view.findViewById(R.id.recyclerSearch);
+
+        firebaseAuth = FirebaseAuth.getInstance();
+        master = new Master(getContext());
 
         recyclerSearch.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerSearch.addItemDecoration(new EqualSpacingItemDecoration(0, EqualSpacingItemDecoration.VERTICAL));
 
+        etSearch.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
-//        contactsCardView.setOnClickListener(view -> {
-//            Intent intent = new Intent(getActivity(), ContactsActivity.class);
-//            startActivity(intent);
-//        });
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                String query = etSearch.getText().toString();
+                if (query.isEmpty()) {
+                    scrollVideos.setVisibility(View.VISIBLE);
+                    frameUsers.setVisibility(View.GONE);
+                } else {
+                    scrollVideos.setVisibility(View.GONE);
+                    frameUsers.setVisibility(View.VISIBLE);
+                    doSearchQuery(query);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
+
         fetchBanners();
 
         fetchMostLikeVideo();
@@ -73,6 +117,15 @@ public class DiscoverFragment extends Fragment implements DiscoverBannerPresente
 
         tvMostViewedSeeMore.setOnClickListener(this);
         tvMostLikedSeeMore.setOnClickListener(this);
+    }
+
+    private void doSearchQuery(String query) {
+        SearchPresenter searchPresenter = new SearchPresenter(getContext(), DiscoverFragment.this);
+        if (firebaseAuth.getCurrentUser() == null) {
+            searchPresenter.fetchSearchQuery("", 0, query);
+        } else {
+            searchPresenter.fetchSearchQuery(master.getId(), 0, query);
+        }
     }
 
     private void fetchMostLikeVideo() {
@@ -104,9 +157,9 @@ public class DiscoverFragment extends Fragment implements DiscoverBannerPresente
         trendingNowRecyclerView.setHasFixedSize(true);
 
         List<TrendingNowModel> trendingNowModelArrayList = new ArrayList<>();
-        trendingNowModelArrayList.add(new TrendingNowModel(R.drawable.dancing, "#dancing", "10K Videos"));
-        trendingNowModelArrayList.add(new TrendingNowModel(R.drawable.singing, "#singing", "20K Videos"));
-        trendingNowModelArrayList.add(new TrendingNowModel(R.drawable.sports, "#sport", "25k Videos"));
+//        trendingNowModelArrayList.add(new TrendingNowModel(R.drawable.dancing, "#dancing", "10K Videos"));
+//        trendingNowModelArrayList.add(new TrendingNowModel(R.drawable.singing, "#singing", "20K Videos"));
+//        trendingNowModelArrayList.add(new TrendingNowModel(R.drawable.sports, "#sport", "25k Videos"));
         trendingNowModelArrayList.add(new TrendingNowModel(R.drawable.technology, "#technology", "50K Videos"));
         trendingNowModelArrayList.add(new TrendingNowModel(R.drawable.comedy, "#comedy", "75K Videos"));
         trendingNowModelArrayList.add(new TrendingNowModel(R.drawable.covid, "#corona", "50K Videos"));
@@ -207,5 +260,24 @@ public class DiscoverFragment extends Fragment implements DiscoverBannerPresente
             Intent intent = new Intent(getActivity(), MostLikedActivity.class);
             getContext().startActivity(intent);
         }
+    }
+
+    @Override
+    public void searchSuccess(List<SearchResponse> searchResponseList) {
+        recyclerSearch.setLayoutManager(new LinearLayoutManager(getContext()));
+        SearchAdapter searchAdapter = new SearchAdapter(getContext(), searchResponseList);
+        searchAdapter.notifyDataSetChanged();
+        recyclerSearch.setAdapter(searchAdapter);
+        if (searchResponseList.size() == 0) {
+            tvNoData.setVisibility(View.VISIBLE);
+        } else {
+            tvNoData.setVisibility(View.GONE);
+        }
+
+    }
+
+    @Override
+    public void searchFailed(String error) {
+        tvNoData.setVisibility(View.VISIBLE);
     }
 }

@@ -50,7 +50,7 @@ public class HashtagAdapter extends RecyclerView.Adapter<HashtagAdapter.ViewHold
             public void onClick(View view) {
                 Master master = new Master(context);
                 Intent intent = new Intent(context, PlayerActivity.class);
-                intent.putExtra("video_type", "liked");
+                intent.putExtra("video_type", "hashtag");
                 intent.putExtra("pos", position+"");
                 intent.putExtra("user_id", master.getId());
                 context.startActivity(intent);

@@ -195,7 +195,6 @@ public class PublicProfileActivity extends AppCompatActivity implements View.OnC
         videoPager.setAdapter(publicProfilePagerAdapter);
         videoTab.setupWithViewPager(videoPager);
         Objects.requireNonNull(videoTab.getTabAt(0)).setIcon(R.drawable.ic_dd_public_videos_inactive);
-
     }
 
     @Override

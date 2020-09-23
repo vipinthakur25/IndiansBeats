@@ -35,6 +35,7 @@ public class SearchPresenter {
         call.enqueue(new Callback<Search>() {
             @Override
             public void onResponse(Call<Search> call, Response<Search> response) {
+                Log.e(TAG, "onResponse: "+response.code());
                 if (response.code() == 200) {
                     Search search = response.body();
                     List<SearchResponse> searchResponseList = new ArrayList<>(search.getSearchResponses());
